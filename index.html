@@ -1,6 +1,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#DCEBFA">
+<meta property="og:title" content="운세전 — 사주로 겨루는 오행 디펜스">
+<meta property="og:description" content="내 사주가 영웅이 되어 오행 군대를 이끈다. 친구와 점수를 겨루고 기운을 나누자.">
+<meta name="description" content="내 사주가 영웅이 되어 오행 군대를 이끈다. 친구와 점수를 겨루고 기운을 나누자.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="운세전">
@@ -29,7 +32,7 @@
   .tag{color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)}
   .ctrl{display:flex;gap:6px}
   .ctrl button{padding:6px 12px;font-size:13px;font-family:var(--mono);min-width:44px}
-  .stage{position:relative;aspect-ratio:660/560;background:var(--ink2);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .stage{position:relative;aspect-ratio:1/1;background:var(--ink2);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
   canvas{display:block;width:100%;height:100%;touch-action:none;cursor:pointer}
   .appframe{width:100%;max-width:480px;height:100dvh;margin:0 auto;display:flex;flex-direction:column;background:#DCEBFA;box-shadow:0 0 0 1px var(--line),0 20px 60px rgba(42,80,140,.18);overflow:hidden}
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;background:#fff;border-bottom:1px solid var(--line)}
@@ -194,9 +197,11 @@
     body.ingame{overflow:hidden;height:100dvh}
     .app{padding:6px 8px 0;gap:6px;height:100dvh;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}
     .app>header{flex:none}
-    .app>.stage{flex:none;width:min(100%,calc((100dvh - 300px) * 0.8485));margin:0 auto;aspect-ratio:560/660}
+    .app>.stage{flex:none;width:min(100%,calc(100dvh - 268px));margin:0 auto;aspect-ratio:1/1}
     .app>.panel{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;overflow:hidden}
-    .panel>.stats{flex:none} .panel>.luck{flex:none;padding:6px 10px} .luck .hint{display:none} .luck .row{font-size:11px} .bar{height:6px;margin-top:4px}
+    .panel>.stats{flex:none} .panel>.luck{flex:none;padding:4px 10px} .luck .hint{display:none} .luck .row{font-size:11px} .bar{height:5px;margin-top:3px}
+    .stats{gap:4px} .stat{padding:3px 2px;border-radius:10px} .stat span{font-size:9.5px} .stat b{font-size:15px;line-height:1.15}
+    .mtabs{padding:0} .mtabs button{min-width:46px;padding:7px 4px;font-size:12px}
     .panel .mtabs{flex:none;padding:0}
     .panel>.sec,.panel>details.sec{position:fixed;left:8px;right:8px;bottom:calc(74px + env(safe-area-inset-bottom));max-height:54dvh;overflow:auto;z-index:6;background:#fff;border-radius:14px;box-shadow:0 -8px 30px rgba(20,40,80,.28);display:none;padding:10px 12px}
     .panel>.sec.open,.panel>details.sec.open{display:block!important}
@@ -517,7 +522,7 @@
   </header>
 
   <div class="stage">
-    <canvas id="c" width="660" height="560" aria-label="게임 보드"></canvas>
+    <canvas id="c" width="540" height="540" aria-label="게임 보드"></canvas>
     <div class="overlay" id="startOverlay">
       <div class="appframe">
         <div class="topbar"><div class="logo"><span class="seal">운</span><span class="ttl">운세<em>전</em></span><small>사주로 겨루는 오행 디펜스</small></div><div class="tb-right"><button class="tbi" id="tbAttend"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/><path d="M9 14h2M13 14h2"/></svg><b id="tbAttendN">1</b>일</button><button class="tbi" id="tbFortune"><svg viewBox="0 0 24 24"><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/><circle cx="12" cy="12" r="4"/></svg><b id="tbFortuneN">?</b></button></div></div>
@@ -622,7 +627,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v8.2</span> · 사주로 겨루는 오행 디펜스</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v8.3</span> · 사주로 겨루는 오행 디펜스</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -878,10 +883,10 @@ const MODS={shield:{k:'방패',color:'#C8CCD6'},split:{k:'분열',color:'#A86BE0
 const GRADE = ['일반','고급','희귀','영웅','전설','신화','태극'];
 const GCOL  = ['#3E5A2E','#5CBF7A','#4C8DE0','#A86BE0','#F2A23A','#F25C5C','#3DD6D0'];
 const PORTRAIT=matchMedia('(orientation: portrait)').matches&&window.innerWidth<880;
-const COLS=5, ROWS=5, SLOT=72, GAP=6;
-const W=PORTRAIT?560:660, H=PORTRAIT?660:560;
+const COLS=5, ROWS=5, SLOT=88, GAP=6;
+const W=540, H=540;
 const BX=(W-(COLS*SLOT+(COLS-1)*GAP))/2, BY=(H-(ROWS*SLOT+(ROWS-1)*GAP))/2;
-const PATH=PORTRAIT?[[64,104],[496,104],[496,556],[64,556]]:[[104,64],[556,64],[556,496],[104,496]];
+const PATH=[[16,16],[524,16],[524,524],[16,524]];
 const SEG=[]; let PERIM=0;
 for(let i=0;i<4;i++){const a=PATH[i],b=PATH[(i+1)%4];const len=Math.hypot(b[0]-a[0],b[1]-a[1]);SEG.push({a,b,len,start:PERIM});PERIM+=len;}
 const BASE_WAVE=22, LIVES=20;
@@ -955,6 +960,15 @@ const BGM={on:true,playing:false,next:0,step:0,timer:null,gain:null,
         [74,0,74,76,77,0,76,74],[72,0,72,74,76,0,74,72],[70,0,70,72,74,0,72,70],[69,0,72,0,76,0,74,72],
         [74,0,74,76,77,0,76,74],[79,0,77,76,77,0,76,74],[72,74,76,77,79,77,76,74],[69,0,0,0,62,0,0,0]],
   chordsD:[[50,53,57],[46,50,53],[48,52,55],[45,49,52]], // Dm · Bb · C · A
+  // 전투 v3: G장조 밝은 훅 — 짧은 후렴 반복 + 16분 아르페지오 + 킥 4비트/클랩
+  melE:[[67,0,71,0,74,74,71,69],[67,0,71,0,74,76,74,71],[69,0,72,0,76,76,72,69],[74,72,71,69,67,0,71,0],
+        [67,0,71,0,74,74,71,69],[67,0,71,0,74,76,74,71],[69,0,72,0,76,76,72,69],[74,76,79,0,76,0,74,0],
+        [79,0,76,74,76,0,74,71],[79,0,76,74,76,79,81,0],[76,0,72,69,72,0,69,67],[74,0,71,0,69,71,74,76],
+        [79,0,76,74,76,0,74,71],[79,0,76,74,76,79,81,0],[76,79,81,79,76,74,72,71],[74,0,71,0,67,0,0,0]],
+  chordsE:[[55,59,62],[52,55,59],[48,52,55],[50,54,57]], // G · Em · C · D
+  bright(m,t,vol,dur){const c=AU.ctx;const g=c.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.01);g.gain.setValueAtTime(vol,t+dur*0.5);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);const lp=c.createBiquadFilter();lp.type='lowpass';lp.Q.value=2;lp.frequency.setValueAtTime(3800,t);lp.frequency.exponentialRampToValueAtTime(1400,t+dur);g.connect(lp);lp.connect(this.gain);
+    for(const [tp,det,mul,v] of [['square',-5,1,1],['sawtooth',6,1,0.7],['triangle',0,2,0.5]]){const o=c.createOscillator();o.type=tp;o.frequency.value=this.f(m)*mul;o.detune.value=det;const g2=c.createGain();g2.gain.value=v;o.connect(g2);g2.connect(g);o.start(t);o.stop(t+dur+0.05);}},
+  clap(t){const c=AU.ctx;for(let k=0;k<3;k++){const n=c.createBufferSource();const buf=c.createBuffer(1,c.sampleRate*0.06,c.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);n.buffer=buf;const g=c.createGain();g.gain.value=0.07;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=2200;f.Q.value=1;n.connect(f);f.connect(g);g.connect(this.gain);n.start(t+k*0.012);}},
   lead(m,t,vol,dur,oct){const c=AU.ctx;const f0=this.f(m)*(oct?2:1);const g=c.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.012);g.gain.setValueAtTime(vol,t+dur*0.6);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
     const lp=c.createBiquadFilter();lp.type='lowpass';lp.Q.value=4;lp.frequency.setValueAtTime(2600,t);lp.frequency.exponentialRampToValueAtTime(900,t+dur);g.connect(lp);lp.connect(this.gain);
     for(const det of [-6,6]){const o=c.createOscillator();o.type='sawtooth';o.frequency.value=f0;o.detune.value=det;o.connect(g);o.start(t);o.stop(t+dur+0.05);}
@@ -979,16 +993,25 @@ const BGM={on:true,playing:false,next:0,step:0,timer:null,gain:null,
   want:'main',
   tick(){const c=AU.ctx;while(this.next<c.currentTime+0.6){const i=this.step%128;const bar=Math.floor(i/8),b8=i%8;const t=this.next;
       if(b8===0&&this.want!==this.mode){this.mode=this.want;this.step=0;}
-      const boss=this.mode==='boss',bat=this.mode==='battle';const bpm=boss?158:bat?142:92;const e8=60/bpm/2;
-      if(bat||boss){
-        const m=this.melD[bar][b8];if(m){this.lead(m,t,boss?0.06:0.055,e8*(b8%2?1.4:2.1));if(boss)this.lead(m,t,0.025,e8*1.2,true);}
+      const boss=this.mode==='boss',bat=this.mode==='battle';const bpm=boss?158:bat?150:92;const e8=60/bpm/2;
+      if(boss){
+        const m=this.melD[bar][b8];if(m){this.lead(m,t,0.06,e8*(b8%2?1.4:2.1));this.lead(m,t,0.025,e8*1.2,true);}
         const ch=this.chordsD[bar%4];const root=ch[0]-12;
         this.bass(b8===7?root+7:b8===3?root+12:root,t,b8%2?0.07:0.09,e8*0.85);
         if(b8===0||b8===4)this.stab(ch,t,e8*1.6);if(bar%2===1&&b8===6)this.stab(ch.map(x=>x+12),t,e8*0.9);
         const fill=bar%4===3&&b8>=5;
-        if(b8===0||b8===4||(boss&&(b8===2||b8===6)))this.taiko(t,boss?0.2:0.17);if(b8===3)this.taiko(t+e8*0.5,0.1);
+        if(b8===0||b8===4||b8===2||b8===6)this.taiko(t,0.2);if(b8===3)this.taiko(t+e8*0.5,0.1);
         if(b8===2||b8===6||fill)this.snare(t,fill?0.09:0.07);
         this.perc(t,'h');this.perc(t+e8*0.5,'h');
+      }else if(bat){
+        const m=this.melE[bar][b8];if(m)this.bright(m,t,0.05,e8*(b8%2?1.3:1.9));
+        const ch=this.chordsE[bar%4];const root=ch[0]-12;
+        // 16분 아르페지오 (코드 톤 순환) + 옥타브 베이스
+        const arp=[ch[0],ch[1],ch[2],ch[1]+12];this.pluck(arp[b8%4]+12,t,0.03,e8*0.5);this.pluck(arp[(b8+2)%4]+12,t+e8*0.5,0.024,e8*0.5);
+        this.bass(b8%2?root+12:root,t,b8%2?0.06:0.085,e8*0.8);if(b8===7)this.bass(root+7,t+e8*0.5,0.06,e8*0.4);
+        if(b8%2===0)this.perc(t,'k');if(b8===2||b8===6)this.clap(t);if(bar%4===3&&b8===7){this.clap(t+e8*0.5);this.snare(t+e8*0.75,0.06);}
+        this.perc(t+e8*0.5,'h');if(b8===7&&bar%2===1)this.perc(t,'s');
+        if(b8===0&&bar%4===0)this.stab(ch.map(x=>x+12),t,e8*3);
       }else{
         const m=this.mel[bar][b8];if(m)this.pluck(m,t,0.075,e8*(b8%2?1.6:2.4));
         const ch=this.chords[bar%4];if(b8===0)this.pad(ch,t,e8*8);
@@ -2613,7 +2636,7 @@ function drawCharacter(u){
   const sh=sheetFor(u);if(sh){drawSheetUnit(u,sh);return;}
   const tier=TIER(u.grade);const swing=SWING<0?-1:SWING>0.66?2:SWING>0.25?1:0;const phase=tier===2||u.hero?((S.time*4)|0)%4:0;
   const key=`${u.hero?'h'+(u.gender||'m')+curSkin().id:'c'}-${u.el}-${tier}-${BLINK?1:0}-${HURT?1:0}-${swing}-${phase}`;
-  const R=u.hero?78:tier===2?62:SPR_R;const D=u.hero?42:tier===2?38:tier===1?33:29;const img=sprite(key,()=>{SWING=[-0.5,0,0.5,1][swing+1];PHASE=phase;if(u.hero)drawHero(u.el,u.gender||'m',tier);else drawCreature(u.el,tier);},R);
+  const R=u.hero?78:tier===2?62:SPR_R;const D=u.hero?52:tier===2?47:tier===1?41:36;const img=sprite(key,()=>{SWING=[-0.5,0,0.5,1][swing+1];PHASE=phase;if(u.hero)drawHero(u.el,u.gender||'m',tier);else drawCreature(u.el,tier);},R);
   ctx.drawImage(img,-D,-D,D*2,D*2);
 }
 function drawFrame(g,sel){
@@ -2662,14 +2685,14 @@ function paperBg(){
   for(let i=0;i<220;i++){const x=r()*W,y=r()*H;g.strokeStyle=PAL[3];g.lineWidth=1.2;g.beginPath();g.moveTo(x,y);g.lineTo(x-2,y-5);g.moveTo(x,y);g.lineTo(x+3,y-4);g.stroke();}
   // 트랙: 모래길 (테두리 진한 흙색 → 밝은 모래)
   const track=()=>{g.beginPath();g.moveTo(...PATH[0]);for(let i=1;i<4;i++)g.lineTo(...PATH[i]);g.closePath();};
-  g.lineJoin='round';track();g.strokeStyle='rgba(0,0,0,.12)';g.lineWidth=50;g.stroke();
-  track();g.strokeStyle='#B98B55';g.lineWidth=44;g.stroke();
-  track();g.strokeStyle='#F0D9A6';g.lineWidth=38;g.stroke();
-  for(let i=0;i<260;i++){const t=r()*PERIM;const [x,y]=posOnPath(t);const ox=(r()-0.5)*26,oy=(r()-0.5)*26;g.fillStyle=`rgba(185,139,85,${0.15+r()*0.25})`;g.beginPath();g.arc(x+ox,y+oy,1+r()*1.8,0,Math.PI*2);g.fill();}
+  g.lineJoin='round';track();g.strokeStyle='rgba(0,0,0,.12)';g.lineWidth=34;g.stroke();
+  track();g.strokeStyle='#B98B55';g.lineWidth=30;g.stroke();
+  track();g.strokeStyle='#F0D9A6';g.lineWidth=26;g.stroke();
+  for(let i=0;i<260;i++){const t=r()*PERIM;const [x,y]=posOnPath(t);const ox=(r()-0.5)*18,oy=(r()-0.5)*18;g.fillStyle=`rgba(185,139,85,${0.15+r()*0.25})`;g.beginPath();g.arc(x+ox,y+oy,1+r()*1.8,0,Math.PI*2);g.fill();}
   // 트랙 방향 화살표
   for(let k=0;k<12;k++){const t=(k+0.5)*PERIM/12;const [x,y]=posOnPath(t);const [x2,y2]=posOnPath((t+6)%PERIM);const a=Math.atan2(y2-y,x2-x);g.save();g.translate(x,y);g.rotate(a);g.fillStyle='rgba(255,255,255,.55)';g.beginPath();g.moveTo(6,0);g.lineTo(-4,-6);g.lineTo(-1,0);g.lineTo(-4,6);g.closePath();g.fill();g.restore();}
   // 보드 나무판
-  const bx=BX-14,by=BY-14,bw=COLS*SLOT+(COLS-1)*GAP+28,bh=ROWS*SLOT+(ROWS-1)*GAP+28;
+  const bx=BX-9,by=BY-9,bw=COLS*SLOT+(COLS-1)*GAP+18,bh=ROWS*SLOT+(ROWS-1)*GAP+18;
   g.fillStyle='rgba(0,0,0,.14)';rrOn(g,bx+3,by+6,bw,bh,16);g.fill();
   g.fillStyle='#C9955C';rrOn(g,bx,by,bw,bh,16);g.fill();g.strokeStyle='#8E5E30';g.lineWidth=3;g.stroke();
   g.fillStyle='#DDAE72';rrOn(g,bx+5,by+5,bw-10,bh-10,12);g.fill();
@@ -2684,7 +2707,7 @@ function draw(){
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,H);
   ctx.drawImage(paperBg(),0,0);
   if(S.shake>0){const m=S.shake*12;ctx.translate((Math.random()-0.5)*m,(Math.random()-0.5)*m);}
-  if(S.waveEl>=0){ctx.strokeStyle=EL[S.waveEl].color+'1A';ctx.lineWidth=38;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(...PATH[0]);for(let i=1;i<4;i++)ctx.lineTo(...PATH[i]);ctx.closePath();ctx.stroke();}
+  if(S.waveEl>=0){ctx.strokeStyle=EL[S.waveEl].color+'1A';ctx.lineWidth=26;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(...PATH[0]);for(let i=1;i<4;i++)ctx.lineTo(...PATH[i]);ctx.closePath();ctx.stroke();}
   // 배경 입자 (매화 꽃잎은 항상, 오행 입자는 웨이브 오행)
   for(const p of S.amb){const a=Math.min(1,p.life,(8-p.life))*0.45;ctx.globalAlpha=Math.max(0,a);
     if(p.petal){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(S.time*1.5+p.ph);ctx.fillStyle='#F0A0A8';ctx.beginPath();ctx.ellipse(0,0,p.r*1.5,p.r*0.9,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#F7C9CE';ctx.beginPath();ctx.ellipse(-p.r*0.4,-p.r*0.2,p.r*0.6,p.r*0.35,0,0,Math.PI*2);ctx.fill();ctx.restore();continue;}
@@ -2702,7 +2725,7 @@ function draw(){
   // HUD: 적 수 · 보드 화력
   if(S.running){let dps=0;S.units.forEach((u,i)=>{if(u&&!(u.silence>0))dps+=unitDmg(u)/unitRate(u,i);});const ht=`적 ${S.enemies.filter(e=>e.d>=0).length} · 화력 ${Math.round(dps).toLocaleString()}`;ctx.font="700 11px 'Noto Sans KR'";const hw=ctx.measureText(ht).width+20;ctx.fillStyle='rgba(255,255,255,.9)';rr(W-12-hw,11,hw,24,12);ctx.fill();ctx.strokeStyle='rgba(60,45,20,.15)';ctx.lineWidth=1;ctx.stroke();ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillStyle='#223047';ctx.fillText(ht,W-22,23);ctx.textBaseline='alphabetic';ctx.textAlign='center';}
   // 극파 지속 효과: 트랙 색조
-  if(S.mud>0){ctx.strokeStyle='rgba(201,162,74,.35)';ctx.lineWidth=40;ctx.beginPath();ctx.moveTo(...PATH[0]);for(let i=1;i<4;i++)ctx.lineTo(...PATH[i]);ctx.closePath();ctx.stroke();}
+  if(S.mud>0){ctx.strokeStyle='rgba(201,162,74,.35)';ctx.lineWidth=28;ctx.beginPath();ctx.moveTo(...PATH[0]);for(let i=1;i<4;i++)ctx.lineTo(...PATH[i]);ctx.closePath();ctx.stroke();}
   if(S.steam>0){ctx.fillStyle=`rgba(227,85,59,${0.05+0.04*Math.sin(S.time*6)})`;ctx.fillRect(0,0,W,H);}
   const dragU=S.drag&&S.drag.moved?S.units[S.drag.from]:null;
   for(let i=0;i<COLS*ROWS;i++){const [x,y]=slotXY(i);
@@ -2972,7 +2995,7 @@ function drawUnit(u,x,y,sel,alpha,form){
   const p=u.pop||1;ctx.save();ctx.translate(x,y);if(alpha)ctx.globalAlpha=alpha;
   BLINK=((S.time*1.1+(u.id||0)*0.37)%4)<0.12;HURT=u.hurt>0;
   let sw=0;if(u.anim==='attack'){const at=u.animT;sw=at<0.08?-0.5:at<0.22?1:Math.max(0,1-(at-0.22)/0.23);}SWING=sw;
-  const t=TIER(u.grade);const c=GCOL[u.grade-1];const FY=22;const rx=u.hero?22:[14,17,20][t],ry=rx*0.36;const ph=(u.id||0)*1.7;
+  const t=TIER(u.grade);const c=GCOL[u.grade-1];const FY=27;const rx=u.hero?27:[17,21,25][t],ry=rx*0.36;const ph=(u.id||0)*1.7;
   // 발판 (등급색 타원)
   ctx.save();ctx.translate(0,FY);
   const g=ctx.createRadialGradient(0,0,2,0,0,rx);g.addColorStop(0,c+'88');g.addColorStop(1,'rgba(34,48,71,.45)');
