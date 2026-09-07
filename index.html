@@ -245,7 +245,7 @@
   .htab.on{background:#2F7BE8;color:#fff;border-color:#2F7BE8}
   .hpane{margin-top:0}
   #revealOverlay{visibility:visible;position:fixed;inset:0;z-index:10}
-  #welcome,#attModal,#cardModal,#dexModal{visibility:visible}
+  #welcome,#attModal,#cardModal,#dexModal,#unitModal{visibility:visible}
   #splash{position:fixed;inset:0;z-index:50;background:linear-gradient(180deg,#DCEBFA,#F6F1E4);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .45s;visibility:visible}
   #splash.off{opacity:0;pointer-events:none}
   #splash::after{content:'';position:absolute;left:0;right:0;bottom:0;height:30%;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 200' preserveAspectRatio='xMidYMax slice'><path d='M0 200V120l70-40 60 28 80-52 70 36 60-30 90 44 70-40 80 30 60-24 70 34 60-20 60 26 70-18v106z' fill='%23C9DDF0'/><path d='M0 200v-56l90-24 70 20 80-30 90 24 60-16 80 26 90-22 80 20 70-14 80 24 60-10 50 14v44z' fill='%23A9C4E3'/><path d='M370 200v-46h160v46z' fill='%232F4A7A'/><path d='M356 156q94-30 188 0l-10 10q-84-20-168 0z' fill='%231B2C4E'/><path d='M352 158c-10-6-14-16-10-24 8 6 12 12 10 24zM548 158c10-6 14-16 10-24-8 6-12 12-10 24z' fill='%231B2C4E'/><rect x='404' y='164' width='18' height='30' fill='%23FFD27A'/><rect x='478' y='164' width='18' height='30' fill='%23FFD27A'/><rect x='438' y='168' width='24' height='32' fill='%237A4A22'/></svg>") no-repeat center bottom/cover;opacity:.95;z-index:-1}
@@ -508,6 +508,9 @@
   .ach.on{background:#fff;color:var(--navy);box-shadow:0 2px 0 #E3D9C6} .ach.on b{background:linear-gradient(160deg,#FFC54A,#E08A00);box-shadow:0 2px 0 #B86D00,inset 0 0 0 3px rgba(255,255,255,.35)}
   /* 더보기 */
   html.bigtext .appframe,html.bigtext .app,html.bigtext .modal,html.bigtext .sheet{zoom:1.12}
+  .nextgoal{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;text-align:left} .nextgoal h4{margin:0 0 2px;font-size:12px;color:var(--muted);font-weight:700} .ng{display:flex;align-items:center;gap:8px;background:#FBF7EE;border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:12.5px;color:var(--text);line-height:1.35} .ng i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1px solid var(--line);font-size:12px;flex:none} .ng b{color:var(--navy)} .ng small{color:var(--muted);margin-left:auto;white-space:nowrap;font-size:11px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px} .chips .chip{padding:5px 10px;font-size:11px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--navy);box-shadow:none;font-weight:700} .chips .chip small{color:var(--muted);font-weight:500;margin-left:3px}
+  .tabbar button:active{transform:scale(.93)} .seg button:active,.chip:active,.todo button:active,.stat:active{transform:scale(.96)} .sw,.sw::after,.sw::before{transition:background-color .2s,transform .2s,box-shadow .2s} .ucard{display:flex;flex-direction:column;gap:8px} .ucard .pcard{display:flex;gap:10px;align-items:center} .ucard .grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:12px;color:var(--muted)} .ucard .grid b{color:var(--text)}
   .srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #F0E9DA} .srow:last-child{border-bottom:none} .srow>span{font-size:14px;color:var(--navy);font-weight:700}
   .sw{width:50px;height:30px;border-radius:999px;background:#D9CFBC;box-shadow:inset 0 2px 4px rgba(0,0,0,.12);padding:0;position:relative;transform:none!important;flex:none}
   .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:left .18s}
@@ -590,7 +593,8 @@
           <section class="scr" id="scr-social">
             <div class="code-card"><div class="cc-l"><span>내 일주 코드</span><b id="myCode">-</b><small>친구가 이 코드를 넣으면 오늘 하루 내 오행이 친구를 돕는다</small></div><div class="cc-b"><button class="sm" id="copyCode">복사</button><button class="ghost sm" id="copyInvite">초대 문구</button></div></div>
             <div class="board" id="friendBox"><h3>친구 기운 받기 <span id="frCount">0/3</span></h3>
-              <div class="submit"><input id="friendIn" maxlength="12" placeholder="친구 코드 (예: 경진-ab12)"><button class="sm" id="friendAdd">받기</button></div>
+              <div class="submit"><input id="friendIn" maxlength="12" placeholder="친구 코드 (예: 경진-ab12)" autocapitalize="off" autocomplete="off"><button class="ghost sm" id="friendPaste">붙여넣기</button><button class="sm" id="friendAdd">받기</button></div>
+              <div class="note" id="friendMsg" style="min-height:16px;margin-top:4px"></div><div class="chips" id="friendRecent"></div>
               <div id="friendList"></div>
             </div>
             <div class="board" id="pane-rec"><h3>내 기록</h3><div class="stats" id="recGrid"></div><div class="note" id="recNote" style="margin-top:6px"></div></div>
@@ -645,7 +649,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.1</span> · 사주로 겨루는 오행 디펜스</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.2</span> · 사주로 겨루는 오행 디펜스</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -654,6 +658,7 @@
       </div>
     </div>
     <div id="splash" aria-hidden="true"><div class="logo">운세전</div><div class="sub">사주로 겨루는 오행 디펜스</div><div class="dots"><i style="background:#3FA66B"></i><i style="background:#E3553B;animation-delay:.15s"></i><i style="background:#C9A24A;animation-delay:.3s"></i><i style="background:#C8CCD6;animation-delay:.45s"></i><i style="background:#3D7FD9;animation-delay:.6s"></i></div></div>
+    <div class="modal" id="unitModal" hidden style="z-index:27"><div class="mbox ucard"><div id="unitCardBody"></div><div class="note" id="unitCardHint">끌어서 옮기거나 겹쳐 합친다. 길게 누르면 이 카드.</div><button class="ghost sm" id="unitCardClose" style="width:100%">닫기</button></div></div>
     <div class="modal" id="dexModal" hidden style="z-index:27"><div class="mbox" style="text-align:center;gap:8px"><canvas id="dexBig" width="480" height="480" style="width:220px;height:220px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#fff,#EEF3F8);border:3px solid #FFD27A;box-shadow:0 0 0 6px rgba(255,210,122,.25);margin:0 auto"></canvas><h3 id="dexBigName" style="margin:0"></h3><div class="note" id="dexBigDesc" style="text-align:left"></div><div style="display:flex;gap:8px"><button class="ghost sm" id="dexPose" style="flex:1">⚔ 공격 포즈</button><button class="ghost sm" id="dexClose" style="flex:1">닫기</button></div></div></div>
     <div class="modal" id="attModal" hidden style="z-index:26"><div class="mbox"><h3 style="margin:0">출석 보상</h3><div class="stats" id="attGrid" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div><div class="note" id="attNote"></div><button class="ghost sm" id="attClose" style="width:100%">닫기</button></div></div>
     <div class="modal" id="welcome" hidden style="z-index:25"><div class="mbox" style="text-align:center;gap:10px"><div style="font-family:'Jua','Noto Sans KR',sans-serif;font-size:34px;color:#2F7BE8">운세전</div><div class="note" style="font-size:14px;color:#223047">내 사주가 영웅이 되어 오행 군대를 이끈다.<br>친구와 점수를 겨루고, 기운을 나눈다.</div>
@@ -695,6 +700,7 @@
         <p id="endMsg"></p>
         <div class="result" id="endResult"></div>
         <canvas id="endChart" width="680" height="220" style="width:100%;height:auto;display:block;margin:-6px 0 12px;border-radius:10px;background:#F4F8FF"></canvas>
+        <div class="nextgoal" id="endNext"></div>
         <div class="submit" id="submitBox" hidden>
           <input id="nameIn" maxlength="12" placeholder="닉네임 (12자)" aria-label="닉네임">
           <button class="ghost sm" id="submitBtn">순위 등록</button>
@@ -888,15 +894,17 @@ function renderAch(){const n=Object.keys(ACHS).length;$('achCount').textContent=
 let RNG=Math.random,rndN=0;const rnd=()=>{rndN++;return RNG();};
 // 첫 판 힌트
 const TIPS=[
-  {id:'summon',when:S=>S.summons<3&&S.units.filter(Boolean).length<4,text:'소환 버튼(또는 Space)으로 유닛을 뽑는다. 오행도 등급도 운빨.'},
-  {id:'merge',when:S=>mergePairs().length>0,text:'같은 오행·같은 등급이 깜빡인다. 겹치면 한 등급 위로 승급.'},
-  {id:'gen',when:S=>{const u=S.units.filter(Boolean);return u.some(a=>u.some(b=>a!==b&&a.grade===b.grade&&GEN(a.el)===b.el));},text:'상생 짝(목→화→토→금→수→목)을 겹치면 융합체. 공격력 +35%.'},
-  {id:'clash',when:S=>S.units.filter(Boolean).length>=5,text:'상극 짝을 겹치면 둘 다 소멸하며 극파가 터진다. 위기 때 아껴 쓰자.'},
-  {id:'luck',when:S=>S.luck>=50,text:'운 게이지 50 이상. 행운 상점에서 다음 소환 오행을 지정할 수 있다.'},
-  {id:'form',when:S=>S.wave>=3,text:'가로·세로·대각선으로 상생 순서를 이으면 오행 진. 겹치면 연환, 세 방향 5칸이면 오행 만다라.'},
-  {id:'wave',when:S=>S.wave>=2,text:'다음 웨이브 주력 오행이 예고된다. 그 오행을 극하는 유닛이 1.6배.'},
+  {id:'summon',when:S=>S.summons<3&&S.units.filter(Boolean).length<4,text:'소환 버튼으로 유닛을 뽑는다. 오행도 등급도 운빨.'},
+  {id:'drag',when:S=>S.units.filter(Boolean).length>=2&&S.summons>=2,text:'유닛을 끌어 자리를 옮긴다. 길게 누르면 상세 카드.'},
+  {id:'merge',when:S=>mergePairs().length>0,text:'흰 링이 도는 둘은 겹치면 한 등급 승급. 합치기 버튼이 한 번에 처리한다.'},
+  {id:'gen',when:S=>{const u=S.units.filter(Boolean);return u.some(a=>u.some(b=>a!==b&&a.grade===b.grade&&GEN(a.el)===b.el));},text:'상생 짝(木→火→土→金→水)을 겹치면 융합체. 공격력 +35%.'},
+  {id:'wave',when:S=>S.wave>=2,text:'다음 웨이브 오행이 예고된다. 그 오행을 극하는 유닛이 1.6배.'},
+  {id:'form',when:S=>S.wave>=3,text:'가로·세로·대각선으로 상생 순서를 이으면 오행 진. 이어질수록 연환.'},
+  {id:'clash',when:S=>S.units.filter(Boolean).length>=6,text:'상극 짝을 겹치면 둘 다 사라지며 극파가 터진다. 위기용.'},
+  {id:'luck',when:S=>S.luck>=50,text:'운 게이지 50. 행운 상점에서 다음 소환 오행을 고를 수 있다.'},
+  {id:'skill',when:S=>S.wave>=4,text:'아래 도화·역마 스킬은 준비되면 빛난다. 웨이브가 몰릴 때 써라.'},
 ];
-let tipShown={},tip=null;
+let tipShown={},tip=null;function loadTips(){try{return JSON.parse(localStorage.getItem('ubz_tips'))||{};}catch(_){return {};}}function saveTips(){try{localStorage.setItem('ubz_tips',JSON.stringify(tipShown));}catch(_){}}
 const MODS={shield:{k:'방패',color:'#C8CCD6'},split:{k:'분열',color:'#A86BE0'},swift:{k:'질주',color:'#F2A23A'}};
 const GRADE = ['일반','고급','희귀','영웅','전설','신화','태극'];
 const GCOL  = ['#3E5A2E','#5CBF7A','#4C8DE0','#A86BE0','#F2A23A','#F25C5C','#3DD6D0'];
@@ -1203,13 +1211,16 @@ function friendBuffOf(fel){if(!SAJU)return {k:'응원',t:'공격력 +3%',power:0
   if(GEN(me)===fel)return {k:'설기',t:'처치 골드 +5%',gold:0.05};
   return {k:'재성',t:'보스 피해 +6%',boss:0.06};}
 function friendTotal(){const tot={power:0,luck:0,clash:0,gold:0,boss:0};for(const f of FR.list){const b=friendBuffOf(f.el);for(const k in tot)tot[k]+=b[k]||0;}return tot;}
-function addFriend(){const p=parseCode($('friendIn').value);const msg=$('friendList');
-  if(!p){log('코드 형식이 다르다. 예: 경진-ab12','bad');$('friendIn').focus();return;}
-  if(p.code===myCode()){log('내 코드는 넣을 수 없다.','bad');return;}
-  if(FR.list.some(f=>f.code===p.code)){log('이미 받은 친구다.','bad');return;}
-  if(FR.list.length>=3){log('오늘은 세 명까지만 받을 수 있다.','bad');return;}
-  FR.list.push(p);saveFriends();$('friendIn').value='';AU.buy();log(`친구 ${p.ilju}의 기운을 받았다: ${friendBuffOf(p.el).t}`,'hi');renderHome();}
-function renderFriends(){$('myCode').textContent=myCode();
+let FRR=[];function loadRecent(){try{FRR=JSON.parse(localStorage.getItem('ubz_frrecent'))||[];}catch(_){FRR=[];}}function saveRecent(){try{localStorage.setItem('ubz_frrecent',JSON.stringify(FRR.slice(0,5)));}catch(_){}}
+function fmsg(t,bad){const m=$('friendMsg');if(!m)return;m.textContent=t;m.style.color=bad?'#C0392B':'var(--good,#2E7D4F)';}
+function addFriend(){const raw=$('friendIn').value;const p=parseCode(raw.trim().toLowerCase().replace(/\s+/g,''));
+  if(!p){fmsg('코드 형식이 다르다. 예: 경진-ab12','bad');$('friendIn').focus();buzz([20,30,20]);return;}
+  if(p.code===myCode()){fmsg('내 코드는 넣을 수 없다.','bad');return;}
+  if(FR.list.some(f=>f.code===p.code)){fmsg('이미 받은 친구다.','bad');return;}
+  if(FR.list.length>=3){fmsg('오늘은 세 명까지만 받을 수 있다.','bad');return;}
+  FR.list.push(p);saveFriends();$('friendIn').value='';AU.buy();buzz(20);FRR=[{code:p.code,ilju:p.ilju},...FRR.filter(f=>f.code!==p.code)].slice(0,5);saveRecent();fmsg(`${p.ilju}의 기운을 받았다 · ${friendBuffOf(p.el).t}`);log(`친구 ${p.ilju}의 기운을 받았다: ${friendBuffOf(p.el).t}`,'hi');renderHome();}
+function renderRecent(){const box=$('friendRecent');if(!box)return;if(!FRR.length)loadRecent();const rest=FRR.filter(f=>!FR.list.some(x=>x.code===f.code));box.innerHTML=rest.length?'<span class="note" style="width:100%">최근 받은 친구</span>'+rest.map(f=>`<button class="chip" data-code="${f.code}">${f.ilju}<small>${f.code}</small></button>`).join(''):'';box.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{$('friendIn').value=b.dataset.code;addFriend();});}
+function renderFriends(){renderRecent();$('myCode').textContent=myCode();
   {const fc=$('frCount');if(fc)fc.textContent=`${FR.list.length}/3`;}
   $('friendList').innerHTML=FR.list.length?FR.list.map((f,i)=>{const b=friendBuffOf(f.el);return `<div class="fcard"><canvas class="fface" data-el="${f.el}" width="88" height="88"></canvas><div class="fm"><b>${f.ilju} ${HERO_STYLE[f.el].job}</b><span style="color:${EL[f.el].color}">${EL[f.el].k} 기운 · ${b.k}</span><small>${b.t}</small></div></div>`;}).join(''):'<span class="note">아직 받은 기운이 없다. 친구 코드를 받아 오늘의 기운을 채워라.</span>';
   $('friendList').querySelectorAll('.fface').forEach(cv2=>{const el=+cv2.dataset.el;drawOn(cv2,()=>{ctx.translate(44,70);ctx.scale(0.82,0.82);BLINK=false;SWING=0;PHASE=0;drawHero(el,'m',1);});});}
@@ -2191,12 +2202,12 @@ function update(dt){
   // 첫 세 판까지 상황별 힌트
   if(S.mode==='tutorial'){if(tutStep<TUT.length-1&&TUT[tutStep].ok(S)){tutStep++;AU.buy();ftext(W/2,H/2-60,'좋아!','#FFB020',true);}
     if(S.wave>=6){S.running=false;S.paused=true;try{localStorage.setItem('ubz_tut','1');}catch(_){}$('winMsg').textContent='안내 판 완료. 이제 자유 모드에서 30웨이브에 도전하라.';$('winOverlay').hidden=false;renderHome();return;}}
-  else if(REC.games<3){if(tip){tip.t-=dt;if(tip.t<=0)tip=null;}
-    else{const t=TIPS.find(x=>!tipShown[x.id]&&x.when(S));if(t){tipShown[t.id]=1;tip={text:t.text,t:8,age:0};}}}
+  else if(REC.games<5){if(tip){tip.t-=dt;if(tip.t<=0)tip=null;}
+    else{const t=TIPS.find(x=>!tipShown[x.id]&&x.when(S));if(t){tipShown[t.id]=1;saveTips();tip={text:t.text,t:8,age:0};}}}
 }
 function gameOver(){
   S.over=true;S.running=false;AU.over();BGM.want='main';
-  if(S.mode==='tutorial'){$('endMsg').textContent='안내 판이 끝났다. 자유 모드에서 다시 도전하라.';$('endResult').innerHTML='';$('submitBox').hidden=true;$('endOverlay').hidden=false;return;}
+  if(S.mode==='tutorial'){$('endMsg').textContent='안내 판이 끝났다. 자유 모드에서 다시 도전하라.';$('endResult').innerHTML='';$('endNext').innerHTML='';$('submitBox').hidden=true;$('endOverlay').hidden=false;return;}
   updateQuests();REC.games++;REC.lastPlay=todayStr();const newW=S.wave>REC.bestWave,newK=S.kills>REC.bestKills,newF=S.fusions>REC.bestFusions;
   REC.bestWave=Math.max(REC.bestWave,S.wave);REC.bestKills=Math.max(REC.bestKills,S.kills);REC.bestFusions=Math.max(REC.bestFusions,S.fusions);REC.mythic+=S.mythic;
   REC.totalKills+=S.kills;REC.totalClashes+=S.clashes;REC.totalUlts+=S.ults;if(S.won)REC.wins++;saveRec();recLine();clearSave();showResume();
@@ -2209,6 +2220,12 @@ function gameOver(){
     +`<div><b>${S.mythic}</b><span>신화</span><small>누적 ${REC.mythic}</small></div><div><b>${S.relics.length}</b><span>유물</span><small>${S.relics.map(id=>RELICS.find(r=>r.id===id).h).join('·')||'-'}</small></div><div><b>${S.ults}</b><span>궁극기</span><small>극파 ${S.clashes}회 · ${REC.games}판째</small></div>`;
   {const q=S.won?'천하가 조용해졌다. 오늘은 발 뻗고 자자.':newW?'이만하면 자네도 꽤 하는군. 다음엔 더 멀리 가자.':S.wave>=20?'스무 고개를 넘었다. 보스가 자네 이름을 기억할 거다.':S.wave>=10?'열 웨이브. 몸이 막 풀리던 참인데 아쉽군.':S.wave>=5?'아직 손이 무디다. 융합부터 익히자.':'첫걸음이다. 소환을 아끼지 마라.';$('endSay').textContent=q;const el=SAJU?SAJU.me:3,g=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';faceAnim($('endFace'),$('endOverlay'),el,g,TIER(metaHeroGrade()),!!S.won);}
   $('endMsg').textContent=`${S.mode==='daily'?'오늘의 판. ':''}최고 등급 ${GRADE[S.maxGrade-1]}까지 뽑았다.${DAILY.level?' 오늘 운세는 '+DAILY.level+'.':''}${newW?' 최고 기록을 넘었다!':''}${drop?' 장비 획득: '+gearById(drop).name+'!':''}${xp?` 경험 +${xp}${ups?' · 영웅 Lv.'+META.lv+' 달성!':''}`:''}`;
+  {const goals=[];const qs=questList();const qd=qs.filter(q=>QST.done[q.id]).length;
+    if(!S.won)goals.push(newW?{i:'🏁',t:`새 기록 <b>${S.wave}웨이브</b>. 다음은 <b>${Math.min(30,S.wave+5)}웨이브</b>에 도전`,s:'자유 모드'}:{i:'🏁',t:`최고 기록 <b>${REC.bestWave}웨이브</b> 경신까지 <b>${Math.max(1,REC.bestWave-S.wave+1)}웨이브</b>`,s:'자유 모드'});
+    const np=nextPerk();if(np)goals.push({i:'⬆',t:`Lv.${np.lv} 특전 <b>${np.t}</b>까지 경험 <b>${Math.max(0,metaNeed(META.lv)-META.xp).toLocaleString()}</b>`,s:`지금 Lv.${META.lv}`});
+    if(qs.length&&qd<qs.length){const q=qs.find(x=>!QST.done[x.id]);goals.push({i:'✓',t:`오늘 과제 <b>${qs.length-qd}개</b> 남음 · ${q.t}`,s:'다 하면 장비'});}
+    const seen=dexSeenN();const nr=DEX_REW.find(r=>r.n>seen);if(nr)goals.push({i:'📖',t:`도감 <b>${nr.n}종</b>까지 ${nr.n-seen}종 · ${nr.t}`,s:`${seen}종 수집`});
+    $('endNext').innerHTML=goals.length?'<h4>다음 목표</h4>'+goals.slice(0,3).map(g=>`<div class="ng"><i>${g.i}</i><span>${g.t}</span><small>${g.s}</small></div>`).join(''):'';}
   const practice=S.mode==='daily'&&!S.ranked;
   if(S.mode==='daily'&&S.ranked)saveDS({started:true,wave:S.wave});
   $('submitBox').hidden=!DB||practice;$('submitMsg').textContent=practice?'연습 판은 순위에 오르지 않는다. 내일 다시 도전.':'';$('submitBtn').disabled=false;$('nameIn').value=NAME;
@@ -3192,10 +3209,11 @@ function drawUnit(u,x,y,sel,alpha,form){
 // ───── 입력 ─────
 function pt(ev){const r=cv.getBoundingClientRect();return [(ev.clientX-r.left)*W/r.width,(ev.clientY-r.top)*H/r.height];}
 cv.addEventListener('pointerdown',ev=>{AU.init();if(!S.running||S.paused)return;const [x,y]=pt(ev);const i=slotAt(x,y);
-  if(i>=0&&S.units[i]){S.drag={from:i,x,y,sx:x,sy:y,moved:false,over:i};cv.setPointerCapture(ev.pointerId);}
+  if(i>=0&&S.units[i]){S.drag={from:i,x,y,sx:x,sy:y,moved:false,over:i};cv.setPointerCapture(ev.pointerId);clearTimeout(S.lp);S.lp=setTimeout(()=>{if(S.drag&&!S.drag.moved&&S.drag.from===i&&S.units[i]){S.drag=null;S.sel=i;openUnitCard(i);}},480);}
   else{S.sel=-1;}});
-cv.addEventListener('pointermove',ev=>{if(!S.drag)return;const [x,y]=pt(ev);S.drag.x=x;S.drag.y=y;if(Math.hypot(x-S.drag.sx,y-S.drag.sy)>6)S.drag.moved=true;S.drag.over=slotAt(x,y);});
-const endDrag=()=>{if(!S.drag)return;const d=S.drag;S.drag=null;
+cv.addEventListener('pointermove',ev=>{if(!S.drag)return;const [x,y]=pt(ev);S.drag.x=x;S.drag.y=y;if(Math.hypot(x-S.drag.sx,y-S.drag.sy)>6){S.drag.moved=true;clearTimeout(S.lp);S.lp=0;}S.drag.over=slotAt(x,y);});
+function openUnitCard(i){const u=S.units[i];if(!u)return;ui.ipk='';ui();let html=$('info').innerHTML.replace('id="infoPortrait" width="64" height="64"','id="ucPortrait" width="112" height="112" style="width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#fff,#EEF3F8);border:2px solid #FFD27A"').replace(/ id="iDmg"/g,'').replace(/ id="iDps"/g,'');$('unitCardBody').innerHTML=html;const pc=$('ucPortrait');if(pc)portrait(pc,u,1.6);S.cardPaused=!S.paused;S.paused=true;$('unitModal').hidden=false;buzz(20);AU.buy();}
+const endDrag=()=>{clearTimeout(S.lp);S.lp=0;if(!S.drag)return;const d=S.drag;S.drag=null;
   if(!d.moved){S.sel=S.sel===d.from?-1:d.from;if(S.sel>=0&&MTAB>=0&&MTAB!==3)mtab(3);return;}
   if(d.over>=0&&d.over!==d.from&&S.units[d.from])tryCombine(d.from,d.over);else S.sel=d.from;};
 cv.addEventListener('pointerup',endDrag);cv.addEventListener('pointercancel',endDrag);
@@ -3236,7 +3254,7 @@ const TUT=[
   {t:'안내 끝. 5웨이브까지 버티면 완료다. 이제 자유 모드에서 30웨이브에 도전하라.',ok:()=>false},
 ];
 let tutStep=0;
-function start(mode){AU.init();mode=mode==='daily'?'daily':mode==='tutorial'?'tutorial':mode==='weekly'?'weekly':'free';lastMode=mode;clearSave();tipShown={};tip=null;tutStep=0;
+function start(mode){AU.init();mode=mode==='daily'?'daily':mode==='tutorial'?'tutorial':mode==='weekly'?'weekly':'free';lastMode=mode;clearSave();tipShown=loadTips();tip=null;tutStep=0;
   RNG=mode==='daily'?rng(hash('daily|'+todayStr())):mode==='weekly'?rng(hash('weekly|'+wkKey())):Math.random;rndN=0;
   S=fresh();S.mode=mode;S.running=true;HOME_FROM_GAME=false;$('goSheet').hidden=true;hideHome();$('endOverlay').hidden=true;$('relicOverlay').hidden=true;$('winOverlay').hidden=true;$('pickRow').hidden=true;$('log').innerHTML='';
   if(mode==='daily'){const ds=loadDS();S.ranked=!(ds&&ds.started);if(S.ranked)saveDS({started:true,wave:null});}
@@ -3296,7 +3314,8 @@ $('homeBtn').onclick=()=>showHome();$('winHome').onclick=()=>{$('winOverlay').hi
 $('endShare').onclick=openCard;$('winShare').onclick=openCard;$('cardClose').onclick=()=>{$('cardModal').hidden=true;};$('dexClose').onclick=()=>{$('dexModal').hidden=true;};$('tbFortune').onclick=()=>$('hFortuneBtn').click();$('tbAttend').onclick=()=>{renderAttend();$('attModal').hidden=false;};$('attClose').onclick=()=>{$('attModal').hidden=true;};$('wcStart').onclick=()=>{$('welcome').hidden=true;openSaju();};$('wcSkip').onclick=()=>{$('welcome').hidden=true;};$('cardShare').onclick=()=>shareCardFile($('cardCopy'));$('cardCopy').onclick=()=>copyShare($('cardCopy'));
 document.addEventListener('visibilitychange',()=>{if(document.hidden){saveGame();if(S&&S.running&&!S.over&&$('startOverlay').hidden){S.paused=true;ui();}}});window.addEventListener('pagehide',saveGame);
 $('winBtn').onclick=()=>{$('winOverlay').hidden=true;if(S.mode==='tutorial'){S.over=true;showHome();ui();return;}if(S.running)S.paused=false;ui();};
-$('mergeBtn').onclick=autoMerge;
+$('mergeBtn').onclick=autoMerge;$('friendPaste').onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){$('friendIn').value=t.trim();addFriend();}else fmsg('클립보드가 비어 있다.','bad');}catch(_){fmsg('붙여넣기 권한이 없다. 코드를 직접 입력하라.','bad');$('friendIn').focus();}};$('unitCardClose').onclick=()=>{$('unitModal').hidden=true;if(S.cardPaused){S.paused=false;S.cardPaused=false;}ui();};$('unitModal').addEventListener('click',ev=>{if(ev.target===$('unitModal'))$('unitCardClose').click();});
+document.querySelector('.tabbar').addEventListener('click',ev=>{if(ev.target.closest('button'))buzz(8);});
 $('mSummon').onclick=()=>$('summonBtn').click();$('mMerge').onclick=autoMerge;$('mNext').onclick=()=>$('nextBtn').click();
 $('sk0').onclick=()=>{AU.init();castSkill(0);};$('sk1').onclick=()=>{AU.init();castSkill(1);};$('mSk0').onclick=()=>castSkill(0);$('mSk1').onclick=()=>castSkill(1);
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{boardMode=t.dataset.b;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));subscribeBoard();});
