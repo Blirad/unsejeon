@@ -633,7 +633,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v8.5</span> · 사주로 겨루는 오행 디펜스</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v8.6</span> · 사주로 겨루는 오행 디펜스</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -2414,7 +2414,8 @@ function drawHero3(C,tier){
   ctx.save();ctx.translate(0,22);const tsc=tier===2?1.08:tier===1?1.03:1;ctx.scale(1.3*tsc,1.36*tsc);ctx.translate(0,-22);if(HURT){ctx.translate(-2,1);ctx.rotate(-0.09);}
   if(tier===2){ctx.save();for(let k=0;k<3;k++){const a=ph*0.5+k*2.09;const ox=Math.cos(a)*24,oy=-12+Math.sin(a)*9;glow(ox,oy,7,P.l,0.7);ctx.fillStyle=P.l;ctx.beginPath();ctx.arc(ox,oy,2.2,0,Math.PI*2);ctx.fill();}ctx.restore();}
   ctx.translate(0,8+Math.sin(ph*1.57)*0.6);
-  const HX=0,HY=-31,RX=f?8.0:8.4,RY=f?9.6:10.0;
+  const HX=0,HY=-31,RX=f?8.0:8.4,RY=f?9.6:10.0;const fl=Math.sin(ph*1.5708);
+  const SH=f?9.4:11,WA=f?5.4:7,HP=f?9.4:8.4;         // 어깨·허리·골반 반폭
   // 4등신: 머리는 목 기준 1.25배, 몸은 0.82배
   const NK=HY+RY;const HEADT=()=>{ctx.save();ctx.translate(0,NK);ctx.scale(1.25,1.25);ctx.translate(0,-NK);};const BODYT=()=>{ctx.save();ctx.translate(0,NK);ctx.scale(0.82,0.82);ctx.translate(0,-NK);};
   // ── 헤어 프리셋 ──
@@ -2422,9 +2423,11 @@ function drawHero3(C,tier){
   const F_STYLE=[{fr:1,braid:1,daenggi:1},{bun:1,pin:1,fr:0},{back:'long',fr:0,locks:1},{bun:'twin',fr:2},{fr:2,braid:'side'},{fr:0,pony:'high'},{back:'bob',fr:2},{bun:0.7,back:'long',fr:1,locks:1},{back:'long',wave:1,fr:0},{bun:'low',fr:1,locks:1},{pony:'twin',fr:2},{crown:1,fr:0,locks:1}];
   const ST=(f?F_STYLE:M_STYLE)[hairS%12];
   // ── 1. 뒷머리 ──
-  const backHair=()=>{if(ST.back==='long'){const L=f?34:26;hshape([[-RX-1,HY-4],[-RX-6,HY+8+ph*0.5,-RX-5,HY+L],[-RX+2,HY+L+3],[0,HY+L-2+ (ST.wave?2:0)],[RX-2,HY+L+3],[RX+5,HY+8+ph*0.5,RX+1,HY-4]],hair,0,HY+10,16,{dk:hairD,w:1.3,hi:false});
+  const backHair=()=>{if(!ST.shave)cball(0,HY-1.6,RX+(f?2.8:2),hair,{dk:hairD,w:1.3,hi:false,lx:0.1,ly:0.35});
+    if(ST.back==='long'){const L=f?37:26,WD=f?8.5:6;hshape([[-RX-1,HY-4],[-RX-WD,HY+8+ph*0.5,-RX-WD+1.5-fl*1.6,HY+L],[-RX+2-fl,HY+L+3],[0,HY+L-2+ (ST.wave?2:0)],[RX-2,HY+L+3],[RX+WD-1.5-fl*0.6,HY+8+ph*0.5,RX+1,HY-4]],hair,0,HY+10,16,{dk:hairD,w:1.3,hi:false});
+      if(f){ctx.strokeStyle=hairL;ctx.globalAlpha=0.35;ctx.lineWidth=1.2;for(const d of [-1,1]){ctx.beginPath();ctx.moveTo(d*(RX-2),HY+4);ctx.quadraticCurveTo(d*(RX+3),HY+14,d*(RX-1)-fl*d*0.5,HY+L-4);ctx.stroke();}ctx.globalAlpha=1;}
       if(ST.wave){ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1.2;for(const d of [-1,1]){ctx.beginPath();ctx.moveTo(d*(RX-1),HY+6);ctx.quadraticCurveTo(d*(RX+4),HY+16,d*(RX-1),HY+26);ctx.stroke();}}}
-    else if(ST.back==='bob'){hshape([[-RX-1,HY-6],[-RX-4,HY+4,-RX-2,HY+11],[0,HY+13],[RX+2,HY+11],[RX+4,HY+4,RX+1,HY-6]],hair,0,HY+4,12,{dk:hairD,w:1.3,hi:false});}
+    else if(ST.back==='bob'){hshape([[-RX-1,HY-6],[-RX-5.5,HY+4,-RX-3-fl*0.6,HY+12],[0,HY+14],[RX+3,HY+12],[RX+5.5,HY+4,RX+1,HY-6]],hair,0,HY+4,12,{dk:hairD,w:1.3,hi:false});}
     if(ST.pony==='low'){hshape([[RX-2,HY+2],[RX+8,HY+8+ph,RX+9,HY+26-ph],[RX+5,HY+27-ph],[RX+2,HY+12,RX-4,HY+4]],hair,RX+4,HY+14,9,{dk:hairD,w:1.2,hi:false});}
     if(ST.pony==='high'){hshape([[2,HY-11],[14,HY-16-ph,20,HY-2+ph],[22,HY+10],[18,HY+8],[14,HY-4-ph,4,HY-8]],hair,12,HY-4,10,{dk:hairD,w:1.2,hi:false});cball(4,HY-10,2.6,acc,{w:1,hi:false});}
     if(ST.pony==='twin'){for(const d of [-1,1]){hshape([[d*(RX-1),HY-4],[d*(RX+8),HY+2+ph,d*(RX+8),HY+18-ph],[d*(RX+4),HY+19-ph],[d*(RX+3),HY+6,d*(RX-3),HY-2]],hair,d*(RX+4),HY+8,9,{dk:hairD,w:1.2,hi:false});cball(d*(RX),HY-3,2,acc,{w:0.9,hi:false});}}
@@ -2433,11 +2436,22 @@ function drawHero3(C,tier){
   BODYT();
   // ── 2. 망토 ──
   if(el===3||(el===1&&yang)||tier>=1){hshape([[-9,-16],[10,-16],[15,4+ph*0.5,9,24],[-7,22],[-22,14+ph,-27,2-ph],[-22,-4,-14,-8]],el===3?'#7A1E1E':dk,-6,4,22,{dk:shade(el===3?'#7A1E1E':dk,-35),w:1.6});}
+  // ── 2b. 등급 리본 (영웅 이상: 오행색 긴 리본이 뒤에서 흩날린다) ──
+  if(tier>=1){ctx.save();ctx.globalAlpha=0.9;for(const [y0,len,d] of (tier===2?[[-17,30,-1],[-15,24,1],[-12,20,-1]]:[[-16,24,-1],[-13,18,1]])){const c=tier===2&&d>0?'#FFD27A':P.l;hshape([[d*SH,y0],[d*(SH+len*0.45),y0-6+fl*2.5,d*(SH+len),y0+4-fl*3],[d*(SH+len-2),y0+8-fl*3],[d*(SH+len*0.45),y0-1+fl*2.5,d*SH,y0+3]],c,d*(SH+len*0.5),y0+2,len*0.5,{dk:shade(c,-35),w:1,hi:false});}ctx.restore();}
+  // ── 2c. 직업 실루엣 (등 뒤) ──
+  if(el===3){ // 장군: 등에 꽂은 오행 깃발
+    ctx.save();ctx.translate(-10,-16);ctx.rotate(0.16);ctx.strokeStyle='#5A3A1E';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,4);ctx.lineTo(0,-46);ctx.stroke();cball(0,-47,1.8,'#FFD27A',{w:0.9,hi:false});
+    const fc=yang?'#B8322B':'#1F3A6E';hshape([[0.5,-46],[-16-fl*2.5,-43+fl*1.2,-21-fl*3,-32],[-15-fl*1.5,-25],[0.5,-24]],fc,-9,-35,11,{dk:shade(fc,-35),w:1.2,hi:false});ctx.strokeStyle='#FFD27A';ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(0.5,-45);ctx.lineTo(-16-fl*2.5,-42+fl*1.2);ctx.moveTo(0.5,-25);ctx.lineTo(-15-fl*1.5,-26);ctx.stroke();
+    ctx.fillStyle='#FFF1C4';ctx.font="700 9px 'Noto Serif KR',serif";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(['木','火','土','金','水'][el],-8.5-fl,-35);ctx.restore();}
+  else if(el===2){ // 도승: 바랑
+    ctx.save();ctx.translate(5,-12);ctx.rotate(-0.25);cbox(-6,-6,13,15,3.5,'#8A6A3E',{w:1.3,dk:'#5A4020'});ctx.strokeStyle='#5A4020';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-6,-1);ctx.lineTo(7,-1);ctx.stroke();ctx.restore();}
+  else if(el===4){ // 술사: 팔 뒤로 흐르는 긴 숄
+    ctx.save();ctx.globalAlpha=0.92;const shc=shade(tr,-8);hshape([[SH+1,-17],[SH+13+fl*2,-6+fl,SH+9+fl*3,14+fl*1.5],[SH+2,7],[SH+5,-6,SH-1,-15]],shc,SH+6,-3,10,{dk:shade(shc,-28),w:1.1,hi:false});
+    hshape([[-SH-1,-17],[-SH-15-fl*2.5,-3+fl*1.5,-SH-11-fl*3.5,18-fl*2],[-SH-3,9],[-SH-6,-4,-SH+1,-15]],shc,-SH-7,-2,11,{dk:shade(shc,-28),w:1.1,hi:false});ctx.restore();}
   // ── 3. 등에 멘 것 (궁사 화살통) ──
   if(el===0){ctx.save();ctx.rotate(-0.35);cbox(8,-24,5,16,1.5,'#7A4E25',{w:1.2,hi:false});for(let k=0;k<3;k++){ctx.strokeStyle='#F1F1EA';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(9+k*1.6,-25);ctx.lineTo(9.5+k*1.6,-31);ctx.stroke();ctx.fillStyle=k%2?SEALR:'#EEF2F7';tri(9+k*1.6-1,-30,9+k*1.6+1,-30,9+k*1.6,-33);ctx.fill();}ctx.restore();}
   // ── 4. 몸 골격 (5등신 · 콘트라포스토) ──
   const civilF=f&&(el===0||el===2||el===4);const armor=el===1||el===3;
-  const SH=f?9.4:11,WA=f?5.4:7,HP=f?9.4:8.4;         // 어깨·허리·골반 반폭
   const legC=armor?'#2E3340':f?'#EDE6DA':(yang?'#3B3F4C':'#5A5E6A');
   const boot=armor?'#1E2230':el===3?'#3A2A1C':f?'#8A5A2A':'#1E2230';
   // 다리 (치마 아래 숨는 경우 제외): 오른다리 곧게 디딤, 왼다리 살짝 굽혀 앞으로
@@ -2453,7 +2467,7 @@ function drawHero3(C,tier){
   ctx.save();
   const torso=[[-SH,-20],[SH,-20],[WA+1,-6,HP,-1],[-HP,-1],[-WA-1,-6,-SH,-20]];
   if(civilF){ // 치마(A라인) + 저고리
-    hshape([[-WA-1,-6],[WA+1,-6],[15,10,17,23],[-17,23],[-15,10,-WA-1,-6]],robe,0,9,18,{dk,w:1.5});
+    hshape([[-WA-1,-6],[WA+1,-6],[15,10,17+fl*0.5,23],[-17-fl*1.5,23-fl*0.4],[-15-fl,10,-WA-1,-6]],robe,0,9,18,{dk,w:1.5});
     ctx.strokeStyle='rgba(0,0,0,.13)';ctx.lineWidth=1;for(const x of [-7,-2,3,8]){ctx.beginPath();ctx.moveTo(x*0.6,-4);ctx.lineTo(x*2,23);ctx.stroke();}
     hshape([[-SH,-20],[SH,-20],[SH-0.5,-5],[-SH+0.5,-5]],el===4?'#F7F3EA':tr,0,-12,10,{dk:shade(el===4?'#F7F3EA':tr,-30),w:1.4});
     ctx.strokeStyle=el===4?'#F7F3EA':robe;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-SH+1,-20);ctx.lineTo(1,-9);ctx.lineTo(SH-1,-20);ctx.stroke();ctx.strokeStyle=acc;ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(1,-9);ctx.lineTo(5,4);ctx.moveTo(1,-9);ctx.lineTo(-2,5);ctx.stroke();
@@ -2468,7 +2482,7 @@ function drawHero3(C,tier){
     cbox(-HP-2,-3,HP*2+4,3.6,1,'#1E2230',{hi:false,w:1.1});cbox(-3.5,-5,7,6,1.4,tr,{w:1,hi:false});
     hshape([[-HP-1,0],[HP+1,0],[HP+4,10],[-HP-4,10]],dk,0,5,12,{dk:shade(dk,-30),w:1.2,hi:false});ctx.strokeStyle='rgba(0,0,0,.25)';for(const x of [-6,-2,2,6]){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x*1.3,10);ctx.stroke();}}
   else{ // 도포·장삼·철릭: 긴 겉옷, 앞이 살짝 벌어짐
-    hshape([[-SH,-20],[SH,-20],[HP+4,2,HP+6,20],[-HP-6,20],[-HP-4,2,-SH,-20]],robe,0,0,17,{dk,w:1.6});
+    hshape([[-SH,-20],[SH,-20],[HP+4,2,HP+6+fl*0.5,20],[-HP-6-fl*1.6,20-fl*0.4],[-HP-4-fl*0.7,2,-SH,-20]],robe,0,0,17,{dk,w:1.6});
     ctx.fillStyle=el===4?'#F7F3EA':tr;hpath([[-8,-20],[0,-20],[2.5,-6],[-1.5,-7]]);ctx.fill();ol(1);hpath([[8,-20],[0,-20],[-1.5,-7],[1.5,-8]]);ctx.fill();ol(1);
     ctx.strokeStyle='rgba(0,0,0,.18)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(1,-6);ctx.quadraticCurveTo(2,8,4,20);ctx.stroke();
     if(el===2){hshape([[-SH+1,-19],[-SH+6,-19],[12,12],[6,15]],tr,0,-2,12,{dk:shade(tr,-35),w:1.1,hi:false});}
@@ -2481,9 +2495,20 @@ function drawHero3(C,tier){
   // 등급 장식: 수놓은 문양 · 금 띠쇠 · 어깨 갑주
   if(tier>=1){ctx.strokeStyle=tier===2?'#FFD27A':tr;ctx.lineWidth=1;ctx.globalAlpha=0.85;for(const y0 of [6,10]){ctx.beginPath();ctx.moveTo(-8,y0);ctx.quadraticCurveTo(-4,y0-2,0,y0);ctx.quadraticCurveTo(4,y0+2,8,y0);ctx.stroke();}ctx.globalAlpha=1;cbox(-3,-6,6,3.6,1.2,'#FFD27A',{w:1,dk:'#B8860B',hi:false});}
   // 어깨
-  if(armor||tier>=1){for(const d of [-1,1]){cball(d*(SH+0.5),-19,tier===2?5.4:4.6,el===3?'#B9C1CE':dk,{w:1.4,dk:shade(el===3?'#B9C1CE':dk,-30)});if(tier===2){ctx.fillStyle='#FFD27A';tri(d*(SH+0.5)-3,-23,d*(SH+0.5)+3,-23,d*(SH+0.5),-30);ctx.fill();ol(1);}}}
+  if(armor||tier>=1){for(const d of [-1,1]){cball(d*(SH+0.5),-19,tier===2?5.4:4.6,el===3?'#B9C1CE':dk,{w:1.4,dk:shade(el===3?'#B9C1CE':dk,-30)});if(tier>=1){ctx.strokeStyle='#FFD27A';ctx.lineWidth=1;ctx.beginPath();ctx.arc(d*(SH+0.5),-19,tier===2?3.6:3,0,Math.PI*2);ctx.stroke();}if(tier===2){ctx.fillStyle='#FFD27A';tri(d*(SH+0.5)-3,-23,d*(SH+0.5)+3,-23,d*(SH+0.5),-30);ctx.fill();ol(1);for(let k=0;k<3;k++){ctx.strokeStyle=k%2?'#FFD27A':SEALR;ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(d*(SH+2+k),-15);ctx.quadraticCurveTo(d*(SH+4+k)+fl*d,-8,d*(SH+2+k*1.5)+fl*d*1.5,-2);ctx.stroke();}}}}
   // 허리끈 끝자락 (바람에 왼쪽으로)
   for(const [y0,len] of [[0,22],[2,16]]){hshape([[-HP,y0],[-HP-9-len*0.3,y0-3+ph,-HP-len,y0+5-ph],[-HP-len+2,y0+8.5-ph],[-HP-9-len*0.3,y0+3+ph,-HP,y0+3.5]],armor?SEALR:acc,-HP-9,y0+4,10,{dk:shade(armor?SEALR:acc,-40),w:1.1,hi:false});}
+  // 직업 실루엣 (몸 앞)
+  if(el===0){ // 궁사: 왼어깨 가죽 반망토
+    hshape([[-SH-2.5,-21.5],[1.5,-21.5],[0.5,-13],[-SH-4-fl,-7+fl*0.5],[-SH-6.5,-14]],'#6B4423',-SH*0.5,-14,9,{dk:'#3F2712',w:1.3,hi:false});ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1;for(const x0 of [-9,-5,-1]){ctx.beginPath();ctx.moveTo(x0,-20);ctx.lineTo(x0-1.5,-10);ctx.stroke();}ctx.strokeStyle=tr;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-SH-2,-21);ctx.lineTo(1,-21);ctx.stroke();}
+  else if(el===1){ // 무사: 왼쪽 허리 검집 + 붉은 술
+    ctx.save();ctx.translate(-HP-1,1);ctx.rotate(0.55);cbox(-1.6,-3,3.2,21,1.3,'#1E1A22',{w:1.2,dk:'#0A0810',hi:false});cbox(-2.2,-3,4.4,2.6,0.8,tr,{w:0.9,hi:false});cbox(-2,14,4,2,0.6,tr,{w:0.8,hi:false});ctx.strokeStyle=SEALR;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(0,-2);ctx.quadraticCurveTo(-4-fl,3,-3-fl*1.5,9);ctx.stroke();ctx.restore();}
+  else if(el===2){ // 도승: 큰 염주
+    for(let k=0;k<=10;k++){const t=k/10;const bx=-8+16*t,by=-19+Math.sin(t*Math.PI)*15;cball(bx,by,k===5?2.1:1.35,k%2?'#6B4423':'#4A2E14',{w:0.8,hi:false});}}
+  else if(el===4){ // 술사: 옥패 목걸이
+    ctx.strokeStyle='#C9A96A';ctx.lineWidth=0.9;ctx.beginPath();ctx.moveTo(-6,-20);ctx.quadraticCurveTo(0,-11,6,-20);ctx.stroke();cball(0,-13.5,2,'#7BC8A4',{w:0.9,dk:'#3E8A66'});}
+  else if(el===3&&tier<1){ // 장군: 넓은 어깨 갑
+    for(const d of [-1,1]){hshape([[d*(SH-3),-21],[d*(SH+4),-21],[d*(SH+5.5),-14],[d*(SH-1),-13]],'#B9C1CE',d*(SH+1),-17,5,{w:1.2,dk:'#5E6878'});}}
   ctx.restore();
   // ── 6. 팔·무기 (직업별 대기 포즈 + 공격 동작) ──
   const sleeve=civilF?(el===4?'#F7F3EA':tr):robe,sleeveD=civilF?shade(el===4?'#F7F3EA':tr,-35):dk;
@@ -2506,6 +2531,7 @@ function drawHero3(C,tier){
   {const sx=-SH+1,sy=-18;const ex=(sx+lhx)/2-2,ey=(sy+lhy)/2+2;
     cel(seg(sx,sy,ex,ey,wide?7:5.6),sleeve,(sx+ex)/2,(sy+ey)/2,6,{dk:sleeveD,w:1.3});cel(seg(ex,ey,lhx,lhy,wide?7.5:5),sleeve,(ex+lhx)/2,(ey+lhy)/2,6,{dk:sleeveD,w:1.3});
     if(wide)hshape([[lhx-1,lhy-5],[lhx-8,lhy+7],[lhx+2,lhy+9],[lhx+5,lhy-3]],sleeve,lhx,lhy+3,7,{dk:sleeveD,w:1.2});
+    if(el===0){const bx0=ex+(lhx-ex)*0.3,by0=ey+(lhy-ey)*0.3,bx1=ex+(lhx-ex)*0.85,by1=ey+(lhy-ey)*0.85;cel(seg(bx0,by0,bx1,by1,6),'#5A3A1E',(bx0+bx1)/2,(by0+by1)/2,4,{dk:'#2E1C0A',w:1.1,hi:false});ctx.strokeStyle=tr;ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(bx0,by0);ctx.lineTo(bx1,by1);ctx.stroke();}
     cball(lhx,lhy,2.9,skin,{w:1,dk:skD});}
   if(el===0){ // 활: 왼손에, 공격 시 시위를 오른손이 당긴다
     ctx.strokeStyle='#5A3A1E';ctx.lineWidth=2.8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(lhx,lhy+19);ctx.quadraticCurveTo(lhx-11,lhy,lhx,lhy-19);ctx.stroke();
@@ -2518,6 +2544,7 @@ function drawHero3(C,tier){
     cel(seg(sx,sy,ex,ey,wide?7:5.6),sleeve,(sx+ex)/2,(sy+ey)/2,6,{dk:sleeveD,w:1.3});cel(seg(ex,ey,wx,wy+1,wide?7.5:5),sleeve,(ex+wx)/2,(ey+wy)/2,6,{dk:sleeveD,w:1.3});
     if(wide)hshape([[wx-6,wy+2],[wx-10,wy+12],[wx-2,wy+13],[wx+2,wy+4]],sleeve,wx-4,wy+7,6,{dk:sleeveD,w:1.2});
     cball(wx,wy+1,3,skin,{w:1,dk:skD});}
+  if(tier>=1&&!atk){ctx.save();ctx.globalAlpha=tier===2?0.55:0.35;glow(wx,wy-6,tier===2?14:10,tier===2?'#FFD27A':P.l,1);ctx.restore();}
   ctx.save();ctx.translate(wx,wy+1);ctx.rotate(rot);const wsc=tier===2?1.45:tier===1?1.3:1.2;ctx.scale(wsc,wsc);const wv=br%3;
   if(el===0){ if(!(atk&&a>=0.7)){ // 궁사: 화살 (활은 왼손) — 변형: 장전 화살 / 쌍화살 / 단검
     if(wv===2){hshape([[-1.5,6],[-1.5,-16],[0,-20],[1.5,-16],[1.5,6]],'#E8ECF2',0,-6,10,{w:1,dk:'#8496AB'});cbox(-4,5,8,2.2,0.8,tr,{hi:false,w:0.9});}
