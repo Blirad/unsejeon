@@ -521,6 +521,8 @@
   .dex .cell{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:6px 2px 5px;box-shadow:0 2px 0 #E3D9C6} .dex .cell canvas,.dex .cell.on canvas{border:none;background:var(--ink3)} .dex .cell.on{border-color:var(--gold)} .dex .cell span{font-size:10.5px;line-height:1.2;text-align:center} .gtile{border-width:1.5px;padding:8px 4px 6px} .gtile b{font-size:11.5px;display:block} .gtile small{font-size:10px;color:var(--muted);display:block;line-height:1.2}
   .mbar button.ready{box-shadow:inset 0 0 0 2px #FFD27A,0 2px 0 #D9CFBC;animation:mready 1.6s ease-in-out infinite} @keyframes mready{0%,100%{box-shadow:inset 0 0 0 2px #FFD27A,0 2px 0 #D9CFBC}50%{box-shadow:inset 0 0 0 2px #FFB020,0 0 10px rgba(255,176,32,.55)}} .mbar button.ready small{color:#B8620A;opacity:1;font-weight:700} .mbar small.warn{color:#C0392B;opacity:1;font-weight:700}
   .relline{font-size:12.5px;color:var(--text);background:#F7F4EC;border-radius:10px;padding:8px 10px;margin-top:6px;text-align:left} .relline span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .shopc.can{border-color:#FFB020;box-shadow:0 0 0 2px rgba(255,176,32,.25),0 2px 0 #D9CFBC} .shopc small{display:block;font-size:10px;line-height:1.25;white-space:normal}
+  .relic .d{font-size:11.5px;line-height:1.3;color:var(--muted)} .relic .n{font-size:13.5px;font-weight:700}
   .srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #F0E9DA} .srow:last-child{border-bottom:none} .srow>span{font-size:14px;color:var(--navy);font-weight:700}
   .sw{width:50px;height:30px;border-radius:999px;background:#D9CFBC;box-shadow:inset 0 2px 4px rgba(0,0,0,.12);padding:0;position:relative;transform:none!important;flex:none}
   .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:left .18s}
@@ -651,7 +653,7 @@
             <li><b>오행 진</b>: 가로·세로·대각선으로 상생 순서가 이어지면 연사가 빨라진다. 3칸 +25%, 4칸 +45%, 5칸 <b>오행대진</b> +70%에 공격력 +15%. 한 칸에 진이 겹치면 <b>진 겹침</b>(연사 ×1.5, 공격력 +10%씩), 세 방향 오행대진이면 <b>오행 만다라</b> 공격력 +30%.</li>
             <li>웨이브마다 <b>주력 오행</b>이 예고된다. 극하는 오행으로 맞받아치면 1.6배. 웨이브를 넘길 때마다 <b>산통 점괘</b>, 5웨이브마다 <b>유물</b>, 10웨이브마다 보스.</li>
             <li><b>신화</b>에 오른 기본 오행은 궁극기를 자동으로 쓴다. 적이 한 바퀴 돌아 빠져나가면 생명 -1, 보스는 -3. 30웨이브를 버티면 <b>천하통일</b>.</li>
-            <li><b>사주 군대</b>: 사주 여덟 글자의 오행 개수만큼 일반 등급 유닛이 매 판 시작에 영웅 곁에 선다(태어난 날의 오행은 영웅). <b>영웅</b>: 사주의 태어난 날의 기운(일주)이 영웅이 되어 시작부터 싸운다. <b>신살 2개</b>가 쿨타임 있는 액티브 스킬, <b>십성 2개</b>가 패시브. 영웅을 합쳐 키우면 스킬도 세진다.</li>
+            <li><b>사주 군대</b>: 사주 여덟 글자의 오행 개수만큼 일반 등급 유닛이 매 판 시작에 영웅 곁에 선다(태어난 날의 오행은 영웅). <b>영웅</b>: 사주의 태어난 날의 기운(일주)이 영웅이 되어 시작부터 싸운다. <b>신살 2개</b>가 쿨타임 있는 특기 스킬, <b>십성 2개</b>가 성향. 영웅을 합쳐 키우면 스킬도 세진다.</li>
             <li>상극 폭발: 금+목 화살비 · 목+토 뿌리덫 · 토+수 진흙늪 · 수+화 증기 · 화+금 단조. 4웨이브부터 방패·분열·질주 적이 섞이고, 보스는 오행마다 패턴이 다르다.</li>
           </ul>
             </details>
@@ -666,7 +668,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.7</span> · 사주로 겨루는 오행 디펜스</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.8</span> · 사주로 겨루는 오행 디펜스</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -766,9 +768,9 @@
     <div class="sec">
       <h3>행운 상점 <span>운 게이지로 산다</span></h3>
       <div class="btns3">
-        <button class="ghost sm shopc" id="shopPick"><i class="mi" style="background:linear-gradient(160deg,#3FA66B,#2E7D4F)"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2"/></svg></i>오행 지정<small>운 50</small></button>
-        <button class="ghost sm shopc" id="shopGuar"><i class="mi" style="background:linear-gradient(160deg,#4C8DE0,#2F5FB0)"><svg viewBox="0 0 24 24"><path d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7zM9 12l2 2 4-4"/></svg></i>희귀 확정<small>운 60</small></button>
-        <button class="ghost sm shopc" id="shopLife"><i class="mi" style="background:linear-gradient(160deg,#E8553B,#B53A24)"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9zM12 9v6M9 12h6"/></svg></i>생명 +3<small>운 70</small></button>
+        <button class="ghost sm shopc" id="shopPick"><i class="mi" style="background:linear-gradient(160deg,#3FA66B,#2E7D4F)"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2"/></svg></i>오행 지정<small>운 50 · 다음 소환 오행 선택</small></button>
+        <button class="ghost sm shopc" id="shopGuar"><i class="mi" style="background:linear-gradient(160deg,#4C8DE0,#2F5FB0)"><svg viewBox="0 0 24 24"><path d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7zM9 12l2 2 4-4"/></svg></i>희귀 확정<small>운 60 · 다음 소환 희귀↑</small></button>
+        <button class="ghost sm shopc" id="shopLife"><i class="mi" style="background:linear-gradient(160deg,#E8553B,#B53A24)"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9zM12 9v6M9 12h6"/></svg></i>생명 +3<small>운 70 · 최대까지</small></button>
       </div>
       <div class="r" id="pickRow" hidden style="margin-top:8px"></div>
       <div class="note" id="shopState" style="margin-top:6px"></div>
@@ -781,7 +783,7 @@
 
     <div class="sec">
       <h3>선택 유닛 <span id="setPill" class="pill">오행 <b id="setCount">0</b>/5</span></h3>
-      <div class="info" id="info">보드의 유닛을 눌러 정보를 보고, 끌어서 합치거나 옮긴다.</div>
+      <div class="info" id="info">유닛을 누르면 정보, 끌면 이동·합치기. 길게 누르면 상세 카드.</div>
       <button class="sell" id="sellBtn" hidden>판매</button>
     </div>
 
@@ -1068,7 +1070,7 @@ const BRANCH=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌',
 const BRANCH_H=['23~01','01~03','03~05','05~07','07~09','09~11','11~13','13~15','15~17','17~19','19~21','21~23'];
 const STEM_K=['갑','을','병','정','무','기','경','신','임','계'], BRANCH_K=['자','축','인','묘','진','사','오','미','신','유','술','해'];
 const REL=['같은 기운(비겁)','표현(식상)','재물(재성)','규율(관성)','학습(인성)'];
-// 십성 패시브 (사주에서 가장 많은 둘) · 신살 액티브 (가장 특징적인 둘, 쿨타임 후 재사용)
+// 십성 성향 (사주에서 가장 많은 둘) · 신살 특기 (가장 특징적인 둘, 쿨타임 후 재사용)
 const TEN=[
   {k:'비겁',name:'동료',desc:'나의 오행 유닛 공격력 추가 +12%'},
   {k:'식상',name:'표현',desc:'융합체 공격력 +15%'},
@@ -1310,8 +1312,8 @@ function renderSaju(){
     const ts=SAJU.ten2.map(i=>TEN[i]),sk=SAJU.skills.map(k=>SKILL[k]);
     box.innerHTML=`<div class="pillars">${cell('시',p.hour)}${cell('일',p.day)}${cell('월',p.month)}${cell('년',p.year)}</div>
       <div class="note" style="margin-bottom:4px">영웅 <b style="color:${EL[SAJU.me].color}">${SAJU.ilju}</b> ${SAJU.raw&&SAJU.raw.g==='f'?'여':'남'} · 희귀로 시작 · 나의 오행 <b style="color:${EL[SAJU.me].color}">${EL[SAJU.me].k}</b> +10% · 부족한 <b style="color:${EL[SAJU.weak].color}">${EL[SAJU.weak].k}</b> 소환 ↑</div>
-      <div class="note">액티브 <b style="color:var(--gold)">${sk[0].name}</b> ${sk[0].desc(3)} · <b style="color:var(--gold)">${sk[1].name}</b> ${sk[1].desc(3)}</div>
-      <div class="note">패시브 <b style="color:var(--good)">${ts[0].k}·${ts[0].name}</b> ${ts[0].desc} · <b style="color:var(--good)">${ts[1].k}·${ts[1].name}</b> ${ts[1].desc}</div>`;}
+      <div class="note">특기 <b style="color:var(--gold)">${sk[0].name}</b> ${sk[0].desc(3)} · <b style="color:var(--gold)">${sk[1].name}</b> ${sk[1].desc(3)}</div>
+      <div class="note">성향 <b style="color:var(--good)">${ts[0].k}·${ts[0].name}</b> ${ts[0].desc} · <b style="color:var(--good)">${ts[1].k}·${ts[1].name}</b> ${ts[1].desc}</div>`;}
   const fb=$('fortuneBody');
   if(DAILY.level){fb.innerHTML=fortuneHtml(DAILY);}
   else fb.innerHTML=`<div class="note">${SAJU?'아직 오늘 운세를 뽑지 않았다. 하루 한 번.':'사주 입력 후 뽑을 수 있다.'}</div>`;
@@ -1328,7 +1330,7 @@ function drawFortuneAnim(){
 function openSaju(){const m=$('sajuModal');m.hidden=false;if(SAJU){const r=SAJU.raw;$('bDate').value=`${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')}`;$('bHour').value=r.h;$('bGender').value=r.g||'m';}$('bDate').focus();}
 function saveSaju(){const v=$('bDate').value;if(!v){$('bDate').focus();return;}const firstTime=!SAJU;const [y,m,d]=v.split('-').map(Number);const h=+$('bHour').value;const g=$('bGender').value;
   try{localStorage.setItem('ubz_saju',JSON.stringify({y,m,d,h,g}));}catch(_){}
-  SAJU=computeSaju({y,m,d,h});SAJU.raw={y,m,d,h,g};loadDaily();$('sajuModal').hidden=true;renderSaju();renderDex();renderHome();if(firstTime&&!(S&&S.running))openReveal('onboard');log(`사주 등록: 영웅 ${SAJU.ilju} · 액티브 ${SAJU.skills.map(k=>SKILL[k].name).join(', ')} · 패시브 ${SAJU.ten2.map(i=>TEN[i].k).join(', ')}`,'hi');}
+  SAJU=computeSaju({y,m,d,h});SAJU.raw={y,m,d,h,g};loadDaily();$('sajuModal').hidden=true;renderSaju();renderDex();renderHome();if(firstTime&&!(S&&S.running))openReveal('onboard');log(`사주 등록: 영웅 ${SAJU.ilju} · 특기 ${SAJU.skills.map(k=>SKILL[k].name).join(', ')} · 성향 ${SAJU.ten2.map(i=>TEN[i].k).join(', ')}`,'hi');}
 
 // ───── 기록 ─────
 let REC={bestWave:0,bestKills:0,bestFusions:0,games:0,mythic:0,totalKills:0,totalClashes:0,totalUlts:0,wins:0,seen:{}};
@@ -1711,10 +1713,10 @@ function shareCard(){const c=document.createElement('canvas');c.width=1080;c.hei
     ctx.fillStyle='#223047';ctx.font="700 40px 'Noto Sans KR',sans-serif";ctx.fillText(`${SAJU?SAJU.ilju+' '+HERO_STYLE[el].job:'무명 영웅'}${NAME?' · '+NAME:''}`,540,880);
     ctx.fillStyle='#F2A23A';ctx.font="700 150px 'Jua','Noto Sans KR',sans-serif";ctx.fillText(`${S.wave}웨이브`,540,990);
     if(S.won){ctx.fillStyle='#C0392B';ctx.font="700 44px 'Noto Sans KR',sans-serif";ctx.fillText('천하통일 · 30웨이브 사수',540,1070);}
-    const cells=[['처치',S.kills],['융합',S.fusions],['신화',S.mythic],['폭발',S.clashes]];cells.forEach(([k,v],i)=>{const x=180+i*240;ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.roundRect(x-95,1100,190,110,18);ctx.fill();ctx.fillStyle='#8A94A6';ctx.font="700 26px 'Noto Sans KR',sans-serif";ctx.fillText(k,x,1130);ctx.fillStyle='#223047';ctx.font="700 50px 'Jua','Noto Sans KR',sans-serif";ctx.fillText(String(v),x,1178);});
-    {const ch=$('endChart');if(ch&&!ch.hidden&&(S.hist||[]).length>=1){ctx.save();ctx.globalAlpha=0.95;ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.roundRect(70,1218,940,120,16);ctx.fill();ctx.drawImage(ch,0,0,ch.width,ch.height,80,1224,920,108);ctx.restore();}}
-    ctx.fillStyle='#5B6B85';ctx.font="700 30px 'Noto Sans KR',sans-serif";ctx.fillText(`${DAILY.level?'오늘 운세 '+DAILY.score+'점 '+DAILY.level+' · ':''}전투력 ${combatPower().toLocaleString()}`,540,1205);
-    ctx.fillStyle='#2F7BE8';ctx.font="700 30px 'Noto Sans KR',sans-serif";ctx.fillText(`내 코드 ${myCode()} · 코드를 넣으면 오늘 내 오행이 널 돕는다`,540,1160);});
+    const cells=[['처치',S.kills],['융합',S.fusions],['신화',S.mythic],['폭발',S.clashes]];cells.forEach(([k,v],i)=>{const x=180+i*240;ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.roundRect(x-95,1080,190,100,18);ctx.fill();ctx.fillStyle='#8A94A6';ctx.font="700 24px 'Noto Sans KR',sans-serif";ctx.fillText(k,x,1104);ctx.fillStyle='#223047';ctx.font="700 46px 'Jua','Noto Sans KR',sans-serif";ctx.fillText(String(v),x,1150);});
+    {const ch=$('endChart');if(ch&&!ch.hidden&&(S.hist||[]).length>=1){ctx.save();ctx.globalAlpha=0.95;ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.roundRect(70,1268,940,74,14);ctx.fill();ctx.drawImage(ch,0,0,ch.width,ch.height,80,1272,920,66);ctx.restore();}}
+    ctx.fillStyle='#5B6B85';ctx.font="700 26px 'Noto Sans KR',sans-serif";ctx.fillText(`${DAILY.level?'오늘 운세 '+DAILY.score+'점 '+DAILY.level+' · '+fortuneEffects(DAILY).slice(0,2).map(t=>t.replace(/^[^\w가-힣]+/,'')).join(' · ')+' · ':''}전투력 ${combatPower().toLocaleString()}`,540,1212);
+    ctx.fillStyle='#2F7BE8';ctx.font="700 30px 'Noto Sans KR',sans-serif";ctx.fillText(`내 코드 ${myCode()} · 넣으면 오늘 내 오행이 널 돕는다`,540,1248);});
   return c;}
 let CARD_URL='';
 function openCard(){const c=shareCard();CARD_URL=c.toDataURL('image/png');$('cardImg').src=CARD_URL;$('cardModal').hidden=false;$('cardShare').hidden=!(navigator.share);}
@@ -1893,6 +1895,7 @@ const elChip=i=>`<span class="chip" style="background:${EL[i].color}" title="${E
 function ui(){
   $('sGold').textContent=Math.floor(S.gold);$('sLives').textContent=S.lives;$('sWave').textContent=S.wave;$('sKill').textContent=S.kills;
   $('luckVal').textContent=Math.floor(S.luck)+'%';$('luckBar').style.width=S.luck+'%';
+  [['shopPick',50],['shopGuar',60],['shopLife',70]].forEach(([id,c])=>{const b=$(id);if(b)b.classList.toggle('can',!!S.running&&S.luck>=c);});
   $('luckHint').textContent=S.luck>=100?'운이 넘친다! 다음 소환은 영웅 이상 확정.':S.luck>=60?'운이 차오른다… 희귀 이상 확률이 크게 올랐다.':S.luck>=25?'운이 조금 쌓였다.':'아직 운이 쌓이지 않았다.';
   const cost=summonCost();$('summonCost').textContent=S.freeSummon>0?`무료 ×${S.freeSummon}`:cost+' 골드';$('summonBtn').disabled=!S.running||S.paused||S.gold<cost||!S.units.includes(null);
   const remain=Math.max(0,waveDur()-S.waveT);$('waveT').textContent=remain.toFixed(1)+'s';$('waveBar').style.width=(100*remain/waveDur())+'%';
@@ -1930,7 +1933,7 @@ function ui(){
   const h=heroUnit();const hg=h?h.grade:3;
   $('heroTag').textContent=h?`${h.heroName} · ${GRADE[h.grade-1]} · Lv ${S.heroLv}`:(S.running?'영웅 없음':'');
   $('heroLvLabel').textContent=`Lv ${S.heroLv}${S.heroLv>=10?' MAX':''}`;$('heroXpLabel').textContent=S.heroLv>=10?'MAX':`${Math.floor(S.heroXp)} / ${XP_NEED(S.heroLv)}`;$('heroXpBar').style.width=(S.heroLv>=10?100:100*S.heroXp/XP_NEED(S.heroLv))+'%';
-  $('heroLvNote').textContent=h?`공격력 +${8*(S.heroLv-1)}% · 스킬 쿨타임 -${3*(S.heroLv-1)}% · 스킬 등급 ${f1(skillGrade(h))}`:'처치할수록 영웅이 성장한다.';
+  $('heroLvNote').textContent=h?`공격력 +${8*(S.heroLv-1)}% · 특기 대기 -${3*(S.heroLv-1)}% · 특기 등급 ${f1(skillGrade(h))}`:'처치할수록 영웅이 성장한다.';
   if(h){const pk=`${h.el}-${h.grade}-${h.gender}-${S.heroLv>=10}`;if(pk!==ui.pk||(S.time|0)!==ui.pt){ui.pk=pk;ui.pt=S.time|0;portrait($('heroPortrait'),h,1.15);}}
   else if(ui.pk){ui.pk='';drawOn($('heroPortrait'),()=>{});}
   S.skills.forEach((s,i)=>{const def=SKILL[s.k];const b=$('sk'+i);const ready=s.cd<=0&&!!h&&S.running&&!S.paused;
@@ -1938,14 +1941,14 @@ function ui(){
     let bar=b.querySelector('.cdbar');if(!bar){bar=document.createElement('div');bar.className='cdbar';b.appendChild(bar);}bar.style.width=(s.cd>0?100*(1-s.cd/def.cd):100)+'%';
     const m=$('mSk'+i);m.disabled=!ready;m.dataset.tip=b.dataset.tip;m.querySelector('span').textContent=def.h;m.querySelector('small').textContent=!h?'영웅 없음':s.cd>0?`${Math.ceil(s.cd)}초 뒤`:'지금 사용';m.classList.toggle('ready',ready);});
   const t2=SAJU?SAJU.ten2:[];[0,1].forEach(i=>{const p=$('ps'+i);const t=t2[i]!=null?TEN[t2[i]]:null;p.querySelector('b').textContent=t?t.k+'·'+t.name:'—';p.querySelector('span').textContent=t?t.desc:'사주 입력 시';p.title=t?t.desc:'';});
-  $('skillNote').textContent=h?`액티브 위력은 영웅 등급(${GRADE[hg-1]})을 따른다. 영웅을 합쳐 키워라.`:(SAJU?'영웅이 사라지면 액티브를 쓸 수 없다.':'사주를 넣으면 나의 일주 영웅과 신살·십성이 붙는다.');
+  $('skillNote').textContent=h?`특기 위력 = 영웅 등급(${GRADE[hg-1]}). 영웅을 합쳐 키워라.`:(SAJU?'영웅이 없으면 특기를 못 쓴다.':'사주를 넣으면 특기 2개가 생긴다.');
 }
 function buildCycle(){
   let gen=`<div class="r"><span class="lab">상생</span>`;for(let i=0;i<5;i++)gen+=elChip(i)+`<span class="arr">→</span>`;gen+=elChip(0)+`</div>`;
   let over=`<div class="r"><span class="lab">상극</span>`;for(let i=0;i<5;i++){over+=elChip(i)+`<span class="arr">⊣</span>`+elChip(OVER(i))+(i<4?`<span class="arr" style="margin:0 3px">·</span>`:'');}over+=`</div>`;
   let sp=`<div class="r"><span class="lab">상극 폭발</span>`;for(const k in CLASH){const s=CLASH[k];sp+=`<span class="chip dual" style="width:auto;padding:0 5px;color:${s.color}" title="${EL[s.els[0]].k}+${EL[s.els[1]].k} ${s.name}: ${s.desc(3)} (희귀 기준)">${s.name}</span>`;}sp+=`</div>`;
   let ul=`<div class="r"><span class="lab">궁극기</span>`;ULT.forEach((u,i)=>{ul+=`<span class="chip dual" style="width:auto;padding:0 6px;color:${EL[i].color}" title="${u.name}: ${u.desc}">${u.h}</span>`;});ul+=`</div>`;
-  $('cycle').innerHTML=gen+over+sp+ul+`<div class="note">상생 짝(서로 살리는 오행)은 화살표 끝 오행의 융합체가 된다. 상극 짝(서로 누르는 오행)을 겹치면 둘 다 소멸하고 상극 폭발이 보드 전체에 터진다 (위력·지속은 등급 평균). 신화 기본 오행은 궁극기 자동 사용. 마우스를 올리면 설명이 보인다.</div>`;
+  $('cycle').innerHTML=gen+over+sp+ul+`<div class="note">상생 짝 → 융합체 · 상극 짝 → 상극 폭발(둘 다 소멸) · 위력은 두 등급 평균</div>`;
   $('pickRow').innerHTML=`<span class="note" style="margin-right:4px">오행 선택</span>`+EL.map((e,i)=>`<button class="chip pick" data-el="${i}" style="background:${e.color}" title="${e.k}">${e.h}</button>`).join('');
   $('pickRow').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(S.luck<50||S.shop.el>=0)return;S.luck-=50;S.shop.el=+b.dataset.el;$('pickRow').hidden=true;AU.buy();log(`행운 상점: 다음 소환 ${EL[S.shop.el].k} 지정 (운 -50)`,'hi');ui();});
 }
@@ -3338,9 +3341,9 @@ function placeHero(){
   const cen=Math.floor(ROWS/2)*COLS+Math.floor(COLS/2);const i=S.units[cen]?S.units.indexOf(null):cen;if(i<0)return;
   S.units[i]={id:S.nextId++,el,grade:metaHeroGrade(),fused:false,cd:0,pop:1.5,ultCd:0,drop:1,hero:true,heroName:name,gender:g};
   S.maxGrade=Math.max(S.maxGrade,3);const [x,y]=slotXY(i);ring(x,y,'#FFB020',90,0.8);burst(x,y,'#FFB020',24,120);
-  log(SAJU?`영웅 ${name} 출전 (희귀). 액티브 ${S.skills.map(s=>SKILL[s.k].name).join('·')} / 패시브 ${SAJU.ten2.map(i=>TEN[i].name+'('+TEN[i].k+')').join(', ')}`:'무명 영웅 출전 (희귀). 사주를 넣으면 일주 영웅과 신살·십성 스킬이 붙는다.','hi');
+  log(SAJU?`영웅 ${name} 출전 (희귀). 특기 ${S.skills.map(s=>SKILL[s.k].name).join('·')} / 성향 ${SAJU.ten2.map(i=>TEN[i].name+'('+TEN[i].k+')').join(', ')}`:'무명 영웅 출전 (희귀). 사주를 넣으면 일주 영웅과 신살·십성 스킬이 붙는다.','hi');
 }
-// ───── 영웅 액티브 스킬 (신살) ─────
+// ───── 영웅 특기 스킬 (신살) ─────
 function castSkill(idx){
   if(!S.running||S.paused)return;const s=S.skills[idx];if(!s||s.cd>0)return;const h=heroUnit();if(!h){log('영웅이 없어 스킬을 쓸 수 없다.','bad');return;}
   buzz([20,30,40]);const g=skillGrade(h),def=SKILL[s.k];const hi=S.units.indexOf(h);const [hx,hy]=slotXY(hi);h.anim='attack';h.animT=-0.15;h.pop=1.35;h.kx=-1;h.ky=0;for(let q=0;q<3;q++)ring(hx,hy,EL[h.el].color,50+q*45,0.5+q*0.2);const alive=S.enemies.filter(e=>e.hp>0&&e.d>=0);
