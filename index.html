@@ -515,6 +515,8 @@
   .cpdelta{font-size:11px;margin-left:5px;font-weight:800;animation:cpin .4s ease-out both;vertical-align:middle} .cpdelta.up{color:#2E7D4F} .cpdelta.down{color:#C0392B} @keyframes cpin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   .bonus{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 8px} .bonus span{font-size:11px;padding:4px 8px;border-radius:999px;background:#FFF6E0;border:1px solid #F2D9A0;color:#7A5200;font-weight:700} .bonus span.dim{background:#F3F0E8;border-color:#E3DCCB;color:var(--muted);font-weight:500}
   .teaser{margin-top:8px;padding:8px 10px;border-radius:10px;background:linear-gradient(90deg,#F4F0FF,#FFF7E8);border:1px dashed #D9CFF2;font-size:12px;color:var(--text)} .teaser b{color:#5B3FB0}
+  .fx{margin:8px 0 6px;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,#FFF6E0,#FFF);border:1.5px solid #F2D9A0;text-align:left} .fx>b{font-size:13px;color:#7A5200} .fxr{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px} .fxr span{font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;background:#fff;border:1px solid #F2D9A0;color:#2A1F00} .fx small{color:var(--muted);font-size:11px}
+  .todo button.pulse{animation:todopulse 1.4s ease-in-out infinite;border-color:#F2A23A;background:#FFF6E0} @keyframes todopulse{0%,100%{box-shadow:0 0 0 0 rgba(242,162,58,.45)}50%{box-shadow:0 0 0 6px rgba(242,162,58,0)}}
   .srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #F0E9DA} .srow:last-child{border-bottom:none} .srow>span{font-size:14px;color:var(--navy);font-weight:700}
   .sw{width:50px;height:30px;border-radius:999px;background:#D9CFBC;box-shadow:inset 0 2px 4px rgba(0,0,0,.12);padding:0;position:relative;transform:none!important;flex:none}
   .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:left .18s}
@@ -566,7 +568,7 @@
               <div class="hs-port"><canvas id="hsFace" width="280" height="280"></canvas><span class="hs-lv">Lv.<b id="hsLv">1</b></span></div>
               <div class="hs-info">
                 <div class="hs-name" id="hsName">영웅 없음</div>
-                <div class="hs-sub" id="hsSub">사주를 넣으면 일주가 영웅이 된다</div>
+                <div class="hs-sub" id="hsSub">사주를 넣으면 태어난 날의 기운(일주)이 영웅이 된다</div>
                 <div class="bar hs-bar"><i id="hsXp"></i></div><div class="hs-xp" id="hsXpT"></div>
                 <div id="hSkins"></div>
               </div>
@@ -574,8 +576,8 @@
             <div class="tiles3"><div class="tile"><span>전투력</span><b id="hsCp">0</b></div><div class="tile" id="hsFortT"><span>오늘 운세</span><b id="hsFort">?</b></div><div class="tile"><span>최고 웨이브</span><b id="hsBest">0</b></div></div>
             <div class="seg" id="heroSeg"><button class="on" data-p="grow">성장</button><button data-p="gear">장비</button><button data-p="quest">과제</button><button data-p="dex">도감</button></div>
             <div class="hp on" data-p="grow">
-              <div class="board"><h3>신살 · 십성 · 군대 <span id="recLine" hidden></span></h3>
-                <div class="note" id="hSub">생년월일을 넣으면 일주가 영웅이 되어 첫 웨이브부터 함께 싸운다.</div>
+              <div class="board"><h3>특기 · 성향 · 군대 <span id="recLine" hidden></span></h3>
+                <div class="note" id="hSub">생년월일을 넣으면 태어난 날의 기운(일주)이 영웅이 되어 첫 웨이브부터 함께 싸운다.</div>
                 <div class="r" id="hSkills" style="margin:8px 0"></div>
                 <div id="hArmy" style="margin:6px 0"></div>
                 <div class="btns"><button class="sm" id="hSajuBtn">사주 입력</button><button class="ghost sm" id="hDetailBtn">영웅 상세</button></div>
@@ -595,7 +597,7 @@
             </div></div>
           </section>
           <section class="scr" id="scr-social">
-            <div class="code-card"><div class="cc-l"><span>내 일주 코드</span><b id="myCode">-</b><small>친구가 이 코드를 넣으면 오늘 하루 내 오행이 친구를 돕는다</small></div><div class="cc-b"><button class="sm" id="copyCode">복사</button><button class="ghost sm" id="copyInvite">초대 문구</button><button class="ghost sm" id="copyCheer" title="오늘만 유효한 응원 코드">응원 보내기</button></div></div>
+            <div class="code-card"><div class="cc-l"><span>내 사주 코드</span><b id="myCode">-</b><small>친구가 이 코드를 넣으면 오늘 하루 내 오행이 친구를 돕는다</small></div><div class="cc-b"><button class="sm" id="copyCode">복사</button><button class="ghost sm" id="copyInvite">초대 문구</button><button class="ghost sm" id="copyCheer" title="오늘만 유효한 응원 코드">응원 보내기</button></div></div>
             <div class="board" id="friendBox"><h3>친구 기운 받기 <span id="frCount">0/3</span></h3>
               <div class="submit"><input id="friendIn" maxlength="12" placeholder="친구 코드 (예: 경진-ab12)" autocapitalize="off" autocomplete="off"><button class="ghost sm" id="friendPaste">붙여넣기</button><button class="sm" id="friendAdd">받기</button></div>
               <div class="note" id="friendMsg" style="min-height:16px;margin-top:4px"></div><div class="chips" id="friendRecent"></div><div class="note" id="giftNote" style="margin-top:8px"></div>
@@ -634,12 +636,12 @@
           <ul class="rules">
             <li><b>소환</b>은 랜덤. 소환할수록 운 게이지가 올라 고등급 확률이 오르고, 운은 <b>행운 상점</b>에서 쓸 수도 있다.</li>
             <li><b>같은 오행·같은 등급</b>을 겹치면 그 오행이 한 등급 오른다(공격력 ×2.15, 희귀·전설에서 특성 해금). <b>상생 짝</b>(목→화→토→금→수→목)을 겹치면 <b>생을 받는 오행</b>의 한 등급 위 융합체가 된다. 예: 화+토 → 토 융합체. 융합체는 공격력 +35%에 낳아준 오행의 기운(중독·소형 폭발·기절·치명·둔화)을 지닌다. 겹치기 전 미리보기로 결과를 볼 수 있다.</li>
-            <li><b>상극 짝</b>을 겹치면 둘 다 소멸하며 <b>극파</b>가 터진다. 효과는 짝마다 다르고, 위력과 지속시간은 두 유닛 등급을 따른다.</li>
-            <li><b>오행 진</b>: 가로·세로·대각선으로 상생 순서가 이어지면 연사가 빨라진다. 3칸 +25%, 4칸 +45%, 5칸 <b>오행대진</b> +70%에 공격력 +15%. 한 칸에 진이 겹치면 <b>연환</b>(연사 ×1.5, 공격력 +10%씩), 세 방향 오행대진이면 <b>오행 만다라</b> 공격력 +30%.</li>
+            <li><b>상극 짝</b>을 겹치면 둘 다 소멸하며 <b>상극 폭발(극파)</b>이 터진다. 효과는 짝마다 다르고, 위력과 지속시간은 두 유닛 등급을 따른다.</li>
+            <li><b>오행 진</b>: 가로·세로·대각선으로 상생 순서가 이어지면 연사가 빨라진다. 3칸 +25%, 4칸 +45%, 5칸 <b>오행대진</b> +70%에 공격력 +15%. 한 칸에 진이 겹치면 <b>진 겹침</b>(연사 ×1.5, 공격력 +10%씩), 세 방향 오행대진이면 <b>오행 만다라</b> 공격력 +30%.</li>
             <li>웨이브마다 <b>주력 오행</b>이 예고된다. 극하는 오행으로 맞받아치면 1.6배. 웨이브를 넘길 때마다 <b>산통 점괘</b>, 5웨이브마다 <b>유물</b>, 10웨이브마다 보스.</li>
             <li><b>신화</b>에 오른 기본 오행은 궁극기를 자동으로 쓴다. 적이 한 바퀴 돌아 빠져나가면 생명 -1, 보스는 -3. 30웨이브를 버티면 <b>천하통일</b>.</li>
-            <li><b>만세력 군대</b>: 사주 여덟 글자의 오행 개수만큼 일반 등급 유닛이 매 판 시작에 영웅 곁에 선다(일간은 영웅). <b>영웅</b>: 사주의 일주가 영웅이 되어 시작부터 싸운다. <b>신살 2개</b>가 쿨타임 있는 액티브 스킬, <b>십성 2개</b>가 패시브. 영웅을 합쳐 키우면 스킬도 세진다.</li>
-            <li>극파: 금+목 화살비 · 목+토 뿌리덫 · 토+수 진흙늪 · 수+화 증기 · 화+금 단조. 4웨이브부터 방패·분열·질주 적이 섞이고, 보스는 오행마다 패턴이 다르다.</li>
+            <li><b>사주 군대</b>: 사주 여덟 글자의 오행 개수만큼 일반 등급 유닛이 매 판 시작에 영웅 곁에 선다(태어난 날의 오행은 영웅). <b>영웅</b>: 사주의 태어난 날의 기운(일주)이 영웅이 되어 시작부터 싸운다. <b>신살 2개</b>가 쿨타임 있는 액티브 스킬, <b>십성 2개</b>가 패시브. 영웅을 합쳐 키우면 스킬도 세진다.</li>
+            <li>상극 폭발: 금+목 화살비 · 목+토 뿌리덫 · 토+수 진흙늪 · 수+화 증기 · 화+금 단조. 4웨이브부터 방패·분열·질주 적이 섞이고, 보스는 오행마다 패턴이 다르다.</li>
           </ul>
             </details>
             <details class="board fold" id="pane-asset"><summary><h3>그림 넣기 <span>PNG 시트를 게임에 끼운다</span></h3></summary>
@@ -653,7 +655,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.3</span> · 사주로 겨루는 오행 디펜스</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.4</span> · 사주로 겨루는 오행 디펜스</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -667,7 +669,7 @@
     <div class="modal" id="attModal" hidden style="z-index:26"><div class="mbox"><h3 style="margin:0">출석 보상</h3><div class="stats" id="attGrid" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div><div class="note" id="attNote"></div><button class="ghost sm" id="attClose" style="width:100%">닫기</button></div></div>
     <div class="modal" id="welcome" hidden style="z-index:25"><div class="mbox" style="text-align:center;gap:10px"><div style="font-family:'Jua','Noto Sans KR',sans-serif;font-size:34px;color:#2F7BE8">운세전</div><div class="note" style="font-size:14px;color:#223047">내 사주가 영웅이 되어 오행 군대를 이끈다.<br>친구와 점수를 겨루고, 기운을 나눈다.</div>
       <div class="r" style="justify-content:center;gap:6px;margin:4px 0"><span class="chip" style="background:#3FA66B;color:#fff">木</span><span class="chip" style="background:#E3553B;color:#fff">火</span><span class="chip" style="background:#C9A24A;color:#fff">土</span><span class="chip" style="background:#C8CCD6;color:#223047">金</span><span class="chip" style="background:#3D7FD9;color:#fff">水</span></div>
-      <div style="text-align:left;display:grid;gap:6px;font-size:13px"><div><i class="num">1</i><b>생년월일</b>을 넣으면 일주가 <b>영웅</b>이 된다</div><div><i class="num">2</i>같은 오행을 겹쳐 <b>승급</b>, 상생 짝을 겹쳐 <b>융합</b></div><div><i class="num">3</i>매일 <b>사당</b>에서 운세를 뽑아 오늘의 힘을 받는다</div></div>
+      <div style="text-align:left;display:grid;gap:6px;font-size:13px"><div><i class="num">1</i><b>생년월일</b>을 넣으면 태어난 날의 기운이 <b>영웅</b>이 된다</div><div><i class="num">2</i>같은 오행을 겹쳐 <b>승급</b>, 상생 짝을 겹쳐 <b>융합</b></div><div><i class="num">3</i>매일 <b>사당</b>에서 운세를 뽑아 오늘의 힘을 받는다</div></div>
       <div class="btns"><button id="wcStart">내 사주로 시작</button><button class="ghost" id="wcSkip">먼저 둘러보기</button></div></div></div>
     <div class="modal" id="cardModal" hidden style="z-index:30"><div class="mbox" style="padding:12px"><h3 style="margin:0">공유 카드</h3><img id="cardImg" alt="결과 카드" style="width:100%;border-radius:12px;display:block"><div class="note">이미지를 길게 누르면 저장할 수 있다.</div><div class="btns"><button class="sm" id="cardShare">공유하기</button><button class="ghost sm" id="cardCopy">글로 복사</button></div><button class="ghost sm" id="cardClose" style="width:100%">닫기</button></div></div>
     <div class="overlay" id="revealOverlay" hidden>
@@ -830,7 +832,7 @@ const EL = [
 const GEN = i => (i+1)%5;
 const OVER = i => (i+2)%5;
 const pairKey=(a,b)=>[a,b].sort().join(',');
-// 극파(剋破): 상극 짝을 겹치면 둘 다 소멸하며 보드 전체에 한 번 발동. g = 두 유닛 등급의 평균
+// 상극 폭발(剋破): 상극 짝을 겹치면 둘 다 소멸하며 보드 전체에 한 번 발동. g = 두 유닛 등급의 평균
 const clashDmg=g=>30*Math.pow(2.2,g-1);
 const f1=v=>(Math.round(v*10)/10).toString();
 const CLASH = {
@@ -856,11 +858,11 @@ const RELICS=[
   {id:'hunter',h:'사냥',hz:'獵',name:'사냥꾼의 눈',desc:'처치 골드 +30%'},
   {id:'formation',h:'진법',hz:'陣',name:'진법서',desc:'오행 진 연사 보너스 두 배 (3칸 +50%, 5칸 +140%)'},
   {id:'sand',h:'모래',hz:'砂',name:'시간의 모래',desc:'앞당기기 보너스 두 배, 웨이브 3초 짧아짐'},
-  {id:'seal',h:'인장',hz:'剋',name:'극파의 인장',desc:'상극 배율 1.6 → 2.0'},
+  {id:'seal',h:'인장',hz:'剋',name:'상극 폭발의 인장',desc:'상극 배율 1.6 → 2.0'},
   {id:'dice',h:'산통',hz:'骰',name:'옻칠 산통',desc:'웨이브마다 뽑는 점괘가 한 단계 좋아진다'},
   {id:'slayer',h:'보스',hz:'王',name:'보스 사냥꾼',desc:'보스에게 주는 피해 +40%'},
   {id:'almanac',h:'만세',hz:'曆',name:'만세력',desc:'오늘의 오행 보너스 두 배'},
-  {id:'amp',h:'증폭',hz:'破',name:'극파 증폭',desc:'극파를 한 등급 높게 계산'},
+  {id:'amp',h:'증폭',hz:'破',name:'상극 폭발 증폭',desc:'상극 폭발을 한 등급 높게 계산'},
   {id:'mirror',h:'거울',hz:'鏡',name:'오행 거울',desc:'상생 융합 시 30% 확률로 재료 하나가 남는다'},
   {id:'recycle',h:'재활',hz:'還',name:'재활용',desc:'유닛 판매가 두 배'},
   {id:'haste',h:'가속',hz:'速',name:'궁극기 가속',desc:'궁극기 쿨다운 -30%'},
@@ -883,7 +885,7 @@ const ACH=[
   {id:'w20',h:'20',name:'존버',desc:'20웨이브 도달'},
   {id:'w30',h:'30',name:'천하통일',desc:'30웨이브 도달'},
   {id:'myth',h:'신화',name:'신화 탄생',desc:'신화 등급 하나 만들기'},
-  {id:'clash5',h:'극파',name:'극파의 달인',desc:'한 판에 극파 5회'},
+  {id:'clash5',h:'상극 폭발',name:'상극 폭발의 달인',desc:'한 판에 상극 폭발 5회'},
   {id:'five',h:'오행',name:'오행완성',desc:'오행 다섯을 한 보드에'},
   {id:'relic6',h:'유물',name:'수집가',desc:'한 판에 유물 6개'},
   {id:'legend',h:'전설',name:'운빨왕',desc:'소환으로 전설 뽑기'},
@@ -903,8 +905,8 @@ const TIPS=[
   {id:'merge',when:S=>mergePairs().length>0,text:'흰 링이 도는 둘은 겹치면 한 등급 승급. 합치기 버튼이 한 번에 처리한다.'},
   {id:'gen',when:S=>{const u=S.units.filter(Boolean);return u.some(a=>u.some(b=>a!==b&&a.grade===b.grade&&GEN(a.el)===b.el));},text:'상생 짝(木→火→土→金→水)을 겹치면 융합체. 공격력 +35%.'},
   {id:'wave',when:S=>S.wave>=2,text:'다음 웨이브 오행이 예고된다. 그 오행을 극하는 유닛이 1.6배.'},
-  {id:'form',when:S=>S.wave>=3,text:'가로·세로·대각선으로 상생 순서를 이으면 오행 진. 이어질수록 연환.'},
-  {id:'clash',when:S=>S.units.filter(Boolean).length>=6,text:'상극 짝을 겹치면 둘 다 사라지며 극파가 터진다. 위기용.'},
+  {id:'form',when:S=>S.wave>=3,text:'가로·세로·대각선으로 상생 순서를 이으면 오행 진. 이어질수록 진 겹침.'},
+  {id:'clash',when:S=>S.units.filter(Boolean).length>=6,text:'상극 짝을 겹치면 둘 다 사라지며 상극 폭발이 터진다. 위기용.'},
   {id:'luck',when:S=>S.luck>=50,text:'운 게이지 50. 행운 상점에서 다음 소환 오행을 고를 수 있다.'},
   {id:'skill',when:S=>S.wave>=4,text:'아래 도화·역마 스킬은 준비되면 빛난다. 웨이브가 몰릴 때 써라.'},
 ];
@@ -1054,13 +1056,13 @@ const STEM=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'], STEM_E
 const BRANCH=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'], BRANCH_EL=[4,2,0,0,2,1,1,2,3,3,2,4];
 const BRANCH_H=['23~01','01~03','03~05','05~07','07~09','09~11','11~13','13~15','15~17','17~19','19~21','21~23'];
 const STEM_K=['갑','을','병','정','무','기','경','신','임','계'], BRANCH_K=['자','축','인','묘','진','사','오','미','신','유','술','해'];
-const REL=['비겁','식상','재성','관성','인성'];
+const REL=['같은 기운(비겁)','표현(식상)','재물(재성)','규율(관성)','학습(인성)'];
 // 십성 패시브 (사주에서 가장 많은 둘) · 신살 액티브 (가장 특징적인 둘, 쿨타임 후 재사용)
 const TEN=[
   {k:'비겁',name:'동료',desc:'나의 오행 유닛 공격력 추가 +12%'},
   {k:'식상',name:'표현',desc:'융합체 공격력 +15%'},
   {k:'재성',name:'재물',desc:'처치 골드 +15%'},
-  {k:'관성',name:'규율',desc:'극파를 반 등급 높게 계산'},
+  {k:'관성',name:'규율',desc:'상극 폭발을 반 등급 높게 계산'},
   {k:'인성',name:'학습',desc:'소환마다 운 게이지 +3'},
 ];
 const q=(v,st)=>Math.round(v/st)*st;
@@ -1158,7 +1160,7 @@ function renderGuest(){renderBonus();const box=$('goHero');if(!box)return;const 
   box.innerHTML=`<div class="note" style="margin:6px 0 4px"><b>출전 영웅</b> · 객원 영웅은 도감에서 그 오행 3단계를 모두 보면 열린다 (Lv.20이면 전부)</div><div class="r">${[mine,...[0,1,2,3,4].filter(e=>e!==mine)].map(el=>{const open=guestOpen(el);const on=(GUEST<0?mine:GUEST)===el;return `<span class="pill${on?' on':''}" data-guest="${el}" style="cursor:${open?'pointer':'default'};opacity:${open?1:.45};border-color:${EL[el].color};padding:6px 10px">${el===mine?SAJU.ilju+' '+HERO_STYLE[el].job:EL[el].k+' '+HERO_STYLE[el].job+(open?'':'<span class="lock">잠김</span>')}${on?' ✓':''}</span>`;}).join('')}</div>`;
   box.querySelectorAll('[data-guest]').forEach(c=>c.onclick=()=>{const el=+c.dataset.guest;if(!guestOpen(el)){toast(`${EL[el].k} 도감 3단계를 모두 보면 열린다`);return;}GUEST=el===mine?-1:el;try{localStorage.setItem('ubz_guest',GUEST);}catch(_){}AU.buy();renderGuest();});}
 const metaNeed=lv=>Math.round(120*Math.pow(lv,1.35));
-const META_PERK=[{lv:5,t:'첫 판 무료 소환 +1'},{lv:10,t:'영웅이 영웅 등급으로 시작'},{lv:15,t:'신살 대기 -10%'},{lv:20,t:'시작 생명 +3'},{lv:25,t:'아군 사거리 +5%'},{lv:30,t:'영웅이 전설 등급으로 시작'}];
+const META_PERK=[{lv:5,t:'첫 판 무료 소환 +1'},{lv:10,t:'영웅이 영웅 등급으로 시작'},{lv:15,t:'특기 대기 -10%'},{lv:20,t:'시작 생명 +3'},{lv:25,t:'아군 사거리 +5%'},{lv:30,t:'영웅이 전설 등급으로 시작'}];
 function loadMeta(){try{const m=JSON.parse(localStorage.getItem('ubz_meta'));if(m)META={...META,...m};}catch(_){}}
 function saveMeta(){try{localStorage.setItem('ubz_meta',JSON.stringify(META));}catch(_){}}
 const wkKey=()=>{const d=new Date();const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
@@ -1179,7 +1181,7 @@ function renderMeta(){const box=$('hMeta');if(!box)return;const np=nextPerk();
   box.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:12px"><b>Lv.${META.lv}</b><span class="note">${META.lv>=META_MAX?'최고 레벨':`경험 ${META.xp.toLocaleString()} / ${need.toLocaleString()} · 다음 레벨까지 ${(need-META.xp).toLocaleString()}`}</span></div><div class="xpbar"><i style="width:${pct}%"></i></div>`
     +`<div class="ladder"><i></i>${META_PERK.map(p=>`<b class="${META.lv>=p.lv?'on':(np&&np.lv===p.lv?'next':'')}" style="left:${Math.round(100*p.lv/maxLv)}%" title="${p.t}">${p.lv}</b>`).join('')}</div>`
     +`<div class="note">레벨마다 전 유닛 공격력 +1%${np?` · 다음 특전 <b>Lv.${np.lv}</b> ${np.t} (${np.lv-META.lv}레벨 남음)`:' · 모든 특전을 열었다'}</div><div class="r" style="margin-top:6px">${META_PERK.map(p=>`<span class="pill${META.lv>=p.lv?' on':''}" title="${p.t}">Lv.${p.lv} ${p.t}</span>`).join('')}</div>`;}
-const QPOOL=[{id:'k40',t:'적 40마리 처치',f:S=>S.kills,goal:40},{id:'w8',t:'8웨이브 도달',f:S=>S.wave,goal:8},{id:'f4',t:'융합 4회',f:S=>S.fusions,goal:4},{id:'c2',t:'극파 2회',f:S=>S.clashes,goal:2},{id:'s12',t:'소환 12회',f:S=>S.summons,goal:12},{id:'u1',t:'궁극기 1회',f:S=>S.ults,goal:1},{id:'m1',t:'신화 등급 1회',f:S=>S.mythic,goal:1},{id:'w15',t:'15웨이브 도달',f:S=>S.wave,goal:15},{id:'k100',t:'적 100마리 처치',f:S=>S.kills,goal:100}];
+const QPOOL=[{id:'k40',t:'적 40마리 처치',f:S=>S.kills,goal:40},{id:'w8',t:'8웨이브 도달',f:S=>S.wave,goal:8},{id:'f4',t:'융합 4회',f:S=>S.fusions,goal:4},{id:'c2',t:'상극 폭발 2회',f:S=>S.clashes,goal:2},{id:'s12',t:'소환 12회',f:S=>S.summons,goal:12},{id:'u1',t:'궁극기 1회',f:S=>S.ults,goal:1},{id:'m1',t:'신화 등급 1회',f:S=>S.mythic,goal:1},{id:'w15',t:'15웨이브 도달',f:S=>S.wave,goal:15},{id:'k100',t:'적 100마리 처치',f:S=>S.kills,goal:100}];
 let QST={date:'',ids:[],done:{},best:{},all:false};
 function loadQuest(){try{const q=JSON.parse(localStorage.getItem('ubz_quest'));if(q&&q.date===todayStr())QST=q;}catch(_){}
   if(QST.date!==todayStr()){const r=rng(hash(todayStr()+'|quest'));const pool=QPOOL.slice();const ids=[];while(ids.length<3){ids.push(pool.splice(Math.floor(r()*pool.length),1)[0].id);}QST={date:todayStr(),ids,done:{},best:{},all:false};saveQuest();}}
@@ -1214,7 +1216,7 @@ const ATT_REW=[{g:20},{g:40},{g:60,gear:1},{g:80},{g:100},{g:100,fs:2},{g:100,ge
 function attendGearCheck(){const d=ATT.streak;const rw=ATT_REW[d-1];if(rw&&rw.gear&&!ATT.gearGiven){ATT.gearGiven=true;const id=rollGear(rw.gear);gainGear(id);try{localStorage.setItem('ubz_att',JSON.stringify(ATT));}catch(_){}return gearById(id);}return null;}
 function renderAttend(){const box=$('attGrid');if(!box)return;box.innerHTML=ATT_REW.map((rw,i)=>{const d=i+1;const on=d<=ATT.streak,today=d===ATT.streak;return `<div class="stat" style="padding:6px 2px;${today?'border-color:#F2A23A;background:#FFF6E0':''}${on&&!today?'opacity:.75':''}"><span>${d}일${today?' ·오늘':''}</span><b style="font-size:13px">${on?'<i class="qk on" style="width:14px;height:14px;margin-right:3px"></i>':''}${rw.g}G</b><small style="display:block;font-size:10px;color:${rw.gear?'#2F7BE8':'var(--muted)'}">${rw.gear?(rw.gear===2?'장비 2등급':'장비'):rw.fs?'소환 +2':'소환 +1'}</small></div>`;}).join('');
   $('attNote').textContent=`연속 ${ATT.streak}일째. 하루 빠지면 1일부터 다시. 골드와 무료 소환은 그날 첫 자유 모드 판에 들어간다.`;}
-// 친구 기운: 일주 코드 교환 → 오늘 하루 오행 관계에 따른 버프 (최대 3명)
+// 친구 기운: 사주 코드 교환 → 오늘 하루 오행 관계에 따른 버프 (최대 3명)
 let FR={date:'',list:[]};
 function loadFriends(){try{const f=JSON.parse(localStorage.getItem('ubz_fr'));if(f&&f.date===todayStr())FR=f;else FR={date:todayStr(),list:[]};}catch(_){FR={date:todayStr(),list:[]};}}
 function saveFriends(){try{localStorage.setItem('ubz_fr',JSON.stringify(FR));}catch(_){}}
@@ -1226,7 +1228,7 @@ function parseCode(t){t=(t||'').trim();const m=t.match(/^([갑을병정무기경
 function friendBuffOf(fel){if(!SAJU)return {k:'응원',t:'공격력 +3%',power:0.03};const me=SAJU.me;
   if(GEN(fel)===me)return {k:'생조',t:'공격력 +6%',power:0.06};
   if(fel===me)return {k:'비겁',t:'소환마다 운 +2',luck:2};
-  if(OVER(fel)===me)return {k:'극제',t:'극파 +0.25등급',clash:0.25};
+  if(OVER(fel)===me)return {k:'극제',t:'상극 폭발 +0.25등급',clash:0.25};
   if(GEN(me)===fel)return {k:'설기',t:'처치 골드 +5%',gold:0.05};
   return {k:'재성',t:'보스 피해 +6%',boss:0.06};}
 function friendTotal(){const tot={power:0,luck:0,clash:0,gold:0,boss:0};for(const f of FR.list){const b=friendBuffOf(f.el);for(const k in tot)tot[k]+=b[k]||0;}return tot;}
@@ -1253,10 +1255,10 @@ const FORT_SUM={
   '대길':['하늘이 길을 열어 준다. 오늘은 거침없이 나아가라.','기운이 정점에 닿았다. 큰 판을 벌여도 좋다.','귀인이 곁을 지킨다. 뽑는 족족 손에 붙는다.'],
   '길':['순풍이 분다. 차근차근 쌓으면 뜻대로 된다.','작은 운이 겹겹이 온다. 욕심만 부리지 않으면 이긴다.','길이 열려 있다. 망설이지 말고 소환하라.'],
   '평':['잔잔한 하루. 운보다 실력이 판을 가른다.','들뜰 것도 움츠릴 것도 없다. 기본을 지켜라.','오행이 고르게 흐른다. 진을 잘 짜면 충분하다.'],
-  '소흉':['바람이 거스른다. 무리한 극파는 삼가라.','운이 잠시 등을 돌렸다. 생명을 아끼며 버텨라.','작은 실수가 크게 번진다. 합치기를 서두르지 마라.'],
+  '소흉':['바람이 거스른다. 무리한 상극 폭발는 삼가라.','운이 잠시 등을 돌렸다. 생명을 아끼며 버텨라.','작은 실수가 크게 번진다. 합치기를 서두르지 마라.'],
   '흉':['먹구름이 낮게 깔렸다. 오늘은 지키는 날이다.','기운이 바닥이다. 화려함보다 안정을 택하라.','운은 없지만 길은 있다. 유물과 진으로 메워라.'],
 };
-const FORT_ADV=['상생 짝을 먼저 모아라. 융합체가 하루를 연다.','부족한 오행부터 채워라. 오행완성이 답이다.','운 게이지가 60을 넘기면 행운 상점을 써라.','보스 전에 극파 하나는 남겨 둬라.','영웅을 한 등급만 올려도 스킬이 달라진다.','앞당기기 보너스를 모아 유물 웨이브에 대비하라.'];
+const FORT_ADV=['상생 짝을 먼저 모아라. 융합체가 하루를 연다.','부족한 오행부터 채워라. 오행완성이 답이다.','운 게이지가 60을 넘기면 행운 상점을 써라.','보스 전에 상극 폭발 하나는 남겨 둬라.','영웅을 한 등급만 올려도 스킬이 달라진다.','앞당기기 보너스를 모아 유물 웨이브에 대비하라.'];
 function drawFortune(){
   if(!SAJU)return null;
   const [ts]=todayPillar();const T=STEM_EL[ts];const M=SAJU.me;
@@ -1274,7 +1276,7 @@ function drawFortune(){
   if(score>=88){res.freeSummon=3;res.guar=true;res.lines.push('대길: 무료 소환 3회 + 첫 소환 희귀 확정, 점괘 한 단계 상승');}
   else if(score>=65){res.freeSummon=1;res.lines.push('길: 무료 소환 1회');}
   if(score>=65){res.gear=rollGear(score>=88?2:1,r);res.lines.push(`장비 획득: ${gearById(res.gear).name} (${gearById(res.gear).d})`);}
-  res.elBonus=Math.round(10+20*m)/100;res.lines.push(`오늘의 오행 ${EL[T].k}(${EL[T].h}) 유닛 공격력 +${Math.round(res.elBonus*100)}%`);
+  res.elBonus=Math.round(10+20*m)/100;res.lines.push(`오늘의 오행 ${EL[T].k}(${EL[T].k}) 유닛 공격력 +${Math.round(res.elBonus*100)}%`);
   const k=0.5+m;
   if(rel===0){res.costMult=1-Math.round(15*k)/100;res.lines.push(`비겁일: 소환 비용 -${Math.round((1-res.costMult)*100)}%`);}
   if(rel===1){res.fuseExtra=Math.round(15*k)/100;res.lines.push(`식상일: 융합체 공격력 +${Math.round(res.fuseExtra*100)}%`);}
@@ -1284,12 +1286,14 @@ function drawFortune(){
   try{localStorage.setItem('ubz_daily',JSON.stringify({date:todayStr(),key:sajuKey(),res}));}catch(_){}
   DAILY=res;if(res.gear&&GR.daily!==todayStr()){GR.daily=todayStr();gainGear(res.gear,'daily');}return res;
 }
-function tomorrowTeaser(){if(!SAJU)return '';const t=new Date();t.setDate(t.getDate()+1);const i=dayIdx(t.getFullYear(),t.getMonth()+1,t.getDate());const ts=i%10,tb=i%12;const T=STEM_EL[ts],M=SAJU.me;const rel=T===M?0:GEN(M)===T?1:OVER(M)===T?2:OVER(T)===M?3:4;const R=[['비화','내 오행이 짙어지는 날. 같은 오행 소환이 잘 붙는다','평'],['식상','내가 낳는 기운. 융합이 잘 되는 날','길'],['재성','내가 다스리는 기운. 골드가 붙는 길일','대길 기대'],['관살','나를 누르는 기운. 조심할 날, 대신 극파가 세다','흉 조심'],['인성','나를 돕는 기운. 영웅이 든든한 날','길']][rel];return `<div class="teaser">내일 일진 <b>${STEM_K[ts]}${BRANCH_K[tb]}</b> · ${EL[T].k}의 날 · <b>${R[0]}</b> — ${R[1]} <span class="note">(${R[2]})</span></div>`;}
-const fortuneHtml=d=>`<div class="fscore"><b>${d.score}</b><span>점</span><em class="${d.level==='흉'||d.level==='소흉'?'bad':d.level==='대길'?'great':''}">${d.level}</em><i>${d.rel}일</i></div><div class="ftitle">${d.title||''}</div><div class="note">${d.advice||''}</div><ul>${d.lines.map(l=>`<li>${l}</li>`).join('')}</ul>${tomorrowTeaser()}`;
+function tomorrowTeaser(){if(!SAJU)return '';const t=new Date();t.setDate(t.getDate()+1);const i=dayIdx(t.getFullYear(),t.getMonth()+1,t.getDate());const ts=i%10,tb=i%12;const T=STEM_EL[ts],M=SAJU.me;const rel=T===M?0:GEN(M)===T?1:OVER(M)===T?2:OVER(T)===M?3:4;const R=[['같은 기운(비겁)','내 오행이 짙어지는 날. 같은 오행 소환이 잘 붙는다','평'],['표현(식상)','내가 낳는 기운. 융합이 잘 되는 날','길'],['재물(재성)','내가 다스리는 기운. 골드가 붙는 길일','대길 기대'],['규율(관살)','나를 누르는 기운. 조심할 날, 대신 상극 폭발이 세다','흉 조심'],['학습(인성)','나를 돕는 기운. 영웅이 든든한 날','길']][rel];return `<div class="teaser">내일 일진 <b>${STEM_K[ts]}${BRANCH_K[tb]}</b> · ${EL[T].k}의 날 · <b>${R[0]}</b> — ${R[1]} <span class="note">(${R[2]})</span></div>`;}
+function fortuneEffects(d){if(!d||!d.level)return [];const o=[];if(d.power)o.push(`⚔ 아군 공격력 +${Math.round(d.power*100)}%`);if(d.startGold)o.push(`💰 시작 골드 +${d.startGold}`);if(d.luckStart)o.push(`🎲 시작 운 게이지 ${d.luckStart}`);if(d.freeSummon)o.push(`✨ 무료 소환 ${d.freeSummon}회`);if(d.guar)o.push('🔒 첫 소환 희귀 확정');if(d.el>=0&&d.elBonus)o.push(`${EL[d.el].k} 유닛 +${Math.round(d.elBonus*100)}%`);if(d.costMult&&d.costMult!==1)o.push(`소환 비용 ${d.costMult<1?'-':'+'}${Math.round(Math.abs(1-d.costMult)*100)}%`);if(d.goldMult&&d.goldMult!==1)o.push(`처치 골드 ${d.goldMult>1?'+':'-'}${Math.round(Math.abs(d.goldMult-1)*100)}%`);if(d.enemyHp&&d.enemyHp!==1)o.push(`적 체력 ${d.enemyHp<1?'-':'+'}${Math.round(Math.abs(1-d.enemyHp)*100)}%`);if(d.luckExtra)o.push(`소환마다 운 +${d.luckExtra}`);if(d.fuseExtra)o.push(`융합 공격력 +${Math.round(d.fuseExtra*100)}%`);if(d.gear)o.push(`🎁 장비 ${gearById(d.gear).name}`);return o;}
+const fxHtml=d=>{const fx=fortuneEffects(d);return fx.length?`<div class="fx"><b>오늘 전투에 붙는 효과</b><div class="fxr">${fx.map(t=>`<span>${t}</span>`).join('')}</div><small>오늘 치르는 모든 판에 자동으로 붙는다.</small></div>`:'';};
+const fortuneHtml=d=>`<div class="fscore"><b>${d.score}</b><span>점</span><em class="${d.level==='흉'||d.level==='소흉'?'bad':d.level==='대길'?'great':''}">${d.level}</em><i>${d.rel}의 날</i></div>${fxHtml(d)}<div class="ftitle">${d.title||''}</div><div class="note">${d.advice||''}</div><ul>${d.lines.map(l=>`<li>${l}</li>`).join('')}</ul>${tomorrowTeaser()}`;
 function renderSaju(){
   const [ts,tb]=todayPillar();$('todayGanji').textContent=`오늘 ${gz(ts,tb)}일`;
   const box=$('sajuBox');
-  if(!SAJU){box.innerHTML=`<div class="note">사주를 넣으면 일주 <b>영웅</b>이 희귀로 주어지고, 신살 액티브 스킬 2개와 십성 패시브 2개가 붙는다. 운세도 뽑을 수 있다.</div>`;}
+  if(!SAJU){box.innerHTML=`<div class="note">사주를 넣으면 태어난 날의 기운(일주)이 <b>영웅</b>이 되어 희귀 등급으로 주어지고, 특기(신살) 2개와 성향(십성) 2개가 붙는다. 운세도 뽑을 수 있다.</div>`;}
   else{const p=SAJU.p;const cell=(lab,v)=>`<div class="pillar"><span>${lab}</span><b>${v?`<i style="color:${EL[STEM_EL[v[0]]].color}">${STEM_K[v[0]]}</i><i style="color:${EL[BRANCH_EL[v[1]]].color}">${BRANCH_K[v[1]]}</i>`:'<i style="color:var(--muted)">??</i>'}</b></div>`;
     const ts=SAJU.ten2.map(i=>TEN[i]),sk=SAJU.skills.map(k=>SKILL[k]);
     box.innerHTML=`<div class="pillars">${cell('시',p.hour)}${cell('일',p.day)}${cell('월',p.month)}${cell('년',p.year)}</div>
@@ -1330,7 +1334,7 @@ function dexFrame(){if($('dexModal').hidden){DEXA.on=false;return;}if(!DEXA.drag
 function openDex(el,t,hero){const cv2=$('dexBig');const g=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';
   Object.assign(DEXA,{el,t,hero,g,ang:0,drag:null,pose:0});if(!cv2._rot){cv2._rot=1;cv2.style.touchAction='none';cv2.style.cursor='grab';cv2.onpointerdown=e=>{DEXA.drag={x:e.clientX,a:DEXA.ang};cv2.setPointerCapture(e.pointerId);};cv2.onpointermove=e=>{if(DEXA.drag)DEXA.ang=DEXA.drag.a+(e.clientX-DEXA.drag.x)*0.025;};cv2.onpointerup=cv2.onpointercancel=()=>{DEXA.drag=null;};const pb=$('dexPose');if(pb)pb.onclick=()=>{DEXA.pose=performance.now();DEXA.ang=0;AU.buy();buzz(15);};}
   if(!DEXA.on){DEXA.on=true;requestAnimationFrame(dexFrame);}
-  const nm=hero?`${SAJU?SAJU.ilju:'무명'} ${HERO_STYLE[el].job} · ${TIER_N[t]}`:(t===2?`${EL[el].h} ${SHIN[el]}`:`${EL[el].h} ${['정령',['트렌트','불꽃 정령','장승','장수','이무기'][el]][t]}`);
+  const nm=hero?`${SAJU?SAJU.ilju:'무명'} ${HERO_STYLE[el].job} · ${TIER_N[t]}`:(t===2?`${EL[el].k} ${SHIN[el]}`:`${EL[el].k} ${['정령',['트렌트','불꽃 정령','장승','장수','이무기'][el]][t]}`);
   $('dexBigName').textContent=nm;
   const tr=TRAIT[el];const lines=[];if(hero)lines.push(`${GRADE[[0,2,4][t]]}~${GRADE[[1,3,5][t]]} 등급의 모습. 영웅은 합칠수록 옷과 무기가 화려해진다.`);else{lines.push(`${['일반·고급','희귀·영웅','전설·신화'][t]} 등급의 모습.`);if(t>=1)lines.push(`특성 ${tr[0].n}: ${tr[0].t}`);if(t>=2)lines.push(`특성 ${tr[1].n}: ${tr[1].t} · 신화에서 궁극기 ${ULT[el].name}`);}
   lines.push(`극하는 오행 ${EL[OVER(el)].k} · 상생 짝 ${EL[GEN(el)].k}`);lines.push(`<small style="opacity:.65">끌어서 돌려볼 수 있다</small>`);
@@ -1339,13 +1343,13 @@ function renderDex(){
   const n=dexSeenN();$('dexCount').textContent=`${n}/15`;BLINK=false;SWING=0;PHASE=0;
   {const r=$('dexRew');if(r){REC.dexRew=REC.dexRew||{};r.innerHTML=DEX_REW.map(x=>`<span class="pill${n>=x.n?' on':''}">${x.n}종 ${x.t}${REC.dexRew[x.n]?' ✓':''}</span>`).join('')+[0,1,2,3,4].map(el=>`<span class="pill${dexElDone(el)?' on':''}" title="${EL[el].k} 3단계 모두 보면 ${EL[el].k} 공격력 +3%, 객원 영웅 해금">${EL[el].k} ${dexElDone(el)?'완성':[0,1,2].filter(t=>REC.seen[`${el}-${t}`]).length+'/3'}</span>`).join('');}}
   const dex=$('dex');dex.innerHTML='';
-  for(let t=0;t<3;t++)for(let el=0;el<5;el++){const on=!!REC.seen[`${el}-${t}`];const cell=document.createElement('div');cell.className='cell'+(on?' on':'');const cv2=document.createElement('canvas');cv2.width=cv2.height=56;cell.appendChild(cv2);const lab=document.createElement('span');lab.textContent=on?(t===2?`${EL[el].h} ${SHIN[el]}`:`${EL[el].h} ${['정령',['트렌트','불꽃 정령','장승','장수','이무기'][el]][t]}`):'???';cell.appendChild(lab);dex.appendChild(cell);if(on){cell.style.cursor='pointer';cell.onclick=()=>openDex(el,t,false);}
+  for(let t=0;t<3;t++)for(let el=0;el<5;el++){const on=!!REC.seen[`${el}-${t}`];const cell=document.createElement('div');cell.className='cell'+(on?' on':'');const cv2=document.createElement('canvas');cv2.width=cv2.height=56;cell.appendChild(cv2);const lab=document.createElement('span');lab.textContent=on?(t===2?`${EL[el].k} ${SHIN[el]}`:`${EL[el].k} ${['정령',['트렌트','불꽃 정령','장승','장수','이무기'][el]][t]}`):'???';cell.appendChild(lab);dex.appendChild(cell);if(on){cell.style.cursor='pointer';cell.onclick=()=>openDex(el,t,false);}
     drawOn(cv2,()=>{ctx.translate(28,28);ctx.scale(0.85,0.85);if(on)drawCreature(el,t);else{ctx.globalAlpha=0.25;drawCreature(el,t);ctx.globalAlpha=1;ctx.fillStyle='#8F88A3';ctx.font="700 18px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',0,2);}});}
   const dh=$('dexHero');dh.innerHTML='';const el=SAJU?SAJU.me:3;const g=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';
   for(let t=0;t<3;t++){const cell=document.createElement('div');cell.className='cell on';const cv2=document.createElement('canvas');cv2.width=cv2.height=56;cell.appendChild(cv2);const lab=document.createElement('span');lab.textContent=`${SAJU?SAJU.ilju:'무명'} ${TIER_N[t]}`;cell.appendChild(lab);dh.appendChild(cell);cell.style.cursor='pointer';cell.onclick=()=>openDex(el,t,true);drawOn(cv2,()=>{ctx.translate(28,38);ctx.scale(0.42,0.42);BLINK=false;SWING=0;PHASE=0;drawHero(el,g,t);});}
 }
 let RV={step:0,mode:'onboard'};
-function heroSkillsHtml(){if(!SAJU)return '';const g=3;return `<div class="r" style="justify-content:center">${SAJU.skills.map(k=>`<span class="chip relic" title="${SKILL[k].desc(g)}">${SKILL[k].name}</span>`).join('')}${SAJU.ten2.map(i=>`<span class="pill on" title="${TEN[i].desc}">${TEN[i].k}·${TEN[i].name}</span>`).join('')}</div><ul class="rules" style="margin-top:10px">${SAJU.skills.map(k=>`<li><b>${SKILL[k].name}</b> ${SKILL[k].desc(g)} · 쿨타임 ${SKILL[k].cd}초</li>`).join('')}${SAJU.ten2.map(i=>`<li><b>${TEN[i].k}·${TEN[i].name}</b> ${TEN[i].desc}</li>`).join('')}<li class="note">처치할수록 레벨이 오른다. 레벨마다 공격력 +8%, 스킬 쿨타임 -3%. 같은 오행 유닛과 합치면 등급이 오르고 스킬 위력도 커진다.</li></ul>`;}
+function heroSkillsHtml(){if(!SAJU)return '';const g=3;return `<div class="r" style="justify-content:center">${SAJU.skills.map(k=>`<span class="chip relic" title="${SKILL[k].desc(g)}">${SKILL[k].name}</span>`).join('')}${SAJU.ten2.map(i=>`<span class="pill on" title="${TEN[i].desc}">${TEN[i].name}<small style="opacity:.6">(${TEN[i].k})</small></span>`).join('')}</div><ul class="rules" style="margin-top:10px">${SAJU.skills.map(k=>`<li><b>${SKILL[k].name}</b> ${SKILL[k].desc(g)} · 쿨타임 ${SKILL[k].cd}초</li>`).join('')}${SAJU.ten2.map(i=>`<li><b>${TEN[i].k}·${TEN[i].name}</b> ${TEN[i].desc}</li>`).join('')}<li class="note">처치할수록 레벨이 오른다. 레벨마다 공격력 +8%, 스킬 쿨타임 -3%. 같은 오행 유닛과 합치면 등급이 오르고 스킬 위력도 커진다.</li></ul>`;}
 let SANTONG={t0:0,score:null,level:''};
 function santongAnim(cv2){if(!cv2)return;SANTONG={t0:performance.now(),score:null,level:'',cv:cv2};const step=()=>{const cvx=SANTONG.cv;if(!cvx||!cvx.isConnected)return;const t=(performance.now()-SANTONG.t0)/1000;
   drawOn(cvx,()=>{ctx.scale(2,2);const W2=260,H2=180;ctx.clearRect(0,0,W2,H2);
@@ -1378,7 +1382,7 @@ function renderReveal(){
   cv2.style.animation='none';void cv2.offsetWidth;cv2.style.animation='';
   const total=RV.mode==='onboard'?3:1;$('rvStep').innerHTML=RV.mode==='onboard'?[0,1,2].map(i=>`<i class="${i===RV.step?'on':i<RV.step?'done':''}"></i>`).join(''):RV.mode==='fortune'?'<b>사당 · 오늘의 운세</b>':'<b>나의 영웅</b>';
   $('rvClose').hidden=true;
-  if(RV.step===0){draw(1);$('rvTitle').innerHTML=`${SAJU.ilju} <em>${HERO_STYLE[el].job}</em>`;$('rvText').textContent=`${g==='f'?'여':'남'} · ${EL[el].k} 일간. 일주가 영웅이 되고, 만세력의 오행 ${armyText()||'없음'}이 군대로 함께 나선다.`;$('rvBody').innerHTML=heroSkillsHtml();$('rvNext').textContent=RV.mode==='onboard'?'오늘의 운세 뽑기':'닫기';}
+  if(RV.step===0){draw(1);$('rvTitle').innerHTML=`${SAJU.ilju} <em>${HERO_STYLE[el].job}</em>`;$('rvText').textContent=`${g==='f'?'여':'남'} · 나의 오행 ${EL[el].k}. 태어난 날의 기운(일주)이 영웅이 되고, 사주 여덟 글자의 오행 ${armyText()||'없음'}이 군대로 함께 나선다.`;$('rvBody').innerHTML=heroSkillsHtml();$('rvNext').textContent=RV.mode==='onboard'?'오늘의 운세 뽑기':'닫기';}
   else if(RV.step===1){draw(1);$('rvTitle').innerHTML='오늘의 <em>운세</em>';
     if(DAILY.level){$('rvText').textContent='';$('rvBody').innerHTML=`<div class="fortune-body" style="text-align:left">${fortuneHtml(DAILY)}</div>`;$('rvNext').textContent=RV.mode==='fortune'?'기운을 받았다':'다음';}
     else{$('rvText').textContent='산통을 흔든다. 점수가 높을수록 오늘 전투가 강해진다.';$('rvBody').innerHTML='<canvas id="rvSantong" width="520" height="360" style="width:260px;height:180px;display:block;margin:0 auto"></canvas>';$('rvNext').textContent='뽑는 중…';$('rvNext').disabled=true;santongAnim($('rvSantong'));
@@ -1527,7 +1531,7 @@ function drawScene(){const cv2=$('homeScene');if(!cv2||!cv2.offsetWidth)return;c
     if(night&&(season==='summer'||season==='spring')){const pr=rng(9);for(let k=0;k<14;k++){const gx=2+pr()*11,gy=5+pr()*7,ph2=pr()*10;const bl=0.5+0.5*Math.sin(t*2.2+ph2);const [x,y]=P(gx,gy,0.8+Math.sin(t*0.8+ph2)*0.3);ctx.fillStyle=`rgba(200,255,120,${0.25+0.7*bl})`;ctx.beginPath();ctx.arc(x,y,1.6,0,Math.PI*2);ctx.fill();}}
     // 디딤돌 (안채 → 대문)
     ctx.fillStyle='#B7A78A';for(let k=0;k<7;k++){const [x,y]=P(7.0+k*0.08,5.2+k*1.05,0);ctx.beginPath();ctx.ellipse(x,y,tw*0.42,th*0.42,0,0,Math.PI*2);ctx.fill();}
-    // 영웅 (마당 가운데) + 만세력 군대
+    // 영웅 (마당 가운데) + 사주 군대
     if(t>HW.next){HW.next=t+2.5+Math.random()*4;if(Math.random()<0.65){HW.tx=5.2+Math.random()*4.8;HW.ty=6.4+Math.random()*4.6;}}
     let walking=false;{const dx=HW.tx-HW.x,dy=HW.ty-HW.y,d=Math.hypot(dx,dy);if(d>0.04){const st=Math.min(0.9/30,d);HW.x+=dx/d*st;HW.y+=dy/d*st;walking=true;HW.face=(dx-dy)>0.02?-1:(dx-dy)<-0.02?1:HW.face;}}
     {const [hx,hy]=P(HW.x,HW.y,0);ctx.save();ctx.translate(hx,hy-(walking?Math.abs(Math.sin(t*9))*2.2:0));const sc=tz*3.4/150,brz=1+0.02*Math.sin(t*2.2);ctx.scale(sc*HW.face*(2-brz),sc*brz);if(walking){ctx.rotate(Math.sin(t*9)*0.04*HW.face);}BLINK=((t*1.1)%4)<0.12;SWING=0;PHASE=Math.floor(t*4)%4;const el=SAJU?SAJU.me:3,g=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';if(!SAJU)ctx.globalAlpha=0.5;
@@ -1578,33 +1582,34 @@ function sceneTap(ev){const cv2=$('homeScene');const r=cv2.getBoundingClientRect
   else if(inR(HOT.fortune)){$('hFortuneBtn').click();}
   else if(inR(HOT.room)){DOORFX={bb:HOT.room,until:sceneT+0.45,col:'#FFD27A'};AU.buy();setTimeout(()=>document.querySelector('.tabbar button[data-s="hero"]').click(),300);}
   else if(inR(HOT.guest)){DOORFX={bb:HOT.guest,until:sceneT+0.45,col:'#9CD1FF'};AU.buy();setTimeout(()=>document.querySelector('.tabbar button[data-s="social"]').click(),300);}}
-function showHome(){HOME_FROM_GAME=!!(S&&S.running&&!S.over);if(META.celebrate&&!HOME_FROM_GAME){CELEB={t:sceneT+0.3,lv:META.celebrate};HW.pose=sceneT+1.6;setTimeout(()=>heroSay(`레벨 ${CELEB.lv} 달성! 한층 강해졌다.`,6),400);META.celebrate=0;saveMeta();try{AU.fanfare&&AU.fanfare();}catch(_){}}if(HOME_FROM_GAME){S.paused=true;saveGame();}if(BUB.day!==todayStr()){BUB.day=todayStr();setTimeout(()=>heroSay(greetLine(),7),600);}$('startOverlay').hidden=false;document.querySelector('.app').classList.add('ingame-hidden');document.body.classList.remove('ingame');BGM.want='main';renderHome();window.scrollTo(0,0);
+function showHome(){HOME_FROM_GAME=!!(S&&S.running&&!S.over);fortunePrompt();if(META.celebrate&&!HOME_FROM_GAME){CELEB={t:sceneT+0.3,lv:META.celebrate};HW.pose=sceneT+1.6;setTimeout(()=>heroSay(`레벨 ${CELEB.lv} 달성! 한층 강해졌다.`,6),400);META.celebrate=0;saveMeta();try{AU.fanfare&&AU.fanfare();}catch(_){}}if(HOME_FROM_GAME){S.paused=true;saveGame();}if(BUB.day!==todayStr()){BUB.day=todayStr();setTimeout(()=>heroSay(greetLine(),7),600);}$('startOverlay').hidden=false;document.querySelector('.app').classList.add('ingame-hidden');document.body.classList.remove('ingame');BGM.want='main';renderHome();window.scrollTo(0,0);
   if(!HOME_FROM_GAME){const hs=$('homeScene');if(hs){hs.classList.remove('reveal');void hs.offsetWidth;hs.classList.add('reveal');clearTimeout(hs._rv);hs._rv=setTimeout(()=>hs.classList.remove('reveal'),1250);}}}
 function hideHome(){$('startOverlay').hidden=true;document.querySelector('.app').classList.remove('ingame-hidden');document.body.classList.add('ingame');BGM.want='battle';}
 function renderShow(){const hasS=!!SAJU;const el=hasS?SAJU.me:3;const g=hasS&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';const f=$('hsFace');if(!f)return;
   drawOn(f,()=>{ctx.translate(140,224);ctx.scale(2.6,2.6);BLINK=false;SWING=0;PHASE=0;HURT=false;if(!hasS)ctx.globalAlpha=0.4;drawHero(el,g,TIER(metaHeroGrade()));});
   $('hsLv').textContent=META.lv;$('hsName').textContent=hasS?`${SAJU.ilju} ${HERO_STYLE[el].job}`:'영웅 없음';
-  $('hsSub').textContent=hasS?`${g==='f'?'여':'남'} · ${EL[el].k} 일간 · ${curSkin().n} 옷 · 시작 ${GRADE[metaHeroGrade()-1]}`:'사주를 넣으면 일주가 영웅이 된다';
+  $('hsSub').textContent=hasS?`${g==='f'?'여':'남'} · 나의 오행 ${EL[el].k} · ${curSkin().n} 옷 · 시작 ${GRADE[metaHeroGrade()-1]}`:'사주를 넣으면 태어난 날의 기운(일주)이 영웅이 된다';
   const need=metaNeed(META.lv);const pct=META.lv>=META_MAX?100:Math.round(100*META.xp/need);$('hsXp').style.width=pct+'%';$('hsXpT').textContent=META.lv>=META_MAX?'최고 레벨':`경험 ${META.xp} / ${need}`;
   $('hsCp').textContent=combatPower().toLocaleString();$('hsFort').textContent=DAILY.level?`${DAILY.score}점`:'미확인';$('hsBest').textContent=REC.bestWave||0;}
 function setCP(cp){const el2=$('cpVal');if(!el2)return;let prev=0;try{prev=+(localStorage.getItem('ubz_cp')||0);}catch(_){}try{localStorage.setItem('ubz_cp',cp);}catch(_){}
   if(!prev||prev===cp||el2._anim){if(!el2._anim)el2.textContent=cp.toLocaleString();return;}
   el2._anim=1;const t0=performance.now(),d=cp-prev;const old=el2.parentElement.querySelector('.cpdelta');if(old)old.remove();const chip=document.createElement('span');chip.className='cpdelta '+(d>0?'up':'down');chip.textContent=(d>0?'▲ +':'▼ ')+d.toLocaleString();el2.parentElement.appendChild(chip);
   const f=()=>{const q=Math.min(1,(performance.now()-t0)/900);el2.textContent=Math.round(prev+d*(1-Math.pow(1-q,3))).toLocaleString();if(q<1)requestAnimationFrame(f);else{el2._anim=0;el2.textContent=cp.toLocaleString();setTimeout(()=>chip.remove(),3000);}};requestAnimationFrame(f);}
+function fortunePrompt(){if(!SAJU||DAILY.level)return;if(S&&S.running&&!S.over)return;let k='';try{k=localStorage.getItem('ubz_fprompt')||'';}catch(_){}if(k===todayStr())return;try{localStorage.setItem('ubz_fprompt',todayStr());}catch(_){}setTimeout(()=>{if($('startOverlay').hidden||($('revealOverlay')&&!$('revealOverlay').hidden)||($('welcome')&&!$('welcome').hidden))return;heroSay('사당부터 들르자. 오늘 운세가 오늘 싸움을 정한다.',6);RV={step:1,mode:'fortune'};$('revealOverlay').hidden=false;renderReveal();},1100);}
 function renderTodo(){const box=$('todo');if(!box)return;const t=todayStr();const qs=questList();const qd=qs.filter(q=>QST.done[q.id]).length;const played=REC.lastPlay===t;
   const items=[{n:'출석',d:true,s:`${ATT.streak}일째`,go:()=>$('tbAttend').click()},
     {n:'운세',d:!!DAILY.level,s:DAILY.level?`${DAILY.score}점`:'뽑기',go:()=>$('hFortuneBtn').click()},
     {n:'과제',d:qs.length>0&&qd>=qs.length,s:`${qd}/${qs.length}`,go:()=>{document.querySelector('.tabbar button[data-s="hero"]').click();setTimeout(()=>{const b=document.querySelector('#heroSeg button[data-p="quest"]');b&&b.click();},80);}},
     {n:'출전',d:played,s:played?'완료':'오늘 첫 판',go:()=>{$('goInfo').textContent=`전투력 ${combatPower().toLocaleString()} · ${rankText()}${DAILY.level?'':' · 운세를 아직 뽑지 않았다'}`;$('goSheet').hidden=false;renderGuest();}}];
   box.innerHTML=items.map(i=>`<button class="${i.d?'done':''}"><b>${i.d?'✓ ':''}${i.n}</b><span>${i.s}</span></button>`).join('');box.querySelectorAll('button').forEach((b,i)=>b.onclick=()=>{AU.init();AU.buy();items[i].go();});}
-function renderHome(){renderTodo();
+function renderHome(){renderTodo();{const tb=document.querySelectorAll('#todo button')[1];if(tb)tb.classList.toggle('pulse',!!SAJU&&!DAILY.level);}
   const hasS=!!SAJU;const el=hasS?SAJU.me:3;const g=hasS&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';
-  $('hName').innerHTML=hasS?`${SAJU.ilju} ${HERO_STYLE[el].job}<small>${g==='f'?'여':'남'} · ${EL[el].k} 일간</small>`:'영웅이 아직 없다';
-  $('hSub').textContent=hasS?`일주 ${SAJU.ilju}. 나의 오행 ${EL[el].k} 유닛 +10%, 부족한 ${EL[SAJU.weak].k} 소환 확률 ↑. 희귀 등급으로 시작한다.`:'생년월일을 넣으면 일주가 영웅이 되어 첫 웨이브부터 함께 싸운다. 넣지 않으면 무명 영웅이 나선다.';
-  $('hSkills').innerHTML=hasS?SAJU.skills.map(k=>`<span class="chip relic" title="${SKILL[k].desc(3)}">${SKILL[k].name}</span>`).join('')+SAJU.ten2.map(i=>`<span class="pill on" title="${TEN[i].desc}">${TEN[i].k}·${TEN[i].name}</span>`).join(''):'';
-  setCP(combatPower());$('rankVal').textContent=rankText();$('cpName').innerHTML=hasS?`Lv.${META.lv} ${SAJU.ilju} ${HERO_STYLE[el].job}<small>${EL[el].k} 일간 · 장비 +${Math.round(gearPower()*100)}%</small>`:'영웅이 아직 없다<small>사주를 넣어라</small>';{const f=$('cpFace');drawOn(f,()=>{ctx.translate(46,73);ctx.scale(0.86,0.86);BLINK=false;SWING=0;PHASE=0;if(!hasS)ctx.globalAlpha=0.45;drawHero(el,g,1);});}drawScene();
-  $('hSajuBtn').textContent=hasS?'사주 수정':'사주 입력';$('hSubShort').textContent=hasS?`${EL[el].k} 일간 · ${HERO_STYLE[el].job} · 군대 ${armyText()||'없음'}`:'사주를 넣으면 일주가 영웅이 된다';
-  $('hArmy').innerHTML=hasS?`<div class="note"><b>만세력 군대</b> · 매 판 시작에 영웅 곁에 선다</div><div class="r" style="margin-top:6px">${(armyCounts()||[]).map((n,i)=>n?`<span class="chip" style="background:${EL[i].color};width:auto;padding:0 8px">${EL[i].h} ×${n}</span>`:'').join('')||'<span class="note">일간 외 오행이 없다</span>'}</div>`:'';
+  $('hName').innerHTML=hasS?`${SAJU.ilju} ${HERO_STYLE[el].job}<small>${g==='f'?'여':'남'} · 나의 오행 ${EL[el].k}</small>`:'영웅이 아직 없다';
+  $('hSub').textContent=hasS?`태어난 날 ${SAJU.ilju}(일주). 나의 오행 ${EL[el].k} 유닛 +10%, 부족한 ${EL[SAJU.weak].k} 소환 확률 ↑. 희귀 등급으로 시작한다.`:'생년월일을 넣으면 태어난 날의 기운(일주)이 영웅이 되어 첫 웨이브부터 함께 싸운다. 넣지 않으면 무명 영웅이 나선다.';
+  $('hSkills').innerHTML=hasS?SAJU.skills.map(k=>`<span class="chip relic" title="${SKILL[k].desc(3)}">${SKILL[k].name}</span>`).join('')+SAJU.ten2.map(i=>`<span class="pill on" title="${TEN[i].desc}">${TEN[i].name}<small style="opacity:.6">(${TEN[i].k})</small></span>`).join(''):'';
+  setCP(combatPower());$('rankVal').textContent=rankText();$('cpName').innerHTML=hasS?`Lv.${META.lv} ${SAJU.ilju} ${HERO_STYLE[el].job}<small>나의 오행 ${EL[el].k} · 장비 +${Math.round(gearPower()*100)}%</small>`:'영웅이 아직 없다<small>사주를 넣어라</small>';{const f=$('cpFace');drawOn(f,()=>{ctx.translate(46,73);ctx.scale(0.86,0.86);BLINK=false;SWING=0;PHASE=0;if(!hasS)ctx.globalAlpha=0.45;drawHero(el,g,1);});}drawScene();
+  $('hSajuBtn').textContent=hasS?'사주 수정':'사주 입력';$('hSubShort').textContent=hasS?`나의 오행 ${EL[el].k} · ${HERO_STYLE[el].job} · 군대 ${armyText()||'없음'}`:'사주를 넣으면 태어난 날의 기운(일주)이 영웅이 된다';
+  $('hArmy').innerHTML=hasS?`<div class="note"><b>사주 군대</b> · 매 판 시작에 영웅 곁에 선다</div><div class="r" style="margin-top:6px">${(armyCounts()||[]).map((n,i)=>n?`<span class="chip" style="background:${EL[i].color};width:auto;padding:0 8px">${EL[i].k} ×${n}</span>`:'').join('')||'<span class="note">일간 외 오행이 없다</span>'}</div>`:'';
   $('hFortuneMini').textContent=DAILY.level?`${DAILY.score}점 ${DAILY.level} · 공격력 +${Math.round((DAILY.power||0)*100)}% · 시작 골드 +${DAILY.startGold||0}`:(hasS?'하루 한 번 · 점수만큼 오늘 전투가 강해진다':'먼저 사주를 넣어라');$('hFortuneBtn').querySelector('b').textContent=DAILY.level?'오늘의 운세':'오늘의 운세 뽑기';
   $('tbFortuneN').textContent=DAILY.level?DAILY.score:'?';$('tbFortune').className='tbi'+(DAILY.level?' on':'');$('tbAttendN').textContent=ATT.streak;renderAttend();
   $('setSound').classList.toggle('on',AU.on);$('setMusic').classList.toggle('on',BGM.on);$('setHaptic').classList.toggle('on',HAPTIC);if($('setBig'))$('setBig').classList.toggle('on',BIGTEXT);if($('setSpeed'))$('setSpeed').textContent=SPEED+'배속';if($('aboutVer'))$('aboutVer').textContent=($('verTag')||{}).textContent||'';renderShow();if(document.activeElement!==$('setName'))$('setName').value=NAME||'';
@@ -1625,8 +1630,8 @@ function drawRecChart(){const cv2=$('recChart');if(!cv2)return;const ks=weekKeys
     const x0=24,x1=W2-24,y0=38,y1=H2-30;const bw=(x1-x0)/6;ctx.strokeStyle='#E8DFC9';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,y1+0.5);ctx.lineTo(x1,y1+0.5);ctx.stroke();
     vals.forEach((v,i)=>{const cx=x0+bw*i+bw/2;const h=(y1-y0)*v.best/mx;const cur=i===5;ctx.fillStyle=cur?'#FFB020':'#D9CFBC';rr(cx-bw*0.3,y1-h,bw*0.6,h,6);ctx.fill();if(v.best){ctx.fillStyle=cur?'#2A1F00':'#5A4E3A';ctx.font="700 14px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(v.best+'w',cx,y1-h-3);if(h>22){ctx.fillStyle=cur?'#5A3A00':'#fff';ctx.font="700 12px 'Noto Sans KR'";ctx.textBaseline='middle';ctx.fillText(v.games+'판',cx,y1-h/2);}}
       ctx.fillStyle=cur?'#7A5200':'#8A7B62';ctx.font="500 12px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(cur?'이번 주':ks[i].slice(5).replace('-','/')+'~',cx,y1+6);});});}
-function renderRec(){const g=$('recGrid');if(!g)return;drawRecChart();const cells=[['전투력',combatPower().toLocaleString()],['최고 웨이브',REC.bestWave||0],['판 수',REC.games||0],['승리',REC.wins||0]];g.innerHTML=cells.map(([k,v])=>`<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');$('recNote').textContent=REC.games?`누적 처치 ${(REC.totalKills||0).toLocaleString()} · 극파 ${REC.totalClashes||0} · 신화 ${REC.mythic||0} · ${rankText()}`:'아직 출전 기록이 없다. 대문으로 나가 첫 판을 치러라.';}
-function recLine(){$('recLine').textContent=REC.games?`최고 ${REC.bestWave}웨이브 · ${REC.games}판 · 승리 ${REC.wins} · 누적 처치 ${REC.totalKills.toLocaleString()} · 신화 ${REC.mythic} · 극파 ${REC.totalClashes}`:'첫 판이다. 운을 시험해 보자.';}
+function renderRec(){const g=$('recGrid');if(!g)return;drawRecChart();const cells=[['전투력',combatPower().toLocaleString()],['최고 웨이브',REC.bestWave||0],['판 수',REC.games||0],['승리',REC.wins||0]];g.innerHTML=cells.map(([k,v])=>`<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');$('recNote').textContent=REC.games?`누적 처치 ${(REC.totalKills||0).toLocaleString()} · 상극 폭발 ${REC.totalClashes||0} · 신화 ${REC.mythic||0} · ${rankText()}`:'아직 출전 기록이 없다. 대문으로 나가 첫 판을 치러라.';}
+function recLine(){$('recLine').textContent=REC.games?`최고 ${REC.bestWave}웨이브 · ${REC.games}판 · 승리 ${REC.wins} · 누적 처치 ${REC.totalKills.toLocaleString()} · 신화 ${REC.mythic} · 상극 폭발 ${REC.totalClashes}`:'첫 판이다. 운을 시험해 보자.';}
 // ───── 자동 저장 / 이어하기 ─────
 const SKIP=new Set(['shots','texts','parts','rings','drag','dice','relicChoices','form','links','cutins','amb','proj','formN','mandala','skillFx','clashFx']);
 function saveGame(){
@@ -1657,12 +1662,12 @@ function resumeGame(o){
 // 오늘의 판 미리보기: 시작 시 난수 호출 순서를 그대로 재현 (nextEl → 소환 2회: 등급, 오행, 칸)
 function dailyPreview(){
   const r=rng(hash('daily|'+todayStr()));const first=Math.floor(r()*5);const units=[];
-  for(let k=0;k<(SAJU?1:2);k++){const w=[60,25,10,4,1];let x=r()*100,g=1;for(let i=0;i<5;i++){x-=w[i];if(x<=0){g=i+1;break;}}const el=Math.floor(r()*5);r();units.push(`${EL[el].h}${GRADE[g-1]==='일반'?'':'·'+GRADE[g-1]}`);}
+  for(let k=0;k<(SAJU?1:2);k++){const w=[60,25,10,4,1];let x=r()*100,g=1;for(let i=0;i<5;i++){x-=w[i];if(x<=0){g=i+1;break;}}const el=Math.floor(r()*5);r();units.push(`${EL[el].k}${GRADE[g-1]==='일반'?'':'·'+GRADE[g-1]}`);}
   const ds=loadDS();
   {const m=weeklyMod();const b=REC.weekly&&REC.weekly.key===wkKey()?REC.weekly.best:0;$('weeklyTag').innerHTML=`${m.t}${b?' · 최고 '+b+'웨이브':''} · 경험 +25%`;}
   if(ds&&ds.wave!=null)$('dailyTag').innerHTML=`오늘 도전 완료 ${ds.wave}웨이브 · 연습 모드`;
   else if(ds&&ds.started)$('dailyTag').innerHTML=`순위 도전 진행 중 · 이어하기로 계속`;
-  else $('dailyTag').innerHTML=`${todayStr()} · 1웨이브 <b style="color:${EL[first].color}">${EL[first].h}</b> · 시작 ${units.join(' ')}`;
+  else $('dailyTag').innerHTML=`${todayStr()} · 1웨이브 <b style="color:${EL[first].color}">${EL[first].k}</b> · 시작 ${units.join(' ')}`;
 }
 function showResume(){const b=$('resumeBtn');if(HOME_FROM_GAME&&S&&S.running&&!S.over){b.hidden=false;b.innerHTML=`계속하기<small>${S.wave}웨이브 · 진행 중인 판</small>`;return;}const o=loadSave();if(o&&!(o.mode==='daily'&&o.date!==todayStr())){b.hidden=false;b.innerHTML=`이어하기<small>${o.wave}웨이브 · ${o.mode==='daily'?'오늘의 판':'자유 모드'} · 생명 ${o.lives}</small>`;}else b.hidden=true;}
 function drawEndChart(){const cv2=$('endChart');if(!cv2)return;let h=(S.hist||[]).slice();{let dps=0;S.units.forEach((u,i)=>{if(u)dps+=unitDmg(u)/unitRate(u,i);});h.push({w:S.wave,k:S.kills,g:S.gold,d:Math.round(dps),l:S.lives});}
@@ -1681,7 +1686,7 @@ function drawEndChart(){const cv2=$('endChart');if(!cv2)return;let h=(S.hist||[]
 // ───── 결과 공유 ─────
 function shareText(){
   const rel=S.relics.map(id=>RELICS.find(r=>r.id===id).name).join(', ')||'-';
-  return `운세전 · ${S.mode==='daily'?'오늘의 판 '+todayStr()+(S.ranked?'':' (연습)'):S.mode==='weekly'?'주간 도전 '+wkKey()+' 주 ('+S.wk.t+')':'자유 모드'}\n${S.won?'🏯 천하통일 · ':''}${S.wave}웨이브 · 처치 ${S.kills} · 신화 ${S.mythic} · 극파 ${S.clashes} · 궁극기 ${S.ults}\n유물 ${rel}${DAILY.level?' · 운세 '+DAILY.level:''}${NAME?' · '+NAME:''}`;
+  return `운세전 · ${S.mode==='daily'?'오늘의 판 '+todayStr()+(S.ranked?'':' (연습)'):S.mode==='weekly'?'주간 도전 '+wkKey()+' 주 ('+S.wk.t+')':'자유 모드'}\n${S.won?'🏯 천하통일 · ':''}${S.wave}웨이브 · 처치 ${S.kills} · 신화 ${S.mythic} · 상극 폭발 ${S.clashes} · 궁극기 ${S.ults}\n유물 ${rel}${DAILY.level?' · 운세 '+DAILY.level:''}${NAME?' · '+NAME:''}`;
 }
 function shareCard(){const c=document.createElement('canvas');c.width=1080;c.height=1350;
   drawOn(c,()=>{const W2=1080,H2=1350;const bg=ctx.createLinearGradient(0,0,0,H2);bg.addColorStop(0,'#DCEBFA');bg.addColorStop(1,'#F6F1E4');ctx.fillStyle=bg;ctx.fillRect(0,0,W2,H2);
@@ -1692,7 +1697,7 @@ function shareCard(){const c=document.createElement('canvas');c.width=1080;c.hei
     ctx.fillStyle='#223047';ctx.font="700 40px 'Noto Sans KR',sans-serif";ctx.fillText(`${SAJU?SAJU.ilju+' '+HERO_STYLE[el].job:'무명 영웅'}${NAME?' · '+NAME:''}`,540,880);
     ctx.fillStyle='#F2A23A';ctx.font="700 150px 'Jua','Noto Sans KR',sans-serif";ctx.fillText(`${S.wave}웨이브`,540,990);
     if(S.won){ctx.fillStyle='#C0392B';ctx.font="700 44px 'Noto Sans KR',sans-serif";ctx.fillText('천하통일 · 30웨이브 사수',540,1070);}
-    const cells=[['처치',S.kills],['융합',S.fusions],['신화',S.mythic],['극파',S.clashes]];cells.forEach(([k,v],i)=>{const x=180+i*240;ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.roundRect(x-95,1100,190,110,18);ctx.fill();ctx.fillStyle='#8A94A6';ctx.font="700 26px 'Noto Sans KR',sans-serif";ctx.fillText(k,x,1130);ctx.fillStyle='#223047';ctx.font="700 50px 'Jua','Noto Sans KR',sans-serif";ctx.fillText(String(v),x,1178);});
+    const cells=[['처치',S.kills],['융합',S.fusions],['신화',S.mythic],['폭발',S.clashes]];cells.forEach(([k,v],i)=>{const x=180+i*240;ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.roundRect(x-95,1100,190,110,18);ctx.fill();ctx.fillStyle='#8A94A6';ctx.font="700 26px 'Noto Sans KR',sans-serif";ctx.fillText(k,x,1130);ctx.fillStyle='#223047';ctx.font="700 50px 'Jua','Noto Sans KR',sans-serif";ctx.fillText(String(v),x,1178);});
     {const ch=$('endChart');if(ch&&!ch.hidden&&(S.hist||[]).length>=1){ctx.save();ctx.globalAlpha=0.95;ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.roundRect(70,1218,940,120,16);ctx.fill();ctx.drawImage(ch,0,0,ch.width,ch.height,80,1224,920,108);ctx.restore();}}
     ctx.fillStyle='#5B6B85';ctx.font="700 30px 'Noto Sans KR',sans-serif";ctx.fillText(`${DAILY.level?'오늘 운세 '+DAILY.score+'점 '+DAILY.level+' · ':''}전투력 ${combatPower().toLocaleString()}`,540,1205);
     ctx.fillStyle='#2F7BE8';ctx.font="700 30px 'Noto Sans KR',sans-serif";ctx.fillText(`내 코드 ${myCode()} · 코드를 넣으면 오늘 내 오행이 널 돕는다`,540,1160);});
@@ -1809,7 +1814,7 @@ const slotAt=(x,y)=>{for(let i=0;i<COLS*ROWS;i++){const [cx,cy]=slotXY(i);if(Mat
 const summonCost=()=>S.freeSummon>0?0:has('flat')?30:Math.round((30+S.summons*(has('purse')?2:4))*DAILY.costMult*wk('cost'));
 const sellPrice=u=>Math.floor(10*Math.pow(2.1,u.grade-1)*(u.fused?1.3:1)*(has('recycle')?2:1));
 const spec=u=>EL[u.el];
-const unitName=u=>`${EL[u.el].h} ${EL[u.el].k}`;
+const unitName=u=>`${EL[u.el].k}`;
 function boardEls(){const s=new Set();for(const u of S.units)if(u)s.add(u.el);return s;}
 const fiveSet=()=>boardEls().size===5;
 function unitDmg(u){
@@ -1860,7 +1865,7 @@ function computeForm(){
   // 대각선 (길이 3 이상)
   const diag=(r0,c0,dr,dc)=>{const line=[];let r=r0,c=c0;while(r>=0&&r<ROWS&&c>=0&&c<COLS){line.push(r*COLS+c);r+=dr;c+=dc;}if(line.length>=3)scan(line);};
   for(let c=0;c<COLS;c++){diag(0,c,1,1);diag(0,c,1,-1);}for(let r=1;r<ROWS;r++){diag(r,0,1,1);diag(r,COLS-1,1,-1);}
-  // 연환: 한 칸을 지나는 진의 수
+  // 진 겹침: 한 칸을 지나는 진의 수
   S.formN=new Array(COLS*ROWS).fill(0);for(const lk of S.links)for(const i of lk.cells)S.formN[i]++;
   const prev=S.mandala;S.mandala=S.links.filter(l=>l.L===5).length>=3;if(S.mandala&&!prev&&S.running){cutin('오행 만다라','세 방향 오행대진 · 보드 전체 공격력 +30%','#FFB020',2,true);AU.relic();ring(W/2,H/2,'#FFB020',600,1.2);}
 }
@@ -1870,7 +1875,7 @@ function log(msg,cls){const ul=$('log');const li=document.createElement('li');li
 function ftext(x,y,t,color,big){if(big&&Math.abs(x-W/2)<1&&y>H/2-80)y=H/2-100;S.texts.push({x,y,t,color,life:big?1.6:1,big});}
 function burst(x,y,color,n,spd){for(let k=0;k<n;k++){const a=Math.random()*Math.PI*2,s=spd*(0.4+Math.random());S.parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:0.6+Math.random()*0.5,color,r:2+Math.random()*3});}}
 function ring(x,y,color,maxR,dur){S.rings.push({x,y,color,maxR,t:0,dur});}
-const elChip=i=>`<span class="chip" style="background:${EL[i].color}">${EL[i].h}</span>`;
+const elChip=i=>`<span class="chip" style="background:${EL[i].color}" title="${EL[i].h}">${EL[i].k}</span>`;
 function ui(){
   $('sGold').textContent=Math.floor(S.gold);$('sLives').textContent=S.lives;$('sWave').textContent=S.wave;$('sKill').textContent=S.kills;
   $('luckVal').textContent=Math.floor(S.luck)+'%';$('luckBar').style.width=S.luck+'%';
@@ -1889,10 +1894,10 @@ function ui(){
   const u=S.sel>=0?S.units[S.sel]:null;
   if(u){const e=spec(u);
     const c1=CLASH[pairKey(u.el,OVER(u.el))],c2=CLASH[pairKey(u.el,(u.el+3)%5)];
-    let extra=`${e.desc}${u.grade>=6?` · <b style="color:var(--gold)">궁극기 ${ULT[u.el].name}</b>: ${ULT[u.el].desc}${u.grade>=7?' · <b style="color:#1FB3AD">태극: 궁극기 대기 40% 단축</b>':''}`:''} · 극하는 오행 <b style="color:${EL[OVER(u.el)].color}">${EL[OVER(u.el)].k}</b> · 상생 짝 <b style="color:${EL[GEN(u.el)].color}">${EL[GEN(u.el)].k}</b> <b style="color:${EL[(u.el+4)%5].color}">${EL[(u.el+4)%5].k}</b><br>극파(둘 다 소멸): <b style="color:${EL[OVER(u.el)].color}">${EL[OVER(u.el)].k}</b>와 ${c1.name} · <b style="color:${EL[(u.el+3)%5].color}">${EL[(u.el+3)%5].k}</b>와 ${c2.name}`;
+    let extra=`${e.desc}${u.grade>=6?` · <b style="color:var(--gold)">궁극기 ${ULT[u.el].name}</b>: ${ULT[u.el].desc}${u.grade>=7?' · <b style="color:#1FB3AD">태극: 궁극기 대기 40% 단축</b>':''}`:''} · 극하는 오행 <b style="color:${EL[OVER(u.el)].color}">${EL[OVER(u.el)].k}</b> · 상생 짝 <b style="color:${EL[GEN(u.el)].color}">${EL[GEN(u.el)].k}</b> <b style="color:${EL[(u.el+4)%5].color}">${EL[(u.el+4)%5].k}</b><br>상극 폭발(둘 다 소멸): <b style="color:${EL[OVER(u.el)].color}">${EL[OVER(u.el)].k}</b>와 ${c1.name} · <b style="color:${EL[(u.el+3)%5].color}">${EL[(u.el+3)%5].k}</b>와 ${c2.name}`;
     if(subOf(u)>=0)extra+=`<br><b style="color:${EL[subOf(u)].color}">${SUB[subOf(u)].n}</b>: ${SUB[subOf(u)].t}`;
-    if(!u.hero&&u.grade<6){const pe=(u.el+4)%5,ne=GEN(u.el);extra+=`<br><span class="note">합성:</span> <b style="color:${EL[u.el].color}">${EL[u.el].h}+${EL[u.el].h}</b> → ${EL[u.el].k} <b>승급</b> · <b style="color:${EL[ne].color}">${EL[u.el].h}+${EL[ne].h}</b> → ${EL[ne].k} <b>융합체</b>(${EL[u.el].k}의 기운) · <b style="color:${EL[pe].color}">${EL[pe].h}+${EL[u.el].h}</b> → ${EL[u.el].k} <b>융합체</b>(${EL[pe].k}의 기운)`;}
-    if(S.form[S.sel])extra+=` · <b style="color:var(--good)">오행 진 ${S.form[S.sel]}칸${S.formN&&S.formN[S.sel]>=2?' · 연환 ×'+S.formN[S.sel]+' 공격력 +'+(10*(S.formN[S.sel]-1))+'%':''} 연사 +${Math.round(formBonus(S.sel)*100)}%${S.form[S.sel]>=5?' · 공격력 +15%':''}</b>`;
+    if(!u.hero&&u.grade<6){const pe=(u.el+4)%5,ne=GEN(u.el);extra+=`<br><span class="note">합성:</span> <b style="color:${EL[u.el].color}">${EL[u.el].k}+${EL[u.el].k}</b> → ${EL[u.el].k} <b>승급</b> · <b style="color:${EL[ne].color}">${EL[u.el].k}+${EL[ne].k}</b> → ${EL[ne].k} <b>융합체</b>(${EL[u.el].k}의 기운) · <b style="color:${EL[pe].color}">${EL[pe].k}+${EL[u.el].k}</b> → ${EL[u.el].k} <b>융합체</b>(${EL[pe].k}의 기운)`;}
+    if(S.form[S.sel])extra+=` · <b style="color:var(--good)">오행 진 ${S.form[S.sel]}칸${S.formN&&S.formN[S.sel]>=2?' · 진 겹침 ×'+S.formN[S.sel]+' 공격력 +'+(10*(S.formN[S.sel]-1))+'%':''} 연사 +${Math.round(formBonus(S.sel)*100)}%${S.form[S.sel]>=5?' · 공격력 +15%':''}</b>`;
     const pk=`${u.id}-${u.grade}`;const redraw=pk!==ui.ipk;ui.ipk=pk;
     if(redraw)$('info').innerHTML=`<div class="pcard"><canvas id="infoPortrait" width="64" height="64"></canvas><div style="min-width:0"><div class="name" style="color:${e.color}">${u.hero?`<span style="color:var(--gold)">♛ ${u.heroName} 영웅</span> · `:''}${unitName(u)} · <span style="color:${GCOL[u.grade-1]}">${GRADE[u.grade-1]}</span> <span class="note">${TIER_N[TIER(u.grade)]} ${u.hero?'':TIER(u.grade)===2?SHIN[u.el]:['정령',['트렌트','불꽃 정령','장승','장수','이무기'][u.el]][TIER(u.grade)]}</span>${u.fused?' <span style="color:var(--gold)">✦융합체</span>':''}${subOf(u)>=0?` <span style="color:${EL[subOf(u)].color}">+${SUB[subOf(u)].n}</span>`:''}</div>
     <div class="grid"><span>공격력 <b id="iDmg">${Math.round(unitDmg(u))}</b></span><span>연사 <b>${unitRate(u,S.sel).toFixed(2)}s</b></span><span>DPS <b id="iDps">${Math.round(unitDmg(u)/unitRate(u,S.sel))}</b></span><span>사거리 <b>${Math.round(unitRange(u))}</b>${u.grade<6?`<small style="color:var(--muted)"> → ${Math.round(unitRange({...u,grade:u.grade+1}))}</small>`:''}</span></div></div></div><div>${extra}</div><div class="note" style="margin-top:4px">${u.hero?'':TRAIT[u.el].map(t=>`<span class="pill ${u.grade>=t.g?'on':''}" title="${t.t}">${t.n} ${u.grade>=t.g?'':'('+GRADE[t.g-1]+')'}</span> ${u.grade>=t.g?t.t+' ':''}`).join('')}</div>`;
@@ -1924,9 +1929,9 @@ function ui(){
 function buildCycle(){
   let gen=`<div class="r"><span class="lab">상생</span>`;for(let i=0;i<5;i++)gen+=elChip(i)+`<span class="arr">→</span>`;gen+=elChip(0)+`</div>`;
   let over=`<div class="r"><span class="lab">상극</span>`;for(let i=0;i<5;i++){over+=elChip(i)+`<span class="arr">⊣</span>`+elChip(OVER(i))+(i<4?`<span class="arr" style="margin:0 3px">·</span>`:'');}over+=`</div>`;
-  let sp=`<div class="r"><span class="lab">극파</span>`;for(const k in CLASH){const s=CLASH[k];sp+=`<span class="chip dual" style="width:auto;padding:0 5px;color:${s.color}" title="${EL[s.els[0]].k}+${EL[s.els[1]].k} ${s.name}: ${s.desc(3)} (희귀 기준)">${s.name}</span>`;}sp+=`</div>`;
+  let sp=`<div class="r"><span class="lab">상극 폭발</span>`;for(const k in CLASH){const s=CLASH[k];sp+=`<span class="chip dual" style="width:auto;padding:0 5px;color:${s.color}" title="${EL[s.els[0]].k}+${EL[s.els[1]].k} ${s.name}: ${s.desc(3)} (희귀 기준)">${s.name}</span>`;}sp+=`</div>`;
   let ul=`<div class="r"><span class="lab">궁극기</span>`;ULT.forEach((u,i)=>{ul+=`<span class="chip dual" style="width:auto;padding:0 6px;color:${EL[i].color}" title="${u.name}: ${u.desc}">${u.h}</span>`;});ul+=`</div>`;
-  $('cycle').innerHTML=gen+over+sp+ul+`<div class="note">상생 짝은 화살표 끝 오행의 융합체. 상극 짝을 겹치면 둘 다 소멸하고 극파가 보드 전체에 터진다 (위력·지속은 등급 평균). 신화 기본 오행은 궁극기 자동 사용. 마우스를 올리면 설명이 보인다.</div>`;
+  $('cycle').innerHTML=gen+over+sp+ul+`<div class="note">상생 짝(서로 살리는 오행)은 화살표 끝 오행의 융합체가 된다. 상극 짝(서로 누르는 오행)을 겹치면 둘 다 소멸하고 상극 폭발이 보드 전체에 터진다 (위력·지속은 등급 평균). 신화 기본 오행은 궁극기 자동 사용. 마우스를 올리면 설명이 보인다.</div>`;
   $('pickRow').innerHTML=`<span class="note" style="margin-right:4px">오행 선택</span>`+EL.map((e,i)=>`<button class="chip pick" data-el="${i}" style="background:${e.color}" title="${e.k}">${e.h}</button>`).join('');
   $('pickRow').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(S.luck<50||S.shop.el>=0)return;S.luck-=50;S.shop.el=+b.dataset.el;$('pickRow').hidden=true;AU.buy();log(`행운 상점: 다음 소환 ${EL[S.shop.el].k} 지정 (운 -50)`,'hi');ui();});
 }
@@ -1960,7 +1965,7 @@ function spawnUnit(el,grade){
   const [x,y]=slotXY(i);AU.summon(grade);
   burst(x,y,GCOL[grade-1],6+grade*6,60+grade*40);ring(x,y,GCOL[grade-1],40+grade*25,0.5);
   if(grade>=3){S.shake=Math.max(S.shake,0.15+grade*0.1);ftext(x,y-40,GRADE[grade-1]+'!',GCOL[grade-1],true);log(`운빨 터짐! ${EL[el].k} ${GRADE[grade-1]} 등장`,'hi');}
-  if(grade>=4){ring(W/2,H/2,GCOL[grade-1],500,0.9);cutin(`${GRADE[grade-1]} 소환`,`${EL[el].h} ${EL[el].k} · 운빨이 터졌다`,GCOL[grade-1],1.4);}
+  if(grade>=4){ring(W/2,H/2,GCOL[grade-1],500,0.9);cutin(`${GRADE[grade-1]} 소환`,`${EL[el].k} · 운빨이 터졌다`,GCOL[grade-1],1.4);}
   return i;
 }
 function tryCombine(from,to){
@@ -1987,7 +1992,7 @@ function tryCombine(from,to){
   if(TIER(ng)>TIER(b.grade)){const nu=S.units[to];nu.evo=1;ring(x,y,'#fff',70,0.6);ring(x,y,GCOL[ng-1],110,0.9);burst(x,y,'#fff',16,140);S.flash=0.15;S.flashColor='#fff';ftext(x,y-48,`진화 · ${['정령','수호자','신수'][TIER(ng)]}`,'#fff',true);AU.relic();}
   S.maxGrade=Math.max(S.maxGrade,ng);S.sel=to;
 }
-// 극파: 상극 짝 둘 다 소멸, 보드 전체 효과
+// 상극 폭발: 상극 짝 둘 다 소멸, 보드 전체 효과
 function clash(from,to){
   const a=S.units[from],b=S.units[to];const c=clashOf(a,b);const g=clashGrade(a,b);
   const [x,y]=slotXY(to);const [fx,fy]=slotXY(from);
@@ -2006,8 +2011,8 @@ function clash(from,to){
   S.clashFx={key,t:0,dur:1.5};
   AU.clash(key);S.shake=Math.max(S.shake,0.45);
   burst(fx,fy,EL[a.el].color,18,120);burst(x,y,EL[b.el].color,18,120);ring(W/2,H/2,c.color,560,1.0);
-  cutin(`극파 ${c.name}`,`${EL[a.el].k}+${EL[b.el].k} 소멸 · ${c.desc(g)}`,c.color,1.8);
-  log(`극파 ${c.name} (${EL[a.el].k}+${EL[b.el].k}, 등급 ${f1(g)}): ${c.desc(g)}`,'good');
+  cutin(`상극 폭발 ${c.name}`,`${EL[a.el].k}+${EL[b.el].k} 소멸 · ${c.desc(g)}`,c.color,1.8);
+  log(`상극 폭발 ${c.name} (${EL[a.el].k}+${EL[b.el].k}, 등급 ${f1(g)}): ${c.desc(g)}`,'good');
 }
 function shake(i,msg){const u=S.units[i];if(u)u.shake=0.35;const [x,y]=slotXY(i);ftext(x,y-30,'✕',EL[1].color);log(msg,'bad');}
 function sell(){const u=S.sel>=0?S.units[S.sel]:null;if(!u)return;S.gold+=sellPrice(u);log(`${unitName(u)} ${GRADE[u.grade-1]} 판매 +${sellPrice(u)}`);S.units[S.sel]=null;S.sel=-1;ui();}
@@ -2035,7 +2040,7 @@ function startWave(){
   S.spawnQ=(S.nextQ&&S.nextQ.length)?S.nextQ:buildQueue(S.wave,S.waveEl);S.hpMul=waveHpMul(S.wave);
   S.nextEl=Math.floor(rnd()*5);S.nextQ=buildQueue(S.wave+1,S.nextEl);
   saveGame();
-  if(S.wave===30&&!S.won){S.won=true;S.paused=true;S.victoryT=3.2;S.fwT=0;$('winMsg').textContent=`30웨이브를 버텼다. ${S.mode==='daily'?'오늘의 판을 정복했다.':'오행이 보드를 지켰다.'} 처치 ${S.kills} · 신화 ${S.mythic} · 극파 ${S.clashes}`;AU.fanfare();ring(W/2,H/2,'#FFB020',700,1.5);S.flash=0.3;S.flashColor='#FFF3C4';buzz([60,60,60,60,120]);const h=heroUnit();if(h){h.anim='attack';h.animT=0;h.pop=1.5;}}
+  if(S.wave===30&&!S.won){S.won=true;S.paused=true;S.victoryT=3.2;S.fwT=0;$('winMsg').textContent=`30웨이브를 버텼다. ${S.mode==='daily'?'오늘의 판을 정복했다.':'오행이 보드를 지켰다.'} 처치 ${S.kills} · 신화 ${S.mythic} · 상극 폭발 ${S.clashes}`;AU.fanfare();ring(W/2,H/2,'#FFB020',700,1.5);S.flash=0.3;S.flashColor='#FFF3C4';buzz([60,60,60,60,120]);const h=heroUnit();if(h){h.anim='attack';h.animT=0;h.pop=1.5;}}
   const boss=S.wave%10===0;
   AU.wave(boss);
   if(boss){cutin(`${BOSS[S.waveEl].name} 등장`,`${EL[S.waveEl].k} 보스 · ${BOSS[S.waveEl].desc} · ${EL[(S.waveEl+3)%5].k}${[0,3].includes((S.waveEl+3)%5)?'으로':'로'} 받아쳐라`,EL[S.waveEl].color,2.8,true,{el:S.waveEl,boss:true});
@@ -2145,7 +2150,7 @@ function killReward(e){
     ftext(W/2,H/2-60,`${BOSS[e.el].name} 격파 · 전리품`,'#FFB020',true);log(`보스 ${BOSS[e.el].name} 격파! 전리품: 골드 +${loot}, 무료 소환 2회, 운 +20`,'hi');}
 }
 // 같은 오행·같은 등급 짝 찾기 (힌트/자동 합치기)
-// 합치기 짝 고르기: 오행 진(연환)에 들어간 유닛은 자리를 지키고, 진 밖의 유닛을 재료로 끌어와 합친다
+// 합치기 짝 고르기: 오행 진(진 겹침)에 들어간 유닛은 자리를 지키고, 진 밖의 유닛을 재료로 끌어와 합친다
 function mergePairs(){computeForm();const fn=S.formN||[];const idx=S.units.map((u,i)=>u?i:-1).filter(i=>i>=0);
   // 진에 많이 걸린 칸부터 '받는 쪽'이 된다
   const order=idx.slice().sort((a,b)=>(fn[b]||0)-(fn[a]||0)||a-b);const pairs=[];const used=new Set();
@@ -2253,7 +2258,7 @@ function gameOver(){
   const cell=(v,lab,best,isNew)=>`<div>${isNew?'<span class="new">신기록</span>':''}<b>${v}</b><span>${lab}</span><small>최고 ${best}</small></div>`;
   drawEndChart();
   $('endResult').innerHTML=cell(S.wave,'도달 웨이브',REC.bestWave,newW)+cell(S.kills,'처치',REC.bestKills,newK)+cell(S.fusions,'융합',REC.bestFusions,newF)
-    +`<div><b>${S.mythic}</b><span>신화</span><small>누적 ${REC.mythic}</small></div><div><b>${S.relics.length}</b><span>유물</span><small>${S.relics.map(id=>RELICS.find(r=>r.id===id).h).join('·')||'-'}</small></div><div><b>${S.ults}</b><span>궁극기</span><small>극파 ${S.clashes}회 · ${REC.games}판째</small></div>`;
+    +`<div><b>${S.mythic}</b><span>신화</span><small>누적 ${REC.mythic}</small></div><div><b>${S.relics.length}</b><span>유물</span><small>${S.relics.map(id=>RELICS.find(r=>r.id===id).h).join('·')||'-'}</small></div><div><b>${S.ults}</b><span>궁극기</span><small>상극 폭발 ${S.clashes}회 · ${REC.games}판째</small></div>`;
   {const q=S.won?'천하가 조용해졌다. 오늘은 발 뻗고 자자.':newW?'이만하면 자네도 꽤 하는군. 다음엔 더 멀리 가자.':S.wave>=20?'스무 고개를 넘었다. 보스가 자네 이름을 기억할 거다.':S.wave>=10?'열 웨이브. 몸이 막 풀리던 참인데 아쉽군.':S.wave>=5?'아직 손이 무디다. 융합부터 익히자.':'첫걸음이다. 소환을 아끼지 마라.';$('endSay').textContent=q;const el=SAJU?SAJU.me:3,g=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';faceAnim($('endFace'),$('endOverlay'),el,g,TIER(metaHeroGrade()),!!S.won);}
   $('endMsg').textContent=`${S.mode==='daily'?'오늘의 판. ':''}최고 등급 ${GRADE[S.maxGrade-1]}까지 뽑았다.${DAILY.level?' 오늘 운세는 '+DAILY.level+'.':''}${newW?' 최고 기록을 넘었다!':''}${drop?' 장비 획득: '+gearById(drop).name+'!':''}${xp?` 경험 +${xp}${ups?' · 영웅 Lv.'+META.lv+' 달성!':''}`:''}`;
   {const goals=[];const qs=questList();const qd=qs.filter(q=>QST.done[q.id]).length;
@@ -2929,11 +2934,11 @@ function draw(){
   // 웨이브 주력 오행 표시
   if(S.waveEl>=0){const sub=`다음 ${EL[S.nextEl].k}${S.mode==='daily'?(S.ranked?' · 오늘의 판':' · 연습'):S.mode==='weekly'?' · 주간':''}`;ctx.font="400 19px 'Jua','Noto Sans KR',sans-serif";const w1=ctx.measureText(`웨이브 ${S.wave}`).width;ctx.font="700 11px 'Noto Sans KR'";const w2=ctx.measureText(sub).width;const bw=Math.max(w1+52,w2+52);
     ctx.fillStyle='rgba(40,30,10,.18)';rr(14,9,bw,44,12);ctx.fill();ctx.fillStyle='rgba(255,255,255,.93)';rr(12,7,bw,44,12);ctx.fill();ctx.strokeStyle='rgba(60,45,20,.15)';ctx.lineWidth=1;ctx.stroke();
-    ctx.fillStyle=EL[S.waveEl].color;rr(18,13,32,32,9);ctx.fill();ctx.fillStyle='#fff';ctx.font="700 18px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(EL[S.waveEl].h,34,30);
+    ctx.fillStyle=EL[S.waveEl].color;rr(18,13,32,32,9);ctx.fill();ctx.fillStyle='#fff';ctx.font="700 18px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(EL[S.waveEl].k,34,30);
     ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillStyle='#223047';ctx.font="400 19px 'Jua','Noto Sans KR',sans-serif";ctx.fillText(`웨이브 ${S.wave}`,56,28);ctx.fillStyle='#7A6E5B';ctx.font="700 11px 'Noto Sans KR'";ctx.fillText(sub,56,44);ctx.textAlign='center';}
   // HUD: 적 수 · 보드 화력
   if(S.running){let dps=0;S.units.forEach((u,i)=>{if(u&&!(u.silence>0))dps+=unitDmg(u)/unitRate(u,i);});const ht=`적 ${S.enemies.filter(e=>e.d>=0).length} · 화력 ${Math.round(dps).toLocaleString()}`;ctx.font="700 11px 'Noto Sans KR'";const hw=ctx.measureText(ht).width+20;ctx.fillStyle='rgba(255,255,255,.9)';rr(W-12-hw,11,hw,24,12);ctx.fill();ctx.strokeStyle='rgba(60,45,20,.15)';ctx.lineWidth=1;ctx.stroke();ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillStyle='#223047';ctx.fillText(ht,W-22,23);ctx.textBaseline='alphabetic';ctx.textAlign='center';}
-  // 극파 지속 효과: 트랙 색조
+  // 상극 폭발 지속 효과: 트랙 색조
   if(S.mud>0){ctx.strokeStyle='rgba(201,162,74,.35)';ctx.lineWidth=28;ctx.beginPath();ctx.moveTo(...PATH[0]);for(let i=1;i<4;i++)ctx.lineTo(...PATH[i]);ctx.closePath();ctx.stroke();}
   if(S.steam>0){ctx.fillStyle=`rgba(227,85,59,${0.05+0.04*Math.sin(S.time*6)})`;ctx.fillRect(0,0,W,H);}
   const dragU=S.drag&&S.drag.moved?S.units[S.drag.from]:null;
@@ -2956,8 +2961,8 @@ function draw(){
   ctx.globalAlpha=1;
   // 선택 유닛의 합성 상대 강조
   if(S.sel>=0&&S.units[S.sel]&&!S.drag){const su=S.units[S.sel];S.units.forEach((o,j)=>{if(!o||j===S.sel)return;const [x,y]=slotXY(j);let col=null,lab='';
-      if(isClash(su,o)){col='#E3553B';lab='극파';}else if(o.grade!==su.grade||su.grade>=7)return;else if(o.el===su.el){col='#FFB020';lab='승급';}else{col='#3FA66B';lab='융합';}
-      ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.setLineDash(lab==='극파'?[3,4]:[]);rr(x-SLOT/2+3,y-SLOT/2+3,SLOT-6,SLOT-6,10);ctx.stroke();ctx.setLineDash([]);
+      if(isClash(su,o)){col='#E3553B';lab='폭발';}else if(o.grade!==su.grade||su.grade>=7)return;else if(o.el===su.el){col='#FFB020';lab='승급';}else{col='#3FA66B';lab='융합';}
+      ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.setLineDash(lab==='폭발'?[3,4]:[]);rr(x-SLOT/2+3,y-SLOT/2+3,SLOT-6,SLOT-6,10);ctx.stroke();ctx.setLineDash([]);
       ctx.fillStyle=col;rr(x-16,y-SLOT/2-2,32,14,6);ctx.fill();ctx.fillStyle='#fff';ctx.font="700 10px 'Noto Sans KR'";ctx.fillText(lab,x,y-SLOT/2+5);});}
   // 합치기 힌트: 같은 오행·같은 등급 짝
   if(!S.drag){for(const [i,j] of mergePairs()){for(const k of [i,j]){const [x,y]=slotXY(k);ctx.strokeStyle=`rgba(242,193,78,${0.25+0.25*Math.sin(S.time*5)})`;ctx.lineWidth=2;rr(x-SLOT/2+3,y-SLOT/2+3,SLOT-6,SLOT-6,8);ctx.stroke();}}}
@@ -3007,14 +3012,14 @@ function draw(){
       let l1='',l2='',col='#FFB020';
       if(u.grade!==t.grade)l1='등급이 달라 합칠 수 없다',l2='같은 등급끼리만 겹칠 수 있다',col='#8F88A3';
       else if(u.grade>=7)l1='태극은 더 오를 수 없다',col='#8F88A3';
-      else{const ng=t.grade+1;if(u.el===t.el){l1=`같은 오행 승급 → ${EL[t.el].h} ${EL[t.el].k} ${GRADE[ng-1]}`;const tr=TRAIT[t.el].find(x=>x.g===ng);l2=tr?`특성 해금: ${tr.n} — ${tr.t}`:`공격력 ×2.15, 사거리 +6%, 연사 +7%`;col=EL[t.el].color;}
-        else{const child=GEN(u.el)===t.el?t.el:u.el;const parent=child===t.el?u.el:t.el;l1=`상생 융합 → ${EL[child].h} ${EL[child].k} ${GRADE[ng-1]} 융합체 (+35% 공격력)`;l2=`${SUB[parent].n}: ${SUB[parent].t}`;col=EL[child].color;}}
+      else{const ng=t.grade+1;if(u.el===t.el){l1=`같은 오행 승급 → ${EL[t.el].k} ${GRADE[ng-1]}`;const tr=TRAIT[t.el].find(x=>x.g===ng);l2=tr?`특성 해금: ${tr.n} — ${tr.t}`:`공격력 ×2.15, 사거리 +6%, 연사 +7%`;col=EL[t.el].color;}
+        else{const child=GEN(u.el)===t.el?t.el:u.el;const parent=child===t.el?u.el:t.el;l1=`상생 융합 → ${EL[child].k} ${EL[child].k} ${GRADE[ng-1]} 융합체 (+35% 공격력)`;l2=`${SUB[parent].n}: ${SUB[parent].t}`;col=EL[child].color;}}
       ctx.fillStyle='rgba(34,48,71,.92)';rr(bx0,py,bw,44,8);ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.stroke();
       ctx.fillStyle=col;ctx.font="700 13px 'Noto Sans KR'";ctx.fillText(l1,bx,py+14);ctx.fillStyle='#fff';ctx.font="500 11px 'Noto Sans KR'";ctx.fillText(l2,bx,py+32);}
     if(u&&t&&isClash(u,t)){const c=clashOf(u,t);const g=clashGrade(u,t);const [tx,ty]=slotXY(S.drag.over);const py=ty>H/2?ty-SLOT/2-40:ty+SLOT/2+12;
       ctx.fillStyle='rgba(34,48,71,.92)';rr(Math.max(8,Math.min(W-8-330,tx-165)),py,330,44,8);ctx.fill();ctx.strokeStyle='#E3553B';ctx.lineWidth=1;ctx.stroke();
       const bx=Math.max(8,Math.min(W-8-330,tx-165))+165;
-      ctx.fillStyle='#E3553B';ctx.font="700 13px 'Noto Sans KR'";ctx.fillText(`⚠ ${(u.hero||t.hero)?'영웅 소멸! ':''}상극 · 둘 다 소멸 → 극파 ${c.name} (등급 ${f1(g)})`,bx,py+14);
+      ctx.fillStyle='#E3553B';ctx.font="700 13px 'Noto Sans KR'";ctx.fillText(`⚠ ${(u.hero||t.hero)?'영웅 소멸! ':''}상극 · 둘 다 소멸 → 상극 폭발 ${c.name} (등급 ${f1(g)})`,bx,py+14);
       ctx.fillStyle='#FFFFFF';ctx.font="500 11px 'Noto Sans KR'";ctx.fillText(c.desc(g),bx,py+32);}}
   // 첫 판 힌트
   if(S.mode==='tutorial'&&S.running){const txt=TUT[tutStep].t.replace(/^\d+\.\s*/,'');ctx.font="700 12.5px 'Noto Sans KR'";const maxW=W-120;const words=txt.split(' ');const lines=[];let cur='';for(const w of words){const t2=cur?cur+' '+w:w;if(ctx.measureText(t2).width>maxW&&cur){lines.push(cur);cur=w;}else cur=t2;}if(cur)lines.push(cur);const L=lines.slice(0,3);
@@ -3026,14 +3031,14 @@ function draw(){
   if(tip&&S.running&&S.mode!=='tutorial'){const a=Math.min(1,tip.t/0.6,(8-tip.t)/0.4+0.01);ctx.globalAlpha=Math.max(0,a);ctx.font="500 13px 'Noto Sans KR'";const tw=ctx.measureText(tip.text).width+56;
     ctx.fillStyle='rgba(34,48,71,.92)';rr(W/2-tw/2,H-42,tw,30,8);ctx.fill();ctx.strokeStyle='#FFB020';ctx.lineWidth=1;ctx.stroke();
     ctx.fillStyle='#FFB020';ctx.textAlign='left';ctx.fillText('힌트',W/2-tw/2+12,H-27);ctx.fillStyle='#FFFFFF';ctx.fillText(tip.text,W/2-tw/2+44,H-27);ctx.textAlign='center';ctx.globalAlpha=1;}
-  // 극파 지속 효과 표시
+  // 상극 폭발 지속 효과 표시
   {let hy=tip&&S.running?H-52:H-14;ctx.font="700 12px 'Noto Sans KR'";ctx.textAlign='right';
     if(S.mud>0){ctx.fillStyle='#C9A24A';ctx.fillText(`진흙늪 받는 피해 +${Math.round(S.mudPct*100)}% · ${S.mud.toFixed(1)}s`,W-12,hy);hy-=16;}
     if(S.steam>0){ctx.fillStyle='#E3553B';ctx.fillText(`증기 공격력 +${Math.round(S.steamPct*100)}% · ${S.steam.toFixed(1)}s`,W-12,hy);hy-=16;}
     if(S.buffT>0){ctx.fillStyle='#FFB020';ctx.fillText(`귀인 강림 공격력 +${Math.round(S.buffPct*100)}% · ${S.buffT.toFixed(1)}s`,W-12,hy);hy-=16;}
     if(S.barrierT>0){ctx.fillStyle='#FFB020';ctx.fillText(`화개 결계 · ${S.barrierT.toFixed(1)}s`,W-12,hy);const [lx,ly]=posOnPath(0);ctx.strokeStyle='#FFB020';ctx.lineWidth=3;ctx.setLineDash([6,4]);ctx.beginPath();ctx.arc(lx,ly,34+3*Math.sin(S.time*6),0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
     ctx.textAlign='center';}
-  if(S.running&&S.waveT<2.2&&S.wave>0){const a=Math.min(1,(2.2-S.waveT)*1.5),sl=Math.min(1,S.waveT*4);ctx.globalAlpha=a;const bw=Math.min(400,W-24),bx=W/2-bw/2,by=58+(1-sl)*-14;ctx.fillStyle='rgba(20,30,50,.9)';rr(bx,by,bw,48,14);ctx.fill();ctx.fillStyle=EL[S.waveEl].color;rr(bx,by,6,48,3);ctx.fill();ctx.fillStyle='#FFD27A';ctx.font="400 22px 'Jua','Noto Sans KR'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(`${S.wave} 웨이브${S.wave%10===0?' · 보스':''}`,bx+18,by+17);ctx.fillStyle='#fff';ctx.font="700 12px 'Noto Sans KR'";ctx.fillText(`${EL[S.waveEl].k} 주력 · ${EL[(S.waveEl+3)%5].k}${(S.waveEl+3)%5===0||(S.waveEl+3)%5===3?'으로':'로'} 받아쳐라`,bx+18,by+36);ctx.fillStyle=EL[S.waveEl].color;rr(bx+bw-44,by+9,30,30,9);ctx.fill();ctx.fillStyle='#fff';ctx.font="700 17px 'Noto Sans KR'";ctx.textAlign='center';ctx.fillText(EL[S.waveEl].h,bx+bw-29,by+25);ctx.textBaseline='alphabetic';ctx.globalAlpha=1;}
+  if(S.running&&S.waveT<2.2&&S.wave>0){const a=Math.min(1,(2.2-S.waveT)*1.5),sl=Math.min(1,S.waveT*4);ctx.globalAlpha=a;const bw=Math.min(400,W-24),bx=W/2-bw/2,by=58+(1-sl)*-14;ctx.fillStyle='rgba(20,30,50,.9)';rr(bx,by,bw,48,14);ctx.fill();ctx.fillStyle=EL[S.waveEl].color;rr(bx,by,6,48,3);ctx.fill();ctx.fillStyle='#FFD27A';ctx.font="400 22px 'Jua','Noto Sans KR'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(`${S.wave} 웨이브${S.wave%10===0?' · 보스':''}`,bx+18,by+17);ctx.fillStyle='#fff';ctx.font="700 12px 'Noto Sans KR'";ctx.fillText(`${EL[S.waveEl].k} 주력 · ${EL[(S.waveEl+3)%5].k}${(S.waveEl+3)%5===0||(S.waveEl+3)%5===3?'으로':'로'} 받아쳐라`,bx+18,by+36);ctx.fillStyle=EL[S.waveEl].color;rr(bx+bw-44,by+9,30,30,9);ctx.fill();ctx.fillStyle='#fff';ctx.font="700 17px 'Noto Sans KR'";ctx.textAlign='center';ctx.fillText(EL[S.waveEl].k,bx+bw-29,by+25);ctx.textBaseline='alphabetic';ctx.globalAlpha=1;}
   // 연속 처치
   if(S.streak>=5&&S.streakT>0){const sz=22+Math.min(14,S.streak*0.5);const pop=1+Math.max(0,S.streakT-1.2)*0.6;ctx.save();ctx.translate(W/2,74);ctx.rotate(-0.06);ctx.scale(pop,pop);ctx.font=`400 ${sz}px 'Jua','Noto Sans KR'`;const tw2=ctx.measureText(`연속 처치 ×${S.streak}`).width+34;ctx.globalAlpha=Math.min(1,S.streakT*3);ctx.fillStyle='rgba(192,57,43,.9)';rr(-tw2/2,-sz*0.8,tw2,sz*1.5,10);ctx.fill();ctx.strokeStyle='#FFD27A';ctx.lineWidth=2.5;rr(-tw2/2+4,-sz*0.8+4,tw2-8,sz*1.5-8,7);ctx.stroke();ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#FFF3C4';ctx.fillText(`연속 처치 ×${S.streak}`,0,sz*-0.05);ctx.restore();}
   // 화면 섬광
@@ -3069,7 +3074,7 @@ function draw(){
   if(S.dice)drawDice();
   if(S.paused&&!S.relicChoices){ctx.fillStyle='rgba(34,48,71,.65)';ctx.fillRect(0,0,W,H);ctx.fillStyle='#FFFFFF';ctx.font="400 56px 'Jua','Noto Sans KR'";ctx.fillText('일시정지',W/2,H/2);}
 }
-// 극파 연출: 화면 전체 오행 효과
+// 상극 폭발 연출: 화면 전체 오행 효과
 function drawClashFx(){
   const f=S.clashFx;const p=f.t/f.dur;const k=f.key;ctx.save();
   if(k==='0,3'){ // 화살비: 강철 촉 화살이 비스듬히 쏟아지고 잎이 흩날린다
@@ -3170,7 +3175,7 @@ function drawSkillFx(){
     nameTag(W/2,H*0.2);}
   else if(k==='mun'){ // 문창: 붓이 하늘에 글자를 쓴다
     ctx.globalAlpha=Math.min(1,p*3)*(p>0.85?(1-p)*6:1);const n=Math.min(5,Math.floor(p*7));
-    ctx.font="700 64px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';for(let i=0;i<n;i++){const xx=W*(0.15+0.175*i),yy=H*0.28+Math.sin(i)*10;ctx.fillStyle='rgba(30,34,48,.85)';ctx.fillText(EL[i].h,xx,yy);ctx.fillStyle=EL[i].color;ctx.globalAlpha*=0.9;ctx.fillText(EL[i].h,xx-2,yy-2);ctx.globalAlpha/=0.9;}
+    ctx.font="700 64px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';for(let i=0;i<n;i++){const xx=W*(0.15+0.175*i),yy=H*0.28+Math.sin(i)*10;ctx.fillStyle='rgba(30,34,48,.85)';ctx.fillText(EL[i].k,xx,yy);ctx.fillStyle=EL[i].color;ctx.globalAlpha*=0.9;ctx.fillText(EL[i].k,xx-2,yy-2);ctx.globalAlpha/=0.9;}
     const bx=W*(0.15+0.175*Math.min(4.6,p*7)),by=H*0.28-40;ctx.save();ctx.translate(bx,by);ctx.rotate(-0.6);ctx.fillStyle='#5A3A1C';ctx.fillRect(-4,-90,8,90);ctx.fillStyle='#223047';ctx.beginPath();ctx.moveTo(-6,0);ctx.lineTo(6,0);ctx.lineTo(0,22);ctx.closePath();ctx.fill();ctx.restore();
     nameTag(W/2,H*0.55);}
   else if(k==='dohwa'){ // 도화: 복사꽃 나무가 피어나고 꽃잎이 쏟아진다
@@ -3234,7 +3239,7 @@ function drawUnit(u,x,y,sel,alpha,form){
   ctx.restore();
   // 오행 배지 (발판 왼쪽 위) · 등급 점 (발판 아래) · 영웅 이름표
   ctx.fillStyle=EL[u.el].color;ctx.beginPath();ctx.arc(-rx-3,FY-14,7.5,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.strokeStyle=OL;ctx.lineWidth=1;ctx.stroke();
-  ctx.fillStyle='#fff';ctx.font="700 10px 'Noto Sans KR',sans-serif";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(EL[u.el].h,-rx-3,FY-13.5);
+  ctx.fillStyle='#fff';ctx.font="700 10px 'Noto Sans KR',sans-serif";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(EL[u.el].k,-rx-3,FY-13.5);
   if(subOf(u)>=0){ctx.fillStyle=EL[subOf(u)].color;ctx.beginPath();ctx.arc(-rx+4,FY-6,4.2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();}
   ctx.fillStyle='rgba(34,48,71,.75)';rr(-u.grade*3.5-2,FY+6,u.grade*7+4,7,3);ctx.fill();for(let k=0;k<u.grade;k++){ctx.fillStyle=c;ctx.fillRect(-u.grade*3.5+k*7+1,FY+7.5,5,4);}
 
@@ -3284,7 +3289,7 @@ const TUT=[
   {t:'1. 소환 버튼(또는 Space)으로 유닛을 두 번 뽑아라.',ok:S=>S.summons>=2},
   {t:'2. 같은 오행·같은 등급 둘을 끌어다 겹쳐 승급시켜라. 없으면 더 뽑아라.',ok:S=>S.units.some(u=>u&&!u.hero&&u.grade>=2)},
   {t:'3. 상생 짝(목→화→토→금→수→목)을 겹쳐 융합체를 만들어라. 융합체는 공격력 +35%.',ok:S=>S.fusions>=1},
-  {t:'4. 상극 짝을 겹쳐 극파를 터뜨려라. 둘 다 사라지지만 보드 전체에 효과가 터진다.',ok:S=>S.clashes>=1},
+  {t:'4. 상극 짝을 겹쳐 상극 폭발을 터뜨려라. 둘 다 사라지지만 보드 전체에 효과가 터진다.',ok:S=>S.clashes>=1},
   {t:'5. 영웅 스킬 [1] 또는 [2]를 써라. 쿨타임이 돌면 다시 쓸 수 있다.',ok:S=>S.skills.some(x=>x.cd>0)},
   {t:'6. 상생 순서로 세 칸을 가로·세로·대각선으로 이어 오행 진을 만들어라.',ok:S=>S.links.length>0},
   {t:'안내 끝. 5웨이브까지 버티면 완료다. 이제 자유 모드에서 30웨이브에 도전하라.',ok:()=>false},
@@ -3299,15 +3304,16 @@ function start(mode){AU.init();mode=mode==='daily'?'daily':mode==='tutorial'?'tu
   log(mode==='daily'?(S.ranked?`오늘의 판 ${todayStr()} — 순위 도전. 하루 한 번뿐이다.`:`오늘의 판 연습 — 순위에는 오르지 않는다.`):'보드가 열렸다. 소환으로 운을 시험하라.','hi');
   if(FR.list.length)log(`친구 기운 ${FR.list.length}명: ${FR.list.map(f=>f.ilju+' '+friendBuffOf(f.el).t).join(', ')}`,'good');
   if(DAILY.level)log(`오늘의 운세 ${DAILY.level} 적용 중 (${DAILY.rel}일, ${EL[DAILY.el].k} 강화)`,'hi');else if(SAJU)log('오늘 운세를 아직 뽑지 않았다. 게임 중에도 뽑을 수 있다.');
-  placeHero();if(SAJU&&GUEST>=0&&GUEST!==SAJU.me)log(`객원 영웅 ${EL[GUEST].k} ${HERO_STYLE[GUEST].job} 출전. 신살은 내 사주 그대로다.`,'hi');
-  const armyN=placeArmy();if(armyN){log(`만세력 군대 출전: ${armyText()} (${armyN}명)`,'good');cutin('만세력 군대 출전',`내 사주의 오행 ${armyText()}이 함께 싸운다`,'#FFB020',1.4);}
+  placeHero();if(SAJU&&GUEST>=0&&GUEST!==SAJU.me)log(`객원 영웅 ${EL[GUEST].k} ${HERO_STYLE[GUEST].job} 출전. 특기는 내 사주 그대로다.`,'hi');
+  const armyN=placeArmy();if(armyN){log(`사주 군대 출전: ${armyText()} (${armyN}명)`,'good');cutin('사주 군대 출전',`내 사주의 오행 ${armyText()}이 함께 싸운다`,'#FFB020',1.4);}
   if(mode==='free'){loadGift();if(GIFT.list.length&&!GIFT.used){S.freeSummon+=GIFT.list.length;S.gold+=40*GIFT.list.length;GIFT.used=true;saveGift();log(`친구 응원 ${GIFT.list.length}회: 무료 소환 +${GIFT.list.length} · 골드 +${40*GIFT.list.length}`,'hi');}
     if(REC.games>0&&daysSince(REC.lastPlay)>=3&&!ATT.back){ATT.back=1;try{localStorage.setItem('ubz_att',JSON.stringify(ATT));}catch(_){}S.gold+=150;S.freeSummon+=2;setTimeout(()=>cutin('복귀 선물','오랜만이다 · 골드 +150 · 무료 소환 +2','#FFB020',2.2,true),600);}}
+  if(DAILY.level&&mode!=='tutorial'){const fx=fortuneEffects(DAILY).slice(0,3).join(' · ');setTimeout(()=>cutin(`오늘의 운세 ${DAILY.level} · ${DAILY.score}점`,fx||'효과 없음','#F2A23A',2.4),1200);}
   if(mode==='free'&&META.lv>=5)S.freeSummon+=1;if(mode==='free'&&useAttend()){S.freeSummon+=(ATT.streak===6?2:1);S.gold+=attendGold();log(`출석 ${ATT.streak}일째 보상: 무료 소환 1회, 골드 +${attendGold()}`,'hi');renderHome();}
   for(let k=0;k<(SAJU?1:2);k++)summon();ui();}
-// 만세력 군대: 사주 여덟 글자(일간=영웅 제외)의 오행 개수만큼 일반 등급 유닛이 영웅 곁에 선다 (난수 소비 없음)
+// 사주 군대: 사주 여덟 글자(일간=영웅 제외)의 오행 개수만큼 일반 등급 유닛이 영웅 곁에 선다 (난수 소비 없음)
 function armyCounts(){if(!SAJU)return null;const c=SAJU.cnt.slice();c[SAJU.me]=Math.max(0,c[SAJU.me]-1);return c;}
-const armyText=()=>{const c=armyCounts();if(!c)return '';return c.map((n,i)=>n?`${EL[i].h}${n}`:'').filter(Boolean).join(' ');};
+const armyText=()=>{const c=armyCounts();if(!c)return '';return c.map((n,i)=>n?`${EL[i].k}${n}`:'').filter(Boolean).join(' ');};
 function placeArmy(){const c=armyCounts();if(!c)return 0;const cen=Math.floor(ROWS/2)*COLS+Math.floor(COLS/2);const cr=Math.floor(cen/COLS),cc=cen%COLS;
   const order=[...Array(COLS*ROWS).keys()].sort((a,b)=>(Math.abs(Math.floor(a/COLS)-cr)+Math.abs(a%COLS-cc))-(Math.abs(Math.floor(b/COLS)-cr)+Math.abs(b%COLS-cc))||a-b);let n=0;
   for(let el=0;el<5;el++)for(let k=0;k<c[el];k++){const i=order.find(j=>!S.units[j]);if(i==null)return n;S.units[i]={id:S.nextId++,el,grade:1,fused:false,cd:0.2*n,pop:1.3,ultCd:0,drop:1};n++;}
@@ -3318,7 +3324,7 @@ function placeHero(){
   const cen=Math.floor(ROWS/2)*COLS+Math.floor(COLS/2);const i=S.units[cen]?S.units.indexOf(null):cen;if(i<0)return;
   S.units[i]={id:S.nextId++,el,grade:metaHeroGrade(),fused:false,cd:0,pop:1.5,ultCd:0,drop:1,hero:true,heroName:name,gender:g};
   S.maxGrade=Math.max(S.maxGrade,3);const [x,y]=slotXY(i);ring(x,y,'#FFB020',90,0.8);burst(x,y,'#FFB020',24,120);
-  log(SAJU?`영웅 ${name} 출전 (희귀). 액티브 ${S.skills.map(s=>SKILL[s.k].name).join('·')} / 패시브 ${SAJU.ten2.map(i=>TEN[i].k+'·'+TEN[i].name).join(', ')}`:'무명 영웅 출전 (희귀). 사주를 넣으면 일주 영웅과 신살·십성 스킬이 붙는다.','hi');
+  log(SAJU?`영웅 ${name} 출전 (희귀). 액티브 ${S.skills.map(s=>SKILL[s.k].name).join('·')} / 패시브 ${SAJU.ten2.map(i=>TEN[i].name+'('+TEN[i].k+')').join(', ')}`:'무명 영웅 출전 (희귀). 사주를 넣으면 일주 영웅과 신살·십성 스킬이 붙는다.','hi');
 }
 // ───── 영웅 액티브 스킬 (신살) ─────
 function castSkill(idx){
@@ -3372,7 +3378,7 @@ if(MOBILE){const aside=document.querySelector('aside.panel');const names=['영�
   const bar=document.createElement('div');bar.className='mtabs';bar.innerHTML=names.map((n,i)=>`<button data-i="${i}" class="${i===0?'on':''}">${n}</button>`).join('');
   aside.insertBefore(bar,MSECS[0]);bar.querySelectorAll('button').forEach(b=>b.onclick=()=>mtab(+b.dataset.i));mtab(-1);}
 function mtab(i){if(!MOBILE)return;if(i===MTAB&&i>=0)i=-1;MTAB=i;MSECS.forEach((el,k)=>{el.classList.toggle('mhide',k!==i);el.classList.toggle('open',k===i);});document.querySelectorAll('.mtabs button').forEach(b=>b.classList.toggle('on',+b.dataset.i===i));}
-requestAnimationFrame(frame);
+requestAnimationFrame(frame);setTimeout(fortunePrompt,400);
 // 디버그 / 시뮬레이션 훅
 const tag=u=>u?EL[u.el].k+u.grade+(u.fused?'✦':''):'-';
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
@@ -3386,7 +3392,7 @@ window.__ubz={HOT,cheer:(c)=>cheerSuffix(c,todayStr()),GIFTv:()=>GIFT,crSheet:(s
   sheet(){const cv2=document.createElement('canvas');cv2.width=1100;cv2.height=560;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,1100,560);for(let el=0;el<5;el++)for(let t=0;t<3;t++){ctx.save();ctx.translate(90+el*200,90+t*150);ctx.scale(2,2);BLINK=false;SWING=0;PHASE=0;drawCreature(el,t);ctx.restore();}for(let el=0;el<5;el++){ctx.save();ctx.translate(110+el*210,470);ctx.scale(1.8,1.8);BLINK=false;SWING=0;PHASE=0;drawBoss(el,el%2);ctx.restore();}for(let el=0;el<5;el++)for(let t=0;t<3;t++){ctx.save();ctx.translate(90+el*200+100,90+t*150);ctx.scale(2,2);BLINK=false;SWING=t===1?1:0;PHASE=0;drawHero(el,t===2?'f':'m',t);ctx.restore();}});return cv2.toDataURL();},
   bgm:()=>({on:BGM.on,playing:BGM.playing,step:BGM.step}),
   place(i,el,grade,fused){S.units[i]={id:S.nextId++,el,grade,fused:!!fused,cd:0,pop:1,ultCd:0};},saju:computeSaju,daily:()=>DAILY,fortune:drawFortune,state:()=>S,dice:applyDice,relics:offerRelics,share:shareText,save:saveGame,rndN:()=>rndN,week:weekKey,board:renderBoard,loadSheet,sheets:SHEETS,
-  auto(sec){ // 단순 자동 플레이: 소환 → 같은 오행 승급 → 상생 융합 (유닛 7개 이상일 때만), 위기 시 극파
+  auto(sec){ // 단순 자동 플레이: 소환 → 같은 오행 승급 → 상생 융합 (유닛 7개 이상일 때만), 위기 시 상극 폭발
     const t0=S.wave;for(let s=0;s<sec&&S.running;s++){
       for(let g=0;g<25;g++){if(!S.units.includes(null)||S.paused)break;const cost=summonCost();if(S.gold<cost||S.gold<60)break;const before=S.summons+S.freeSummon;summon();if(S.summons+S.freeSummon===before)break;}
       let done=true,guard=0;while(done&&guard++<30){done=false;const idx=S.units.map((u,i)=>u?i:-1).filter(i=>i>=0);if(idx.length<7)break;
