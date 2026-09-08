@@ -525,6 +525,8 @@
   .relic .d{font-size:11.5px;line-height:1.3;color:var(--muted)} .relic .n{font-size:13.5px;font-weight:700}
   .sajuform{display:grid;gap:10px;margin:4px 0} .sajuform label{display:grid;gap:5px;font-size:13px;font-weight:700;color:var(--text)} .sajuform label small{font-weight:500;color:var(--muted);margin-left:4px} .sajuform input,.sajuform select{font-size:15px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--text);font-family:inherit;width:100%;box-sizing:border-box}
   .stat.att{padding:8px 2px;opacity:.6} .stat.att.on{opacity:1} .stat.att.today{border-color:#F2A23A;background:#FFF6E0;box-shadow:0 0 0 2px rgba(242,162,58,.25)} .stat.att b{font-size:14px} .stat.att b small{font-size:10px;margin-left:1px} .stat.att .ex{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+  .tbi.pulse{animation:todopulse 1.4s ease-in-out infinite;border-color:#F2A23A;background:#FFF6E0} .tbi.pulse b{color:#B8620A}
+  #winFace,#endFace{width:96px!important;height:96px!important;flex:none} #winOverlay .hsay,#endOverlay .hsay{align-items:center}
   .srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #F0E9DA} .srow:last-child{border-bottom:none} .srow>span{font-size:14px;color:var(--navy);font-weight:700}
   .sw{width:50px;height:30px;border-radius:999px;background:#D9CFBC;box-shadow:inset 0 2px 4px rgba(0,0,0,.12);padding:0;position:relative;transform:none!important;flex:none}
   .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:left .18s}
@@ -670,7 +672,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.9</span> · 사주로 겨루는 오행 디펜스</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.10</span> · 사주로 겨루는 오행 디펜스</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -682,9 +684,9 @@
     <div class="modal" id="unitModal" hidden style="z-index:27"><div class="mbox ucard"><div id="unitCardBody"></div><div class="note" id="unitCardHint">끌어서 옮기거나 겹쳐 합친다. 길게 누르면 이 카드.</div><button class="ghost sm" id="unitCardClose" style="width:100%">닫기</button></div></div>
     <div class="modal" id="dexModal" hidden style="z-index:27"><div class="mbox" style="text-align:center;gap:8px"><canvas id="dexBig" width="480" height="480" style="width:220px;height:220px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#fff,#EEF3F8);border:3px solid #FFD27A;box-shadow:0 0 0 6px rgba(255,210,122,.25);margin:0 auto"></canvas><h3 id="dexBigName" style="margin:0"></h3><div class="note" id="dexBigDesc" style="text-align:left"></div><div style="display:flex;gap:8px"><button class="ghost sm" id="dexPose" style="flex:1">⚔ 공격 포즈</button><button class="ghost sm" id="dexClose" style="flex:1">닫기</button></div></div></div>
     <div class="modal" id="attModal" hidden style="z-index:26"><div class="mbox"><h3 style="margin:0">출석 보상</h3><div class="stats" id="attGrid" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div><div class="note" id="attNote"></div><button class="ghost sm" id="attClose" style="width:100%">닫기</button></div></div>
-    <div class="modal" id="welcome" hidden style="z-index:25"><div class="mbox" style="text-align:center;gap:10px"><div style="font-family:'Jua','Noto Sans KR',sans-serif;font-size:34px;color:#2F7BE8">운세전</div><div class="note" style="font-size:14px;color:#223047">내 사주가 영웅이 되어 오행 군대를 이끈다.<br>친구와 점수를 겨루고, 기운을 나눈다.</div>
-      <div class="r" style="justify-content:center;gap:6px;margin:4px 0"><span class="chip" style="background:#3FA66B;color:#fff">木</span><span class="chip" style="background:#E3553B;color:#fff">火</span><span class="chip" style="background:#C9A24A;color:#fff">土</span><span class="chip" style="background:#C8CCD6;color:#223047">金</span><span class="chip" style="background:#3D7FD9;color:#fff">水</span></div>
-      <div style="text-align:left;display:grid;gap:6px;font-size:13px"><div><i class="num">1</i><b>생년월일</b>을 넣으면 태어난 날의 기운이 <b>영웅</b>이 된다</div><div><i class="num">2</i>같은 오행을 겹쳐 <b>승급</b>, 상생 짝을 겹쳐 <b>융합</b></div><div><i class="num">3</i>매일 <b>사당</b>에서 운세를 뽑아 오늘의 힘을 받는다</div></div>
+    <div class="modal" id="welcome" hidden style="z-index:25"><div class="mbox" style="text-align:center;gap:10px"><div style="font-family:'Jua','Noto Sans KR',sans-serif;font-size:34px;color:#2F7BE8">운세전</div><div class="note" style="font-size:14px;color:#223047">내 사주가 영웅이 되어 오행 군대를 이끈다.<br>매일 운세를 뽑고, 친구와 기운을 나눈다.</div>
+      <div class="r" style="justify-content:center;gap:6px;margin:4px 0"><span class="chip" title="木" style="background:#3FA66B;color:#fff">목</span><span class="chip" title="火" style="background:#E3553B;color:#fff">화</span><span class="chip" title="土" style="background:#C9A24A;color:#fff">토</span><span class="chip" title="金" style="background:#C8CCD6;color:#223047">금</span><span class="chip" title="水" style="background:#3D7FD9;color:#fff">수</span></div>
+      <div style="text-align:left;display:grid;gap:6px;font-size:13px"><div><i class="num">1</i><b>생년월일</b> 하나로 나만의 <b>영웅</b>이 생긴다</div><div><i class="num">2</i>같은 오행은 <b>승급</b>, 상생 짝은 <b>융합</b></div><div><i class="num">3</i>매일 <b>사당</b>에서 운세를 뽑으면 그날 전투가 세진다</div></div>
       <div class="btns"><button id="wcStart">내 사주로 시작</button><button class="ghost" id="wcSkip">먼저 둘러보기</button></div></div></div>
     <div class="modal" id="cardModal" hidden style="z-index:30"><div class="mbox" style="padding:12px"><h3 style="margin:0">공유 카드</h3><img id="cardImg" alt="결과 카드" style="width:100%;border-radius:12px;display:block"><div class="note">이미지를 길게 누르면 저장할 수 있다.</div><div class="btns"><button class="sm" id="cardShare">공유하기</button><button class="ghost sm" id="cardCopy">글로 복사</button></div><button class="ghost sm" id="cardClose" style="width:100%">닫기</button></div></div>
     <div class="overlay" id="revealOverlay" hidden>
@@ -701,8 +703,8 @@
       <div class="box">
         <h2><em>천하통일</em></h2>
         <div class="hsay" style="border-color:#FFB020;background:#FFF6E0"><canvas id="winFace" width="120" height="120"></canvas><p id="winSay"></p></div>
-        <p id="winMsg">30웨이브를 버텼다. 오행이 보드를 지켰다.</p>
-        <p class="note">계속하면 무한 모드로 이어진다. 기록은 계속 쌓인다.</p>
+        <p id="winMsg">30웨이브를 버텼다.</p>
+        <div class="bonus" id="winBonus" style="justify-content:center"></div>
         <div class="btns"><button id="winBtn">계속 버티기</button><button class="ghost" id="winShare">공유 카드</button></div>
         <button class="ghost sm" id="winHome" style="margin-top:8px;width:100%">홈으로</button>
       </div>
@@ -1637,7 +1639,7 @@ function renderHome(){renderTodo();{const tb=document.querySelectorAll('#todo bu
   $('hSajuBtn').textContent=hasS?'사주 수정':'사주 입력';$('hSubShort').textContent=hasS?`나의 오행 ${EL[el].k} · ${HERO_STYLE[el].job} · 군대 ${armyText()||'없음'}`:'사주를 넣으면 태어난 날의 기운(일주)이 영웅이 된다';
   $('hArmy').innerHTML=hasS?`<div class="note"><b>사주 군대</b> · 매 판 시작에 영웅 곁에 선다</div><div class="r" style="margin-top:6px">${(armyCounts()||[]).map((n,i)=>n?`<span class="chip" style="background:${EL[i].color};width:auto;padding:0 8px">${EL[i].k} ×${n}</span>`:'').join('')||'<span class="note">일간 외 오행이 없다</span>'}</div>`:'';
   $('hFortuneMini').textContent=DAILY.level?`${DAILY.score}점 ${DAILY.level} · 공격력 +${Math.round((DAILY.power||0)*100)}% · 시작 골드 +${DAILY.startGold||0}`:(hasS?'하루 한 번 · 점수만큼 오늘 전투가 강해진다':'먼저 사주를 넣어라');$('hFortuneBtn').querySelector('b').textContent=DAILY.level?'오늘의 운세':'오늘의 운세 뽑기';
-  $('tbFortuneN').textContent=DAILY.level?DAILY.score:'?';$('tbFortune').className='tbi'+(DAILY.level?' on':'');$('tbAttendN').textContent=ATT.streak;renderAttend();
+  $('tbFortuneN').textContent=DAILY.level?DAILY.score:'뽑기';$('tbFortune').className='tbi'+(DAILY.level?' on':(SAJU?' pulse':''));$('tbAttendN').textContent=ATT.streak;renderAttend();
   $('setSound').classList.toggle('on',AU.on);$('setMusic').classList.toggle('on',BGM.on);$('setHaptic').classList.toggle('on',HAPTIC);if($('setBig'))$('setBig').classList.toggle('on',BIGTEXT);if($('setSpeed'))$('setSpeed').textContent=SPEED+'배속';if($('aboutVer'))$('aboutVer').textContent=($('verTag')||{}).textContent||'';renderShow();if(document.activeElement!==$('setName'))$('setName').value=NAME||'';
   document.querySelector('.tabbar button[data-s="hero"]').classList.toggle('dot',!!SAJU&&!DAILY.level);
   const fb=$('hFortune');if(DAILY.level)fb.innerHTML=fortuneHtml(DAILY);else{fb.innerHTML=`<div class="note">${hasS?'오늘 운세를 아직 뽑지 않았다. 점수만큼 오늘 전투가 강해진다.':'사주를 넣어야 운세를 뽑을 수 있다.'}</div><div class="btns" style="margin-top:8px"><button class="primary sm" id="hFortuneGo">${hasS?'사당에서 운세 뽑기':'사주 입력'}</button></div>`;$('hFortuneGo').onclick=()=>$('hFortuneBtn').click();}
@@ -1923,7 +1925,7 @@ function ui(){
     const c1=CLASH[pairKey(u.el,OVER(u.el))],c2=CLASH[pairKey(u.el,(u.el+3)%5)];
     let extra=`${e.desc}${u.grade>=6?` · <b style="color:var(--gold)">궁극기 ${ULT[u.el].name}</b>: ${ULT[u.el].desc}${u.grade>=7?' · <b style="color:#1FB3AD">태극: 궁극기 대기 40% 단축</b>':''}`:''} · 극하는 오행 <b style="color:${EL[OVER(u.el)].color}">${EL[OVER(u.el)].k}</b> · 상생 짝 <b style="color:${EL[GEN(u.el)].color}">${EL[GEN(u.el)].k}</b> <b style="color:${EL[(u.el+4)%5].color}">${EL[(u.el+4)%5].k}</b><br>상극 폭발(둘 다 소멸): <b style="color:${EL[OVER(u.el)].color}">${EL[OVER(u.el)].k}</b>와 ${c1.name} · <b style="color:${EL[(u.el+3)%5].color}">${EL[(u.el+3)%5].k}</b>와 ${c2.name}`;
     if(subOf(u)>=0)extra+=`<br><b style="color:${EL[subOf(u)].color}">${SUB[subOf(u)].n}</b>: ${SUB[subOf(u)].t}`;
-    if(!u.hero&&u.grade<6){const pe=(u.el+4)%5,ne=GEN(u.el);extra+=`<br><span class="note">합성:</span> <b style="color:${EL[u.el].color}">${EL[u.el].k}+${EL[u.el].k}</b> → ${EL[u.el].k} <b>승급</b> · <b style="color:${EL[ne].color}">${EL[u.el].k}+${EL[ne].k}</b> → ${EL[ne].k} <b>융합체</b>(${EL[u.el].k}의 기운) · <b style="color:${EL[pe].color}">${EL[pe].k}+${EL[u.el].k}</b> → ${EL[u.el].k} <b>융합체</b>(${EL[pe].k}의 기운)`;}
+    if(!u.hero&&u.grade<6){const pe=(u.el+4)%5,ne=GEN(u.el);extra+=`<div class="r" style="margin-top:5px;gap:4px"><span class="pill" style="border-color:${EL[u.el].color}">${EL[u.el].k}+${EL[u.el].k} → 승급</span><span class="pill" style="border-color:${EL[ne].color}">${EL[u.el].k}+${EL[ne].k} → ${EL[ne].k} 융합체</span><span class="pill" style="border-color:${EL[pe].color}">${EL[pe].k}+${EL[u.el].k} → ${EL[u.el].k} 융합체</span></div>`;}
     if(S.form[S.sel])extra+=` · <b style="color:var(--good)">오행 진 ${S.form[S.sel]}칸${S.formN&&S.formN[S.sel]>=2?' · 진 겹침 ×'+S.formN[S.sel]+' 공격력 +'+(10*(S.formN[S.sel]-1))+'%':''} 연사 +${Math.round(formBonus(S.sel)*100)}%${S.form[S.sel]>=5?' · 공격력 +15%':''}</b>`;
     const pk=`${u.id}-${u.grade}`;const redraw=pk!==ui.ipk;ui.ipk=pk;
     if(redraw)$('info').innerHTML=`<div class="pcard"><canvas id="infoPortrait" width="64" height="64"></canvas><div style="min-width:0"><div class="name" style="color:${e.color}">${u.hero?`<span style="color:var(--gold)">♛ ${u.heroName} 영웅</span> · `:''}${unitName(u)} · <span style="color:${GCOL[u.grade-1]}">${GRADE[u.grade-1]}</span> <span class="note">${TIER_N[TIER(u.grade)]} ${u.hero?'':TIER(u.grade)===2?SHIN[u.el]:['정령',['트렌트','불꽃 정령','장승','장수','이무기'][u.el]][TIER(u.grade)]}</span>${u.fused?' <span style="color:var(--gold)">✦융합체</span>':''}${subOf(u)>=0?` <span style="color:${EL[subOf(u)].color}">+${SUB[subOf(u)].n}</span>`:''}</div>
@@ -2067,7 +2069,7 @@ function startWave(){
   S.spawnQ=(S.nextQ&&S.nextQ.length)?S.nextQ:buildQueue(S.wave,S.waveEl);S.hpMul=waveHpMul(S.wave);
   S.nextEl=Math.floor(rnd()*5);S.nextQ=buildQueue(S.wave+1,S.nextEl);
   saveGame();
-  if(S.wave===30&&!S.won){S.won=true;S.paused=true;S.victoryT=3.2;S.fwT=0;$('winMsg').textContent=`30웨이브를 버텼다. ${S.mode==='daily'?'오늘의 판을 정복했다.':'오행이 보드를 지켰다.'} 처치 ${S.kills} · 신화 ${S.mythic} · 상극 폭발 ${S.clashes}`;AU.fanfare();ring(W/2,H/2,'#FFB020',700,1.5);S.flash=0.3;S.flashColor='#FFF3C4';buzz([60,60,60,60,120]);const h=heroUnit();if(h){h.anim='attack';h.animT=0;h.pop=1.5;}}
+  if(S.wave===30&&!S.won){S.won=true;S.paused=true;S.victoryT=3.2;S.fwT=0;$('winMsg').textContent=`30웨이브 사수 · 처치 ${S.kills} · 융합 ${S.fusions}${S.mode==='daily'?' · 오늘의 판 정복':''}`;{const wb=$('winBonus');if(wb)wb.innerHTML=['🏯 승리 경험 +200','🎁 장비 드랍 확률 ↑','∞ 계속 버티면 무한 모드'].map(t=>`<span>${t}</span>`).join('');}AU.fanfare();ring(W/2,H/2,'#FFB020',700,1.5);S.flash=0.3;S.flashColor='#FFF3C4';buzz([60,60,60,60,120]);const h=heroUnit();if(h){h.anim='attack';h.animT=0;h.pop=1.5;}}
   const boss=S.wave%10===0;
   AU.wave(boss);
   if(boss){cutin(`${BOSS[S.waveEl].name} 등장`,`${EL[S.waveEl].k} 보스 · ${BOSS[S.waveEl].desc} · ${EL[(S.waveEl+3)%5].k}${[0,3].includes((S.waveEl+3)%5)?'으로':'로'} 받아쳐라`,EL[S.waveEl].color,2.8,true,{el:S.waveEl,boss:true});
@@ -2213,7 +2215,7 @@ function fxOnly(dt){
   if(S.heroEvo){S.heroEvo.t+=dt;if(S.heroEvo.t>=S.heroEvo.dur)S.heroEvo=null;}
   if(S.lives<=3&&!S.lowWarned&&S.mode!=='tutorial'){S.lowWarned=true;const hu=S.units.find(u=>u&&u.hero);cutin('위기',hu?'성문이 흔들린다! 버텨라!':'생명이 얼마 남지 않았다','#C0392B',1.8,false,hu?{el:hu.el,grade:hu.grade,hero:true,gender:hu.gender,react:true}:null);buzz([60,40,60]);}
   if(S.victoryT>0){S.victoryT-=dt;S.fwT=(S.fwT||0)+dt;if(S.fwT>0.28){S.fwT=0;const x=W*0.15+Math.random()*W*0.7,y=H*0.15+Math.random()*H*0.4;const col=['#FFB020','#E3553B','#3FA66B','#3D7FD9','#F7A8C4'][Math.floor(Math.random()*5)];burst(x,y,col,26,150);burst(x,y,'#fff',10,90);ring(x,y,col,40,0.5);AU.tone(600+Math.random()*500,0.12,'triangle',0.05,-200);const h=heroUnit();if(h&&Math.random()<0.4){h.anim='attack';h.animT=0;}}
-    if(S.victoryT<=0){$('winOverlay').hidden=false;{const el=SAJU?SAJU.me:3,g=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';const f=$('winFace');if(f)faceAnim(f,$('winOverlay'),el,g,TIER(metaHeroGrade()),true);const ws=$('winSay');if(ws)ws.textContent=['서른 고개를 넘었다. 이 마당의 주인은 자네다.','천하가 조용해졌다. 오늘은 발 뻗고 자자.','오행이 춤을 췄다. 자네 손이 좋았다.'][Math.floor(Math.random()*3)];}}}
+    if(S.victoryT<=0){$('winOverlay').hidden=false;{const wb=$('winBonus');if(wb&&!wb.innerHTML)wb.innerHTML=['🏯 승리 경험 +200','🎁 장비 드랍 확률 ↑','∞ 계속 버티면 무한 모드'].map(t=>`<span>${t}</span>`).join('');}{const el=SAJU?SAJU.me:3,g=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';const f=$('winFace');if(f)faceAnim(f,$('winOverlay'),el,g,TIER(metaHeroGrade()),true);const ws=$('winSay');if(ws)ws.textContent=['서른 고개를 넘었다. 이 마당의 주인은 자네다.','천하가 조용해졌다. 오늘은 발 뻗고 자자.','오행이 춤을 췄다. 자네 손이 좋았다.'][Math.floor(Math.random()*3)];}}}
   for(const s of S.shots){s.life-=dt*(s.slow?1:s.rain?1.2:7);if(s.rain){s.y1+=dt*700;s.x2=s.x1-8;s.y2=s.y1+40;}}S.shots=S.shots.filter(s=>s.life>0);
   for(const p of S.proj){p.t+=dt;p.rot+=dt*18;if(p.e&&p.e.hp>0&&p.e.d>=0){const [ex,ey]=posOnPath(p.e.d);p.tx=ex;p.ty=ey;}
     const k=Math.min(1,p.t/p.dur);p.cx=p.x+(p.tx-p.x)*k;p.cy=p.y+(p.ty-p.y)*k-Math.sin(k*Math.PI)*(p.el===2?26:p.el===0?12:4);
