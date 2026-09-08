@@ -523,6 +523,8 @@
   .relline{font-size:12.5px;color:var(--text);background:#F7F4EC;border-radius:10px;padding:8px 10px;margin-top:6px;text-align:left} .relline span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
   .shopc.can{border-color:#FFB020;box-shadow:0 0 0 2px rgba(255,176,32,.25),0 2px 0 #D9CFBC} .shopc small{display:block;font-size:10px;line-height:1.25;white-space:normal}
   .relic .d{font-size:11.5px;line-height:1.3;color:var(--muted)} .relic .n{font-size:13.5px;font-weight:700}
+  .sajuform{display:grid;gap:10px;margin:4px 0} .sajuform label{display:grid;gap:5px;font-size:13px;font-weight:700;color:var(--text)} .sajuform label small{font-weight:500;color:var(--muted);margin-left:4px} .sajuform input,.sajuform select{font-size:15px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--text);font-family:inherit;width:100%;box-sizing:border-box}
+  .stat.att{padding:8px 2px;opacity:.6} .stat.att.on{opacity:1} .stat.att.today{border-color:#F2A23A;background:#FFF6E0;box-shadow:0 0 0 2px rgba(242,162,58,.25)} .stat.att b{font-size:14px} .stat.att b small{font-size:10px;margin-left:1px} .stat.att .ex{display:block;font-size:10px;color:var(--muted);margin-top:2px}
   .srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #F0E9DA} .srow:last-child{border-bottom:none} .srow>span{font-size:14px;color:var(--navy);font-weight:700}
   .sw{width:50px;height:30px;border-radius:999px;background:#D9CFBC;box-shadow:inset 0 2px 4px rgba(0,0,0,.12);padding:0;position:relative;transform:none!important;flex:none}
   .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:left .18s}
@@ -668,7 +670,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.8</span> · 사주로 겨루는 오행 디펜스</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.9</span> · 사주로 겨루는 오행 디펜스</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -819,12 +821,15 @@
 
 <div class="modal" id="sajuModal" hidden>
   <div class="mbox">
-    <h3>내 사주</h3>
-    <div class="note">생년월일과 태어난 시각으로 네 기둥을 세운다. 절기는 근사값이라 절입일 전후 하루는 오차가 있을 수 있다.</div>
-    <label>생년월일 <input type="date" id="bDate" min="1900-01-01" max="2030-12-31"></label>
-    <label>태어난 시각 <select id="bHour"></select></label>
-    <label>성별 (영웅 외형) <select id="bGender"><option value="m">남</option><option value="f">여</option></select></label>
-    <div class="btns"><button id="sajuSave">저장</button><button class="ghost" id="sajuCancel">닫기</button></div>
+    <h3 style="margin:0">나만의 영웅 만들기</h3>
+    <div class="note" style="margin-top:-2px">생년월일을 넣으면 태어난 날의 기운이 영웅이 되고, 오늘의 운세를 뽑을 수 있다.</div>
+    <div class="sajuform">
+      <label>생년월일 <input type="date" id="bDate" min="1900-01-01" max="2030-12-31"></label>
+      <label>태어난 시각 <small>모르면 '모름'</small><select id="bHour"></select></label>
+      <label>영웅 성별 <select id="bGender"><option value="m">남</option><option value="f">여</option></select></label>
+    </div>
+    <div class="note" style="font-size:11.5px">절기는 근사값이라 절입일 전후 하루는 다를 수 있다. 사주는 이 기기에만 저장된다.</div>
+    <div class="btns"><button id="sajuSave">영웅 깨우기</button><button class="ghost" id="sajuCancel">닫기</button></div>
   </div>
 </div>
 
@@ -1227,8 +1232,8 @@ function loadAttend(){let a={};try{a=JSON.parse(localStorage.getItem('ubz_att'))
 const attendGold=()=>20*Math.min(5,ATT.streak);
 const ATT_REW=[{g:20},{g:40},{g:60,gear:1},{g:80},{g:100},{g:100,fs:2},{g:100,gear:2}];
 function attendGearCheck(){const d=ATT.streak;const rw=ATT_REW[d-1];if(rw&&rw.gear&&!ATT.gearGiven){ATT.gearGiven=true;const id=rollGear(rw.gear);gainGear(id);try{localStorage.setItem('ubz_att',JSON.stringify(ATT));}catch(_){}return gearById(id);}return null;}
-function renderAttend(){const box=$('attGrid');if(!box)return;box.innerHTML=ATT_REW.map((rw,i)=>{const d=i+1;const on=d<=ATT.streak,today=d===ATT.streak;return `<div class="stat" style="padding:6px 2px;${today?'border-color:#F2A23A;background:#FFF6E0':''}${on&&!today?'opacity:.75':''}"><span>${d}일${today?' ·오늘':''}</span><b style="font-size:13px">${on?'<i class="qk on" style="width:14px;height:14px;margin-right:3px"></i>':''}${rw.g}G</b><small style="display:block;font-size:10px;color:${rw.gear?'#2F7BE8':'var(--muted)'}">${rw.gear?(rw.gear===2?'장비 2등급':'장비'):rw.fs?'소환 +2':'소환 +1'}</small></div>`;}).join('');
-  $('attNote').textContent=`연속 ${ATT.streak}일째. 하루 빠지면 1일부터 다시. 골드와 무료 소환은 그날 첫 자유 모드 판에 들어간다.`;}
+function renderAttend(){const box=$('attGrid');if(!box)return;box.innerHTML=ATT_REW.map((rw,i)=>{const d=i+1;const on=d<=ATT.streak,today=d===ATT.streak;return `<div class="stat att${on?' on':''}${today?' today':''}"><span>${today?'오늘':d+'일'}</span><b>${on?'✓ ':''}${rw.g}<small>G</small></b><small class="ex">${rw.gear?(rw.gear===2?'🎁 장비2':'🎁 장비'):rw.fs?'✨ 소환 2':'✨ 소환 1'}</small></div>`;}).join('');
+  $('attNote').innerHTML=`<b>연속 ${ATT.streak}일째</b> · 첫 자유 판에 자동 적용 · 하루 빠지면 1일부터`;}
 // 친구 기운: 사주 코드 교환 → 오늘 하루 오행 관계에 따른 버프 (최대 3명)
 let FR={date:'',list:[]};
 function loadFriends(){try{const f=JSON.parse(localStorage.getItem('ubz_fr'));if(f&&f.date===todayStr())FR=f;else FR={date:todayStr(),list:[]};}catch(_){FR={date:todayStr(),list:[]};}}
@@ -1437,6 +1442,11 @@ function greetLine(){const hr=new Date().getHours();const L=[];const nm=SAJU?SAJ
   if(ATT.streak>=3)L.push(`${ATT.streak}일 연속 출석. 성실하군.`);
   if(FR.list.length)L.push(`친구 ${FR.list.length}명이 기운을 보냈다. 든든하다.`);else L.push('사랑채가 비었다. 친구 코드를 받아 오게.');
   if(META.lv>=10)L.push(`내가 벌써 Lv.${META.lv}라니. 자네 덕이다.`);
+  try{loadGift();if(GIFT.list.length)L.push(`친구 응원이 ${GIFT.list.length}개 왔다. 오늘 판은 든든하겠군.`);else if(FR.list.length)L.push('응원 코드도 한 번 보내 보게. 서로 좋은 일이다.');}catch(_){}
+  {const np=nextPerk();if(np&&np.lv-META.lv<=2)L.push(`특전까지 ${np.lv-META.lv}레벨 남았다. 한 판 더 가자.`);}
+  {const mo=window.__mo!=null?window.__mo:new Date().getMonth()+1;if(mo>=6&&mo<=8)L.push('덥군. 부채질이나 하다 나가자.');else if(mo>=12||mo<=2)L.push('눈이 오면 마당에 눈사람이나 세우자.');else if(mo>=3&&mo<=5)L.push('꽃이 피었군. 마당이 환하다.');else L.push('단풍이 곱다. 걷기 좋은 날이군.');}
+  if(REC.games>0&&daysSince(REC.lastPlay)>=3)L.push('오랜만이군. 그동안 마당은 내가 지켰다.');
+  if(REC.bestWave>=20)L.push(`최고 ${REC.bestWave}웨이브라. 자네도 꽤 하는군.`);
   return L[Math.floor(Math.random()*L.length)];}
 function heroSay(text,sec){BUB.text=text;BUB.until=sceneT+(sec||6);}
 function drawScene(){const cv2=$('homeScene');if(!cv2||!cv2.offsetWidth)return;const dpr=Math.min(2,window.devicePixelRatio||1);const w=cv2.offsetWidth,h=cv2.offsetHeight;if(cv2.width!==Math.round(w*dpr)){cv2.width=Math.round(w*dpr);cv2.height=Math.round(h*dpr);}
@@ -3055,7 +3065,7 @@ function draw(){
     if(S.buffT>0){ctx.fillStyle='#FFB020';ctx.fillText(`귀인 강림 공격력 +${Math.round(S.buffPct*100)}% · ${S.buffT.toFixed(1)}s`,W-12,hy);hy-=16;}
     if(S.barrierT>0){ctx.fillStyle='#FFB020';ctx.fillText(`화개 결계 · ${S.barrierT.toFixed(1)}s`,W-12,hy);const [lx,ly]=posOnPath(0);ctx.strokeStyle='#FFB020';ctx.lineWidth=3;ctx.setLineDash([6,4]);ctx.beginPath();ctx.arc(lx,ly,34+3*Math.sin(S.time*6),0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
     ctx.textAlign='center';}
-  if(S.running&&S.waveT<2.2&&S.wave>0){const a=Math.min(1,(2.2-S.waveT)*1.5),sl=Math.min(1,S.waveT*4);ctx.globalAlpha=a;const bw=Math.min(400,W-24),bx=W/2-bw/2,by=58+(1-sl)*-14;ctx.fillStyle='rgba(20,30,50,.9)';rr(bx,by,bw,48,14);ctx.fill();ctx.fillStyle=EL[S.waveEl].color;rr(bx,by,6,48,3);ctx.fill();ctx.fillStyle='#FFD27A';ctx.font="400 22px 'Jua','Noto Sans KR'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(`${S.wave} 웨이브${S.wave%10===0?' · 보스':''}`,bx+18,by+17);ctx.fillStyle='#fff';ctx.font="700 12px 'Noto Sans KR'";ctx.fillText(`${EL[S.waveEl].k} 주력 · ${EL[(S.waveEl+3)%5].k}${(S.waveEl+3)%5===0||(S.waveEl+3)%5===3?'으로':'로'} 받아쳐라`,bx+18,by+36);ctx.fillStyle=EL[S.waveEl].color;rr(bx+bw-44,by+9,30,30,9);ctx.fill();ctx.fillStyle='#fff';ctx.font="700 17px 'Noto Sans KR'";ctx.textAlign='center';ctx.fillText(EL[S.waveEl].k,bx+bw-29,by+25);ctx.textBaseline='alphabetic';ctx.globalAlpha=1;}
+  if(S.running&&S.waveT<2.2&&S.wave>0){const a=Math.min(1,(2.2-S.waveT)*1.5),sl=Math.min(1,S.waveT*4);ctx.globalAlpha=a;const bw=Math.min(400,W-24),bx=W/2-bw/2,by=58+(1-sl)*-14;ctx.fillStyle='rgba(20,30,50,.9)';rr(bx,by,bw,48,14);ctx.fill();ctx.fillStyle=EL[S.waveEl].color;rr(bx,by,6,48,3);ctx.fill();ctx.fillStyle='#FFD27A';ctx.font="400 22px 'Jua','Noto Sans KR'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(`${S.wave} 웨이브${S.wave%10===0?' · 보스':''}`,bx+18,by+17);{const ce=(S.waveEl+3)%5;const chip=(x0,el)=>{ctx.fillStyle=EL[el].color;rr(x0,by+27,18,18,5);ctx.fill();ctx.fillStyle=el===3?'#223047':'#fff';ctx.font="700 12px 'Noto Sans KR'";ctx.textAlign='center';ctx.fillText(EL[el].k,x0+9,by+36.5);ctx.textAlign='left';};chip(bx+18,S.waveEl);ctx.fillStyle='#fff';ctx.font="700 12px 'Noto Sans KR'";ctx.fillText('주력',bx+40,by+36);ctx.fillStyle='#FFD27A';ctx.fillText('·',bx+70,by+36);chip(bx+82,ce);ctx.fillStyle='#fff';ctx.fillText(`${EL[ce].k}이 유리`,bx+104,by+36);}ctx.fillStyle=EL[S.waveEl].color;rr(bx+bw-44,by+9,30,30,9);ctx.fill();ctx.fillStyle='#fff';ctx.font="700 17px 'Noto Sans KR'";ctx.textAlign='center';ctx.fillText(EL[S.waveEl].k,bx+bw-29,by+25);ctx.textBaseline='alphabetic';ctx.globalAlpha=1;}
   // 연속 처치
   if(S.streak>=5&&S.streakT>0){const sz=22+Math.min(14,S.streak*0.5);const pop=1+Math.max(0,S.streakT-1.2)*0.6;ctx.save();ctx.translate(W/2,74);ctx.rotate(-0.06);ctx.scale(pop,pop);ctx.font=`400 ${sz}px 'Jua','Noto Sans KR'`;const tw2=ctx.measureText(`연속 처치 ×${S.streak}`).width+34;ctx.globalAlpha=Math.min(1,S.streakT*3);ctx.fillStyle='rgba(192,57,43,.9)';rr(-tw2/2,-sz*0.8,tw2,sz*1.5,10);ctx.fill();ctx.strokeStyle='#FFD27A';ctx.lineWidth=2.5;rr(-tw2/2+4,-sz*0.8+4,tw2-8,sz*1.5-8,7);ctx.stroke();ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#FFF3C4';ctx.fillText(`연속 처치 ×${S.streak}`,0,sz*-0.05);ctx.restore();}
   // 화면 섬광
