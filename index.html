@@ -517,7 +517,7 @@
   .teaser{margin-top:8px;padding:8px 10px;border-radius:10px;background:linear-gradient(90deg,#F4F0FF,#FFF7E8);border:1px dashed #D9CFF2;font-size:12px;color:var(--text)} .teaser b{color:#5B3FB0}
   .fx{margin:8px 0 6px;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,#FFF6E0,#FFF);border:1.5px solid #F2D9A0;text-align:left} .fx>b{font-size:13px;color:#7A5200} .fxr{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px} .fxr span{font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;background:#fff;border:1px solid #F2D9A0;color:#2A1F00} .fx small{color:var(--muted);font-size:11px}
   .todo button.pulse{animation:todopulse 1.4s ease-in-out infinite;border-color:#F2A23A;background:#FFF6E0} @keyframes todopulse{0%,100%{box-shadow:0 0 0 0 rgba(242,162,58,.45)}50%{box-shadow:0 0 0 6px rgba(242,162,58,0)}}
-  .qrow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #F0E9DA;font-size:13px;line-height:1.45} .qrow:last-child{border-bottom:none} .qrow>i{font-style:normal;width:28px;height:28px;border-radius:9px;background:#FFF6E0;border:1px solid #F2D9A0;display:grid;place-items:center;flex:none;font-size:14px} .qrow .note{display:block;font-size:12px}
+  #pane-quick .qrow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #F0E9DA;font-size:13px;line-height:1.45} #pane-quick .qrow:last-child{border-bottom:none} #pane-quick .qrow>i{font-style:normal;width:28px;height:28px;border-radius:9px;background:#FFF6E0;border:1px solid #F2D9A0;display:grid;place-items:center;flex:none;font-size:14px} #pane-quick .qrow .note{display:block;font-size:12px}
   .dex .cell{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:6px 2px 5px;box-shadow:0 2px 0 #E3D9C6} .dex .cell canvas,.dex .cell.on canvas{border:none;background:var(--ink3)} .dex .cell.on{border-color:var(--gold)} .dex .cell span{font-size:10.5px;line-height:1.2;text-align:center} .gtile{border-width:1.5px;padding:8px 4px 6px} .gtile b{font-size:11.5px;display:block} .gtile small{font-size:10px;color:var(--muted);display:block;line-height:1.2}
   .mbar button.ready{box-shadow:inset 0 0 0 2px #FFD27A,0 2px 0 #D9CFBC;animation:mready 1.6s ease-in-out infinite} @keyframes mready{0%,100%{box-shadow:inset 0 0 0 2px #FFD27A,0 2px 0 #D9CFBC}50%{box-shadow:inset 0 0 0 2px #FFB020,0 0 10px rgba(255,176,32,.55)}} .mbar button.ready small{color:#B8620A;opacity:1;font-weight:700} .mbar small.warn{color:#C0392B;opacity:1;font-weight:700}
   .relline{font-size:12.5px;color:var(--text);background:#F7F4EC;border-radius:10px;padding:8px 10px;margin-top:6px;text-align:left} .relline span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
@@ -672,7 +672,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.11</span> · 사주로 겨루는 오행 디펜스</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.12</span> · 사주로 겨루는 오행 디펜스</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -696,7 +696,7 @@
         <h2 id="rvTitle"></h2>
         <p id="rvText"></p>
         <div id="rvBody"></div>
-        <div class="btns" style="margin-top:12px"><button id="rvNext">다음</button><button class="ghost" id="rvClose">닫기</button></div>
+        <div class="btns" style="margin-top:12px"><button id="rvNext">다음</button><button class="ghost" id="rvShare" hidden>운세 공유</button><button class="ghost" id="rvClose">닫기</button></div>
       </div>
     </div>
     <div class="overlay" id="winOverlay" hidden>
@@ -1212,7 +1212,7 @@ function updateQuests(){if(!S||S.mode==='tutorial')return;let ch=false;for(const
   if(!QST.all&&questList().every(q=>QST.done[q.id])){QST.all=true;const id=rollGear(DAILY.score>=65?2:1);gainGear(id);log(`과제 전부 달성! 장비 획득: ${gearById(id).name}`,'good');ftext(W/2,H/2-30,`장비 획득 · ${gearById(id).name}`,'#3DD6D0',true);}
   if(ch)saveQuest();}
 function renderQuest(){const box=$('hQuest');if(!box)return;const n=questList().filter(q=>QST.done[q.id]).length;
-  box.innerHTML=questList().map(q=>{const v=Math.min(q.goal,QST.best[q.id]||0),d=!!QST.done[q.id];return `<div class="qrow${d?' done':''}"><i class="qk${d?' on':''}"></i><div class="qm"><b>${q.t}</b><div class="bar"><i style="width:${Math.round(100*v/q.goal)}%"></i></div></div><span class="qn">${v}/${q.goal}</span></div>`;}).join('')+`<div class="note" style="margin-top:8px">달성 ${n}/3 · 오늘 공격력 +${n*3}% · 셋 다 달성하면 장비 하나${QST.all?' (받음)':''}</div>`;}
+  box.innerHTML=questList().map(q=>{const v=Math.min(q.goal,QST.best[q.id]||0),d=!!QST.done[q.id];return `<div class="qrow${d?' done':''}"><i class="qk${d?' on':''}"></i><div class="qm"><b>${q.t}</b><div class="bar"><i style="width:${Math.round(100*v/q.goal)}%"></i></div></div><span class="qn">${v}/${q.goal}</span></div>`;}).join('')+`<div class="bonus" style="margin-top:8px"><span class="${n?'':'dim'}">달성 ${n}/3 · 공격력 +${n*3}%</span><span class="${QST.all?'':'dim'}">🎁 셋 다 하면 장비${DAILY.score>=65?' 2등급':''}${QST.all?' ✓ 받음':''}</span></div>`;}
 function loadGear(){try{const g=JSON.parse(localStorage.getItem('ubz_gear'));if(g)GR={...GR,...g,eq:{...GR.eq,...(g.eq||{})}};}catch(_){}}
 function saveGear(){try{localStorage.setItem('ubz_gear',JSON.stringify(GR));}catch(_){}}
 const gearById=id=>GEAR.find(g=>g.id===id);
@@ -1223,7 +1223,7 @@ function rollGear(r,rf){const pool=GEAR.filter(g=>g.r===r);return pool[Math.floo
 function renderGear(){const box=$('hGear');if(!box)return;
   const slots=Object.keys(GEAR_SLOT).map(sl=>{const g=gearById(GR.eq[sl]);return `<div class="stat" data-sl="${sl}" style="cursor:pointer;${g?'border-color:'+GCOLR[g.r]:''}"><span>${GEAR_SLOT[sl]}</span><b style="font-size:13px;color:${g?GCOLR[g.r]:'var(--muted)'}">${g?g.name:'비어 있음'}</b><small style="display:block;font-size:10px;color:var(--muted)">${g?g.d:'—'}</small></div>`;}).join('');
   const inv=Object.keys(GR.inv).filter(id=>GR.inv[id]>0).map(id=>gearById(id)).sort((a,b)=>b.r-a.r).map(g=>{const on=GR.eq[g.slot]===g.id;return `<div class="gtile${on?' on':''}" data-eq="${g.id}" style="border-color:${GCOLR[g.r]}" title="${g.d}"><i class="gi" style="background:linear-gradient(160deg,${GCOLR[g.r]},${shade(GCOLR[g.r],-25)})">${g.name.slice(0,1)}</i><b>${g.name}</b><small>${g.d}</small>${GR.inv[g.id]>1?`<span class="cnt">×${GR.inv[g.id]}</span>`:''}</div>`;}).join('');
-  box.innerHTML=`<div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">${slots}</div>${inv?`<div class="ginv">${inv}</div>`:'<div class="note" style="margin-top:8px">아직 장비가 없다. 운세 65점 이상, 10웨이브 이상 도달, 과제 3개 달성으로 얻는다.</div>'}<div class="note" style="margin-top:8px">장비 전투력 +${Math.round(gearPower()*100)}% · 타일을 누르면 착용, 칸을 누르면 해제</div>`;
+  box.innerHTML=`<div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">${slots}</div>${inv?`<div class="ginv">${inv}</div>`:'<div class="note" style="margin-top:8px">아직 장비가 없다. 이렇게 얻는다:</div><div class="bonus"><span>🔮 운세 65점 이상</span><span>🏁 10웨이브 도달</span><span>✓ 오늘 과제 3개</span></div>'}<div class="note" style="margin-top:8px">장비 전투력 +${Math.round(gearPower()*100)}% · 타일을 누르면 착용, 칸을 누르면 해제</div>`;
   box.querySelectorAll('[data-eq]').forEach(el=>el.onclick=()=>{const g=gearById(el.dataset.eq);GR.eq[g.slot]=GR.eq[g.slot]===g.id?null:g.id;saveGear();AU.buy();renderHome();});
   box.querySelectorAll('[data-sl]').forEach(el=>el.onclick=()=>{const sl=el.dataset.sl;if(GR.eq[sl]){GR.eq[sl]=null;saveGear();renderHome();}});}
 let ATT={date:'',streak:0,used:true};
@@ -1398,7 +1398,8 @@ function santongAnim(cv2){if(!cv2)return;SANTONG={t0:performance.now(),score:nul
   });
   if(t<3.4)requestAnimationFrame(step);};requestAnimationFrame(step);}
 function openReveal(mode){if(!SAJU)return;RV={step:0,mode};$('revealOverlay').hidden=false;renderReveal();}
-function renderReveal(){
+function shareFortune(btn){if(!DAILY.level)return;const fx=fortuneEffects(DAILY).map(t=>t.replace(/^[^\w가-힣]+/,''));const text=`운세전 · 오늘의 운세 ${DAILY.score}점 ${DAILY.level} (${DAILY.rel}의 날)\n${fx.slice(0,3).join(' · ')}\n내 코드 ${myCode()} — 넣으면 오늘 내 오행이 널 돕는다\n${location.href.split('#')[0]}`;if(navigator.share){navigator.share({text}).catch(()=>{});}else copyText(text,btn);AU.buy();}
+function renderReveal(){{const b=$('rvShare');if(b)b.hidden=true;}
   const el=SAJU.me,g=SAJU.raw&&SAJU.raw.g==='f'?'f':'m';const cv2=$('rvPortrait');
   const draw=(tier)=>drawOn(cv2,()=>{ctx.translate(110,176);ctx.scale(2.05,2.05);BLINK=false;SWING=0;PHASE=0;drawHero(el,g,tier);});
   cv2.style.animation='none';void cv2.offsetWidth;cv2.style.animation='';
@@ -1406,7 +1407,7 @@ function renderReveal(){
   $('rvClose').hidden=true;
   if(RV.step===0){draw(1);$('rvTitle').innerHTML=`${SAJU.ilju} <em>${HERO_STYLE[el].job}</em>`;$('rvText').textContent=`${g==='f'?'여':'남'} · 나의 오행 ${EL[el].k}. 태어난 날의 기운(일주)이 영웅이 되고, 사주 여덟 글자의 오행 ${armyText()||'없음'}이 군대로 함께 나선다.`;$('rvBody').innerHTML=heroSkillsHtml();$('rvNext').textContent=RV.mode==='onboard'?'오늘의 운세 뽑기':'닫기';}
   else if(RV.step===1){draw(1);$('rvTitle').innerHTML='오늘의 <em>운세</em>';
-    if(DAILY.level){$('rvText').textContent='';$('rvBody').innerHTML=`<div class="fortune-body" style="text-align:left">${fortuneHtml(DAILY)}</div>`;$('rvNext').textContent=RV.mode==='fortune'?'기운을 받았다':'다음';}
+    if(DAILY.level){$('rvShare').hidden=false;$('rvText').textContent='';$('rvBody').innerHTML=`<div class="fortune-body" style="text-align:left">${fortuneHtml(DAILY)}</div>`;$('rvNext').textContent=RV.mode==='fortune'?'기운을 받았다':'다음';}
     else{$('rvText').textContent='산통을 흔들어 오늘의 점수를 받는다.';$('rvBody').innerHTML='<canvas id="rvSantong" width="520" height="360" style="width:260px;height:180px;display:block;margin:0 auto"></canvas>';$('rvNext').textContent='뽑는 중…';$('rvNext').disabled=true;santongAnim($('rvSantong'));
       let n=0;const iv=setInterval(()=>{AU.tone(420+(n%4)*60,0.03,'square',0.018);n++;},110);
       setTimeout(()=>{clearInterval(iv);drawFortune();SANTONG.score=DAILY.score;SANTONG.level=DAILY.level;renderSaju();renderHome();AU.diceResult(DAILY.score>=88?6:DAILY.score<15?1:4);setTimeout(()=>{$('rvNext').disabled=false;renderReveal();},1300);},1500);}}
@@ -1607,10 +1608,11 @@ function drawScene(){const cv2=$('homeScene');if(!cv2||!cv2.offsetWidth)return;c
 function sceneLoop(){if(!$('startOverlay').hidden&&$('scr-home').classList.contains('on')){sceneT+=1/30;drawScene();if(((sceneT*30)|0)%45===0)ambSync();}else if(AMB.kind)AMB.stop();requestAnimationFrame(sceneLoop);}
 function sceneTap(ev){const cv2=$('homeScene');const r=cv2.getBoundingClientRect();const x=ev.clientX-r.left,y=ev.clientY-r.top;const inB=(h)=>h&&x>=h[0]&&x<=h[0]+h[2]&&y>=h[1]&&y<=h[1]+h[3];const inR=(h)=>h&&(inB(h)||inB(h.tag));
   AU.init();if(inR(HOT.hero)){heroSay(greetLine());HW.pose=sceneT+1.1;HW.poseFx=sceneT;AU.buy();buzz(20);return;}
-  if(inR(HOT.gate)){$('goInfo').textContent=`전투력 ${combatPower().toLocaleString()} · ${rankText()}${DAILY.level?'':' · 운세를 아직 뽑지 않았다'}`;$('goSheet').hidden=false;renderGuest();AU.buy();}
-  else if(inR(HOT.fortune)){$('hFortuneBtn').click();}
-  else if(inR(HOT.room)){DOORFX={bb:HOT.room,until:sceneT+0.45,col:'#FFD27A'};AU.buy();setTimeout(()=>document.querySelector('.tabbar button[data-s="hero"]').click(),300);}
-  else if(inR(HOT.guest)){DOORFX={bb:HOT.guest,until:sceneT+0.45,col:'#9CD1FF'};AU.buy();setTimeout(()=>document.querySelector('.tabbar button[data-s="social"]').click(),300);}}
+  const enter=(bb,col,fn)=>{DOORFX={bb,until:sceneT+0.45,col};AU.buy();buzz(12);setTimeout(fn,280);};
+  if(inR(HOT.gate)){enter(HOT.gate,'#9CD1FF',()=>{$('goInfo').textContent=`전투력 ${combatPower().toLocaleString()} · ${rankText()}${DAILY.level?'':' · 운세를 아직 뽑지 않았다'}`;$('goSheet').hidden=false;renderGuest();});}
+  else if(inR(HOT.fortune)){enter(HOT.fortune,'#FFD27A',()=>$('hFortuneBtn').click());}
+  else if(inR(HOT.room)){enter(HOT.room,'#FFD27A',()=>document.querySelector('.tabbar button[data-s="hero"]').click());}
+  else if(inR(HOT.guest)){enter(HOT.guest,'#9CD1FF',()=>document.querySelector('.tabbar button[data-s="social"]').click());}}
 function showHome(){HOME_FROM_GAME=!!(S&&S.running&&!S.over);fortunePrompt();if(META.celebrate&&!HOME_FROM_GAME){CELEB={t:sceneT+0.3,lv:META.celebrate};HW.pose=sceneT+1.6;setTimeout(()=>heroSay(`레벨 ${CELEB.lv} 달성! 한층 강해졌다.`,6),400);META.celebrate=0;saveMeta();try{AU.fanfare&&AU.fanfare();}catch(_){}}if(HOME_FROM_GAME){S.paused=true;saveGame();}if(BUB.day!==todayStr()){BUB.day=todayStr();setTimeout(()=>heroSay(greetLine(),7),600);}$('startOverlay').hidden=false;document.querySelector('.app').classList.add('ingame-hidden');document.body.classList.remove('ingame');BGM.want='main';renderHome();window.scrollTo(0,0);
   if(!HOME_FROM_GAME){const hs=$('homeScene');if(hs){hs.classList.remove('reveal');void hs.offsetWidth;hs.classList.add('reveal');clearTimeout(hs._rv);hs._rv=setTimeout(()=>hs.classList.remove('reveal'),1250);}}}
 function hideHome(){$('startOverlay').hidden=true;document.querySelector('.app').classList.remove('ingame-hidden');document.body.classList.add('ingame');BGM.want='battle';}
@@ -3388,7 +3390,7 @@ $('homeBtn').onclick=()=>showHome();$('winHome').onclick=()=>{$('winOverlay').hi
 $('endShare').onclick=openCard;$('winShare').onclick=openCard;$('cardClose').onclick=()=>{$('cardModal').hidden=true;};$('dexClose').onclick=()=>{$('dexModal').hidden=true;};$('tbFortune').onclick=()=>$('hFortuneBtn').click();$('tbAttend').onclick=()=>{renderAttend();$('attModal').hidden=false;};$('attClose').onclick=()=>{$('attModal').hidden=true;};$('wcStart').onclick=()=>{$('welcome').hidden=true;openSaju();};$('wcSkip').onclick=()=>{$('welcome').hidden=true;};$('cardShare').onclick=()=>shareCardFile($('cardCopy'));$('cardCopy').onclick=()=>copyShare($('cardCopy'));
 document.addEventListener('visibilitychange',()=>{if(document.hidden){saveGame();if(S&&S.running&&!S.over&&$('startOverlay').hidden){S.paused=true;ui();}}});window.addEventListener('pagehide',saveGame);
 $('winBtn').onclick=()=>{$('winOverlay').hidden=true;if(S.mode==='tutorial'){S.over=true;showHome();ui();return;}if(S.running)S.paused=false;ui();};
-$('mergeBtn').onclick=autoMerge;$('endMoreBtn').onclick=()=>{const m=$('endMore');m.hidden=!m.hidden;$('endMoreBtn').textContent=m.hidden?'자세히 보기 ▾':'접기 ▴';};$('friendPaste').onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){$('friendIn').value=t.trim();addFriend();}else fmsg('클립보드가 비어 있다.','bad');}catch(_){fmsg('붙여넣기 권한이 없다. 코드를 직접 입력하라.','bad');$('friendIn').focus();}};$('unitCardClose').onclick=()=>{$('unitModal').hidden=true;if(S.cardPaused){S.paused=false;S.cardPaused=false;}ui();};$('unitModal').addEventListener('click',ev=>{if(ev.target===$('unitModal'))$('unitCardClose').click();});
+$('mergeBtn').onclick=autoMerge;$('rvShare').onclick=()=>shareFortune($('rvShare'));$('endMoreBtn').onclick=()=>{const m=$('endMore');m.hidden=!m.hidden;$('endMoreBtn').textContent=m.hidden?'자세히 보기 ▾':'접기 ▴';};$('friendPaste').onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){$('friendIn').value=t.trim();addFriend();}else fmsg('클립보드가 비어 있다.','bad');}catch(_){fmsg('붙여넣기 권한이 없다. 코드를 직접 입력하라.','bad');$('friendIn').focus();}};$('unitCardClose').onclick=()=>{$('unitModal').hidden=true;if(S.cardPaused){S.paused=false;S.cardPaused=false;}ui();};$('unitModal').addEventListener('click',ev=>{if(ev.target===$('unitModal'))$('unitCardClose').click();});
 document.querySelector('.tabbar').addEventListener('click',ev=>{if(ev.target.closest('button'))buzz(8);});
 $('mSummon').onclick=()=>$('summonBtn').click();$('mMerge').onclick=autoMerge;$('mNext').onclick=()=>$('nextBtn').click();
 $('sk0').onclick=()=>{AU.init();castSkill(0);};$('sk1').onclick=()=>{AU.init();castSkill(1);};$('mSk0').onclick=()=>castSkill(0);$('mSk1').onclick=()=>castSkill(1);
