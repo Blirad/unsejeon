@@ -519,6 +519,8 @@
   .todo button.pulse{animation:todopulse 1.4s ease-in-out infinite;border-color:#F2A23A;background:#FFF6E0} @keyframes todopulse{0%,100%{box-shadow:0 0 0 0 rgba(242,162,58,.45)}50%{box-shadow:0 0 0 6px rgba(242,162,58,0)}}
   .qrow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #F0E9DA;font-size:13px;line-height:1.45} .qrow:last-child{border-bottom:none} .qrow>i{font-style:normal;width:28px;height:28px;border-radius:9px;background:#FFF6E0;border:1px solid #F2D9A0;display:grid;place-items:center;flex:none;font-size:14px} .qrow .note{display:block;font-size:12px}
   .dex .cell{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:6px 2px 5px;box-shadow:0 2px 0 #E3D9C6} .dex .cell canvas,.dex .cell.on canvas{border:none;background:var(--ink3)} .dex .cell.on{border-color:var(--gold)} .dex .cell span{font-size:10.5px;line-height:1.2;text-align:center} .gtile{border-width:1.5px;padding:8px 4px 6px} .gtile b{font-size:11.5px;display:block} .gtile small{font-size:10px;color:var(--muted);display:block;line-height:1.2}
+  .mbar button.ready{box-shadow:inset 0 0 0 2px #FFD27A,0 2px 0 #D9CFBC;animation:mready 1.6s ease-in-out infinite} @keyframes mready{0%,100%{box-shadow:inset 0 0 0 2px #FFD27A,0 2px 0 #D9CFBC}50%{box-shadow:inset 0 0 0 2px #FFB020,0 0 10px rgba(255,176,32,.55)}} .mbar button.ready small{color:#B8620A;opacity:1;font-weight:700} .mbar small.warn{color:#C0392B;opacity:1;font-weight:700}
+  .relline{font-size:12.5px;color:var(--text);background:#F7F4EC;border-radius:10px;padding:8px 10px;margin-top:6px;text-align:left} .relline span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
   .srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #F0E9DA} .srow:last-child{border-bottom:none} .srow>span{font-size:14px;color:var(--navy);font-weight:700}
   .sw{width:50px;height:30px;border-radius:999px;background:#D9CFBC;box-shadow:inset 0 2px 4px rgba(0,0,0,.12);padding:0;position:relative;transform:none!important;flex:none}
   .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:left .18s}
@@ -664,7 +666,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.6</span> · 사주로 겨루는 오행 디펜스</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v9.7</span> · 사주로 겨루는 오행 디펜스</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -713,7 +715,7 @@
         <h2>보드가 <em>무너졌다</em></h2>
         <div class="hsay"><canvas id="endFace" width="120" height="120"></canvas><p id="endSay"></p></div>
         <p id="endMsg"></p>
-        <div class="result" id="endResult"></div>
+        <div class="result" id="endResult"></div><div class="result" id="endMore" hidden style="margin-top:-8px"></div><button class="ghost sm" id="endMoreBtn" style="width:100%;margin:-8px 0 10px;padding:8px">자세히 보기 ▾</button>
         <canvas id="endChart" width="680" height="220" style="width:100%;height:auto;display:block;margin:-6px 0 12px;border-radius:10px;background:#F4F8FF"></canvas>
         <div class="nextgoal" id="endNext"></div>
         <div class="submit" id="submitBox" hidden>
@@ -1298,7 +1300,8 @@ function drawFortune(){
 function tomorrowTeaser(){if(!SAJU)return '';const t=new Date();t.setDate(t.getDate()+1);const i=dayIdx(t.getFullYear(),t.getMonth()+1,t.getDate());const ts=i%10,tb=i%12;const T=STEM_EL[ts],M=SAJU.me;const rel=T===M?0:GEN(M)===T?1:OVER(M)===T?2:OVER(T)===M?3:4;const R=[['같은 기운(비겁)','내 오행이 짙어지는 날. 같은 오행 소환이 잘 붙는다','평'],['표현(식상)','내가 낳는 기운. 융합이 잘 되는 날','길'],['재물(재성)','내가 다스리는 기운. 골드가 붙는 길일','대길 기대'],['규율(관살)','나를 누르는 기운. 조심할 날, 대신 상극 폭발이 세다','흉 조심'],['학습(인성)','나를 돕는 기운. 영웅이 든든한 날','길']][rel];return `<div class="teaser">내일 일진 <b>${STEM_K[ts]}${BRANCH_K[tb]}</b> · ${EL[T].k}의 날 · <b>${R[0]}</b> — ${R[1]} <span class="note">(${R[2]})</span></div>`;}
 function fortuneEffects(d){if(!d||!d.level)return [];const o=[];if(d.power)o.push(`⚔ 아군 공격력 +${Math.round(d.power*100)}%`);if(d.startGold)o.push(`💰 시작 골드 +${d.startGold}`);if(d.luckStart)o.push(`🎲 시작 운 게이지 ${d.luckStart}`);if(d.freeSummon)o.push(`✨ 무료 소환 ${d.freeSummon}회`);if(d.guar)o.push('🔒 첫 소환 희귀 확정');if(d.el>=0&&d.elBonus)o.push(`${EL[d.el].k} 유닛 +${Math.round(d.elBonus*100)}%`);if(d.costMult&&d.costMult!==1)o.push(`소환 비용 ${d.costMult<1?'-':'+'}${Math.round(Math.abs(1-d.costMult)*100)}%`);if(d.goldMult&&d.goldMult!==1)o.push(`처치 골드 ${d.goldMult>1?'+':'-'}${Math.round(Math.abs(d.goldMult-1)*100)}%`);if(d.enemyHp&&d.enemyHp!==1)o.push(`적 체력 ${d.enemyHp<1?'-':'+'}${Math.round(Math.abs(1-d.enemyHp)*100)}%`);if(d.luckExtra)o.push(`소환마다 운 +${d.luckExtra}`);if(d.fuseExtra)o.push(`융합 공격력 +${Math.round(d.fuseExtra*100)}%`);if(d.gear)o.push(`🎁 장비 ${gearById(d.gear).name}`);return o;}
 const fxHtml=d=>{const fx=fortuneEffects(d);return fx.length?`<div class="fx"><b>오늘 전투에 붙는 효과</b><div class="fxr">${fx.map(t=>`<span>${t}</span>`).join('')}</div><small>오늘 치르는 모든 판에 자동으로 붙는다.</small></div>`:'';};
-const fortuneHtml=d=>`<div class="fscore"><b>${d.score}</b><span>점</span><em class="${d.level==='흉'||d.level==='소흉'?'bad':d.level==='대길'?'great':''}">${d.level}</em><i>${d.rel}의 날</i></div>${fxHtml(d)}<div class="ftitle">${d.title||''}</div><div class="note">${d.advice||''}</div>${tomorrowTeaser()}`;
+function relLine(d){if(!SAJU||!d||d.el<0)return '';const [ts,tb]=todayPillar();const M={'같은 기운(비겁)':'내 오행과 같은 기운 · 같은 오행 소환이 잘 붙는다','표현(식상)':'내가 낳는 기운 · 융합이 잘 된다','재물(재성)':'내가 다스리는 기운 · 골드가 붙는다','규율(관성)':'나를 누르는 기운 · 조심, 대신 상극 폭발이 세다','학습(인성)':'나를 돕는 기운 · 영웅이 든든하다'}[d.rel]||'';return `<div class="relline">오늘 일진 <b>${STEM_K[ts]}${BRANCH_K[tb]}</b> · ${EL[d.el].k}의 날 · <b>${d.rel}</b><span>${M}</span></div>`;}
+const fortuneHtml=d=>`<div class="fscore"><b>${d.score}</b><span>점</span><em class="${d.level==='흉'||d.level==='소흉'?'bad':d.level==='대길'?'great':''}">${d.level}</em><i>${d.rel}의 날</i></div>${relLine(d)}${fxHtml(d)}<div class="ftitle">${d.title||''}</div><div class="note">${d.advice||''}</div>${tomorrowTeaser()}`;
 function renderSaju(){
   const [ts,tb]=todayPillar();$('todayGanji').textContent=`오늘 ${gz(ts,tb)}일`;
   const box=$('sajuBox');
@@ -1920,9 +1923,9 @@ function ui(){
   const mpArr=S.running?mergePairs():[];const mp=mpArr.length;for(const u of S.units)if(u)u.mergeHint=false;for(const pr of mpArr)for(const k of pr){if(S.units[k])S.units[k].mergeHint=true;}$('mergeBtn').disabled=!S.running||S.paused||!mp;$('mergeCount').textContent=mp?`${mp}쌍`:'';
   // 모바일 액션 바
   $('mbar').hidden=!S.running||S.over;
-  $('mSummon').disabled=$('summonBtn').disabled;$('mCost').textContent=$('summonCost').textContent;
-  $('mMerge').disabled=$('mergeBtn').disabled;$('mMergeN').textContent=mp?`${mp}쌍`:'없음';
-  $('mNext').disabled=$('nextBtn').disabled;$('mNextB').textContent='+'+nb;
+  $('mSummon').disabled=$('summonBtn').disabled;{const full=!S.units.includes(null);const c2=summonCost();const ms=$('mCost');ms.textContent=!S.running?'—':full?'자리 없음':S.freeSummon>0?`무료 ×${S.freeSummon}`:S.gold<c2?`골드 부족 ${c2}`:`${c2} 골드`;ms.classList.toggle('warn',S.running&&!full&&S.freeSummon<=0&&S.gold<c2);}
+  $('mMerge').disabled=$('mergeBtn').disabled;$('mMergeN').textContent=mp?`${mp}쌍 가능`:'—';$('mMerge').classList.toggle('ready',mp>0&&S.running&&!S.paused);
+  $('mNext').disabled=$('nextBtn').disabled;$('mNextB').textContent=S.running&&S.wave>0?`+${nb} 골드`:'첫 웨이브';
   // 영웅 스킬 슬롯
   const h=heroUnit();const hg=h?h.grade:3;
   $('heroTag').textContent=h?`${h.heroName} · ${GRADE[h.grade-1]} · Lv ${S.heroLv}`:(S.running?'영웅 없음':'');
@@ -1933,7 +1936,7 @@ function ui(){
   S.skills.forEach((s,i)=>{const def=SKILL[s.k];const b=$('sk'+i);const ready=s.cd<=0&&!!h&&S.running&&!S.paused;
     b.disabled=!ready;b.querySelector('b').textContent=def.name;b.querySelector('span').textContent=def.desc(skillGrade(h||{grade:3}));b.querySelector('i').textContent=s.cd>0?`${Math.ceil(s.cd)}s`:h?`[${i+1}] 준비`:'-';b.title='';b.dataset.tip=`${def.name} · 쿨타임 ${def.cd}초\n${def.desc(skillGrade(h||{grade:3}))}\n${SKILL_ANIM[s.k]}`;
     let bar=b.querySelector('.cdbar');if(!bar){bar=document.createElement('div');bar.className='cdbar';b.appendChild(bar);}bar.style.width=(s.cd>0?100*(1-s.cd/def.cd):100)+'%';
-    const m=$('mSk'+i);m.disabled=!ready;m.dataset.tip=b.dataset.tip;m.querySelector('span').textContent=def.h;m.querySelector('small').textContent=s.cd>0?Math.ceil(s.cd)+'s':'준비';});
+    const m=$('mSk'+i);m.disabled=!ready;m.dataset.tip=b.dataset.tip;m.querySelector('span').textContent=def.h;m.querySelector('small').textContent=!h?'영웅 없음':s.cd>0?`${Math.ceil(s.cd)}초 뒤`:'지금 사용';m.classList.toggle('ready',ready);});
   const t2=SAJU?SAJU.ten2:[];[0,1].forEach(i=>{const p=$('ps'+i);const t=t2[i]!=null?TEN[t2[i]]:null;p.querySelector('b').textContent=t?t.k+'·'+t.name:'—';p.querySelector('span').textContent=t?t.desc:'사주 입력 시';p.title=t?t.desc:'';});
   $('skillNote').textContent=h?`액티브 위력은 영웅 등급(${GRADE[hg-1]})을 따른다. 영웅을 합쳐 키워라.`:(SAJU?'영웅이 사라지면 액티브를 쓸 수 없다.':'사주를 넣으면 나의 일주 영웅과 신살·십성이 붙는다.');
 }
@@ -2259,7 +2262,7 @@ function update(dt){
 }
 function gameOver(){
   S.over=true;S.running=false;AU.over();BGM.want='main';
-  if(S.mode==='tutorial'){$('endMsg').textContent='안내 판이 끝났다. 자유 모드에서 다시 도전하라.';$('endResult').innerHTML='';$('endNext').innerHTML='';$('submitBox').hidden=true;$('endOverlay').hidden=false;return;}
+  if(S.mode==='tutorial'){$('endMsg').textContent='안내 판이 끝났다. 자유 모드에서 다시 도전하라.';$('endResult').innerHTML='';$('endNext').innerHTML='';$('endMore').hidden=true;$('endMoreBtn').hidden=true;$('submitBox').hidden=true;$('endOverlay').hidden=false;return;}
   updateQuests();REC.games++;REC.lastPlay=todayStr();{const wk=wkKey();REC.weeks=REC.weeks||{};const w=REC.weeks[wk]||(REC.weeks[wk]={best:0,games:0,kills:0});w.games++;w.kills+=S.kills;w.best=Math.max(w.best,S.wave);}const newW=S.wave>REC.bestWave,newK=S.kills>REC.bestKills,newF=S.fusions>REC.bestFusions;
   REC.bestWave=Math.max(REC.bestWave,S.wave);REC.bestKills=Math.max(REC.bestKills,S.kills);REC.bestFusions=Math.max(REC.bestFusions,S.fusions);REC.mythic+=S.mythic;
   REC.totalKills+=S.kills;REC.totalClashes+=S.clashes;REC.totalUlts+=S.ults;if(S.won)REC.wins++;saveRec();recLine();clearSave();showResume();
@@ -2268,8 +2271,8 @@ function gameOver(){
   let drop=null;if(S.mode!=='tutorial'){const rr=Math.random();if(S.wave>=30&&rr<0.35)drop=rollGear(3);else if(S.wave>=20&&rr<0.4)drop=rollGear(2);else if(S.wave>=10&&rr<0.5)drop=rollGear(1);if(drop){gainGear(drop,'run');buzz(30);}}
   const cell=(v,lab,best,isNew)=>`<div>${isNew?'<span class="new">신기록</span>':''}<b>${v}</b><span>${lab}</span><small>최고 ${best}</small></div>`;
   drawEndChart();
-  $('endResult').innerHTML=cell(S.wave,'도달 웨이브',REC.bestWave,newW)+cell(S.kills,'처치',REC.bestKills,newK)+cell(S.fusions,'융합',REC.bestFusions,newF)
-    +`<div><b>${S.mythic}</b><span>신화</span><small>누적 ${REC.mythic}</small></div><div><b>${S.relics.length}</b><span>유물</span><small>${S.relics.map(id=>RELICS.find(r=>r.id===id).h).join('·')||'-'}</small></div><div><b>${S.ults}</b><span>궁극기</span><small>상극 폭발 ${S.clashes}회 · ${REC.games}판째</small></div>`;
+  $('endResult').innerHTML=cell(S.wave,'도달 웨이브',REC.bestWave,newW)+cell(S.kills,'처치',REC.bestKills,newK)+cell(S.fusions,'융합',REC.bestFusions,newF);
+  $('endMore').innerHTML=`<div><b>${S.mythic}</b><span>신화</span><small>누적 ${REC.mythic}</small></div><div><b>${S.relics.length}</b><span>유물</span><small>${S.relics.map(id=>RELICS.find(r=>r.id===id).h).join('·')||'-'}</small></div><div><b>${S.ults}</b><span>궁극기</span><small>폭발 ${S.clashes}회 · ${REC.games}판째</small></div>`;$('endMore').hidden=true;$('endMoreBtn').textContent='자세히 보기 ▾';$('endMoreBtn').hidden=false;
   {const q=S.won?'천하가 조용해졌다. 오늘은 발 뻗고 자자.':newW?'이만하면 자네도 꽤 하는군. 다음엔 더 멀리 가자.':S.wave>=20?'스무 고개를 넘었다. 보스가 자네 이름을 기억할 거다.':S.wave>=10?'열 웨이브. 몸이 막 풀리던 참인데 아쉽군.':S.wave>=5?'아직 손이 무디다. 융합부터 익히자.':'첫걸음이다. 소환을 아끼지 마라.';$('endSay').textContent=q;const el=SAJU?SAJU.me:3,g=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';faceAnim($('endFace'),$('endOverlay'),el,g,TIER(metaHeroGrade()),!!S.won);}
   $('endMsg').textContent=`${S.mode==='daily'?'오늘의 판. ':''}최고 등급 ${GRADE[S.maxGrade-1]}까지 뽑았다.${DAILY.level?' 오늘 운세는 '+DAILY.level+'.':''}${newW?' 최고 기록을 넘었다!':''}${drop?' 장비 획득: '+gearById(drop).name+'!':''}${xp?` 경험 +${xp}${ups?' · 영웅 Lv.'+META.lv+' 달성!':''}`:''}`;
   {const goals=[];const qs=questList();const qd=qs.filter(q=>QST.done[q.id]).length;
@@ -3297,13 +3300,13 @@ $('setReset').onclick=()=>{if(!confirm('사주·기록·장비·성장을 모두
 $('sajuModal').addEventListener('click',ev=>{if(ev.target===$('sajuModal'))$('sajuModal').hidden=true;});
 let lastMode='free';
 const TUT=[
-  {t:'1. 소환 버튼(또는 Space)으로 유닛을 두 번 뽑아라.',ok:S=>S.summons>=2},
-  {t:'2. 같은 오행·같은 등급 둘을 끌어다 겹쳐 승급시켜라. 없으면 더 뽑아라.',ok:S=>S.units.some(u=>u&&!u.hero&&u.grade>=2)},
-  {t:'3. 상생 짝(목→화→토→금→수→목)을 겹쳐 융합체를 만들어라. 융합체는 공격력 +35%.',ok:S=>S.fusions>=1},
-  {t:'4. 상극 짝을 겹쳐 상극 폭발을 터뜨려라. 둘 다 사라지지만 보드 전체에 효과가 터진다.',ok:S=>S.clashes>=1},
-  {t:'5. 영웅 스킬 [1] 또는 [2]를 써라. 쿨타임이 돌면 다시 쓸 수 있다.',ok:S=>S.skills.some(x=>x.cd>0)},
-  {t:'6. 상생 순서로 세 칸을 가로·세로·대각선으로 이어 오행 진을 만들어라.',ok:S=>S.links.length>0},
-  {t:'안내 끝. 5웨이브까지 버티면 완료다. 이제 자유 모드에서 30웨이브에 도전하라.',ok:()=>false},
+  {t:'1. 소환을 두 번 눌러 유닛을 뽑아라.',ok:S=>S.summons>=2},
+  {t:'2. 같은 오행·같은 등급 둘을 겹쳐 승급. 없으면 더 뽑아라.',ok:S=>S.units.some(u=>u&&!u.hero&&u.grade>=2)},
+  {t:'3. 상생 짝(목→화→토→금→수)을 겹쳐 융합체. 공격력 +35%.',ok:S=>S.fusions>=1},
+  {t:'4. 상극 짝을 겹쳐 상극 폭발. 둘은 사라지고 보드 전체에 효과.',ok:S=>S.clashes>=1},
+  {t:'5. 특기 버튼을 눌러라. 대기 시간이 돌면 다시 쓴다.',ok:S=>S.skills.some(x=>x.cd>0)},
+  {t:'6. 상생 순서로 세 칸을 이어 오행 진을 만들어라.',ok:S=>S.links.length>0},
+  {t:'안내 끝. 5웨이브까지 버티면 완료. 다음은 자유 모드 30웨이브.',ok:()=>false},
 ];
 let tutStep=0;
 function start(mode){AU.init();mode=mode==='daily'?'daily':mode==='tutorial'?'tutorial':mode==='weekly'?'weekly':'free';lastMode=mode;clearSave();tipShown=loadTips();tip=null;tutStep=0;
@@ -3369,7 +3372,7 @@ $('homeBtn').onclick=()=>showHome();$('winHome').onclick=()=>{$('winOverlay').hi
 $('endShare').onclick=openCard;$('winShare').onclick=openCard;$('cardClose').onclick=()=>{$('cardModal').hidden=true;};$('dexClose').onclick=()=>{$('dexModal').hidden=true;};$('tbFortune').onclick=()=>$('hFortuneBtn').click();$('tbAttend').onclick=()=>{renderAttend();$('attModal').hidden=false;};$('attClose').onclick=()=>{$('attModal').hidden=true;};$('wcStart').onclick=()=>{$('welcome').hidden=true;openSaju();};$('wcSkip').onclick=()=>{$('welcome').hidden=true;};$('cardShare').onclick=()=>shareCardFile($('cardCopy'));$('cardCopy').onclick=()=>copyShare($('cardCopy'));
 document.addEventListener('visibilitychange',()=>{if(document.hidden){saveGame();if(S&&S.running&&!S.over&&$('startOverlay').hidden){S.paused=true;ui();}}});window.addEventListener('pagehide',saveGame);
 $('winBtn').onclick=()=>{$('winOverlay').hidden=true;if(S.mode==='tutorial'){S.over=true;showHome();ui();return;}if(S.running)S.paused=false;ui();};
-$('mergeBtn').onclick=autoMerge;$('friendPaste').onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){$('friendIn').value=t.trim();addFriend();}else fmsg('클립보드가 비어 있다.','bad');}catch(_){fmsg('붙여넣기 권한이 없다. 코드를 직접 입력하라.','bad');$('friendIn').focus();}};$('unitCardClose').onclick=()=>{$('unitModal').hidden=true;if(S.cardPaused){S.paused=false;S.cardPaused=false;}ui();};$('unitModal').addEventListener('click',ev=>{if(ev.target===$('unitModal'))$('unitCardClose').click();});
+$('mergeBtn').onclick=autoMerge;$('endMoreBtn').onclick=()=>{const m=$('endMore');m.hidden=!m.hidden;$('endMoreBtn').textContent=m.hidden?'자세히 보기 ▾':'접기 ▴';};$('friendPaste').onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){$('friendIn').value=t.trim();addFriend();}else fmsg('클립보드가 비어 있다.','bad');}catch(_){fmsg('붙여넣기 권한이 없다. 코드를 직접 입력하라.','bad');$('friendIn').focus();}};$('unitCardClose').onclick=()=>{$('unitModal').hidden=true;if(S.cardPaused){S.paused=false;S.cardPaused=false;}ui();};$('unitModal').addEventListener('click',ev=>{if(ev.target===$('unitModal'))$('unitCardClose').click();});
 document.querySelector('.tabbar').addEventListener('click',ev=>{if(ev.target.closest('button'))buzz(8);});
 $('mSummon').onclick=()=>$('summonBtn').click();$('mMerge').onclick=autoMerge;$('mNext').onclick=()=>$('nextBtn').click();
 $('sk0').onclick=()=>{AU.init();castSkill(0);};$('sk1').onclick=()=>{AU.init();castSkill(1);};$('mSk0').onclick=()=>castSkill(0);$('mSk1').onclick=()=>castSkill(1);
