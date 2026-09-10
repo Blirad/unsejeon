@@ -866,7 +866,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.5</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.6</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -1106,6 +1106,29 @@ function stageMobHp(stage,mods){
   const m=mods||{};
   const em=m.enemyHp||1, emEff=stage>=EM_HALF?1+(em-1)*0.5:em;
   return Math.round(95*Math.pow(1.556,Math.min(stage,KNEE)-1)*Math.pow(1.12,Math.max(0,stage-KNEE))*LATE_HP[Math.min(2,Math.max(0,stage-LATE))])*emEff;
+}
+// stagePreview(stage,el,purity,mods): 준비 화면에 보여 줄 "이번 판에 오는 것"의 예고.
+// stageWaves 와 **같은 식**에서 뽑되 rng 을 한 번도 안 쓴다 — 런의 난수를 여기서 당겨 쓰면 실제 판 구성이
+// 달라져 버린다. 그래서 뽑기가 걸린 값(종류·오행)은 기대값으로 낸다.
+//   groups 무리 수 · rows 무리별 마리 수 · count 총 마리 수(rows 의 합) ·
+//   kinds 종류 비율 {melee,ranged,rush} · boss {name,hp}|null · hp 잡몹(근접) 체력 · elShare 판 오행이 나올 비율
+function stagePreview(stage,el,purity,mods){
+  const m=mods||defaultMods();
+  const n=Math.min(stage>LATE?20:16,6+stage*2);
+  const groups=3+(stage>=6?1:0);
+  const rows=[];
+  for(let g=0;g<groups;g++)rows.push(stage===KNEE?Math.floor(n/groups)+(g<n%groups?1:0):Math.ceil(n/groups));
+  const count=rows.reduce((a,b)=>a+b,0);
+  // stageWaves 의 종류 뽑기: `kind = rng()<0.3 ? 1 : 0` 뒤에 7판부터 `rng()<0.2` 면 2 로 덮어쓴다.
+  // 두 추첨이 독립이라 돌파형이 원거리를 먹는다 — 7판부터 돌파 0.2 · 원거리 0.3×0.8 · 근접 0.7×0.8.
+  const rush=stage>=7?0.2:0, ranged=0.3*(1-rush);
+  const hpBase=stageMobHp(stage,m);
+  return {stage,el,groups,rows,count,kinds:{melee:1-ranged-rush,ranged,rush},
+    // 보스 체력은 배수를 얹기 전 hpBase 로, 잡몹 체력은 5판만 STAGE5_HP 를 얹어 — 둘 다 stageWaves 와 같은 식이다.
+    boss:stage%5===0?{name:BOSS_NAMES[el],hp:Math.round(hpBase*(stage>=10?6:1.5)*(m.bossHp||1))}:null,
+    hp:Math.round(hpBase*(stage===KNEE?STAGE5_HP:1)),
+    // 적 하나가 판 오행일 확률: purity 로 바로 뽑히거나, 아니면 다섯 중 하나로 다시 뽑혀 걸리거나.
+    elShare:purity+(1-purity)/5};
 }
 function stageWaves(stage,el,purity,rng,mods){
   const out=[];
@@ -1451,7 +1474,7 @@ const SKV={
   cheon:g=>({dur:q(8+g,1),pct:q(35+8*g,5)}),
   mun:g=>({luck:q(50+8*g,5)}),
   dohwa:g=>({st:q(2.5+0.6*g,0.5)}),
-  yeokma:g=>({push:q(120+30*g,10),gold:q(20+5*g,5)}),
+  yeokma:g=>({push:q(1+0.25*g,0.25),gold:q(20+5*g,5)}),   // push 는 칸(lane) 단위다
   hwagae:g=>({dur:q(6+1.5*g,1)}),
 };
 const SKILL_KEYS=Object.keys(SKV);
@@ -1461,6 +1484,13 @@ const SKILL_KEYS=Object.keys(SKV);
 // 0.5 는 씨앗 40 naive 6.15/7.63/6.92(띠 4~5.5), 0.12 는 씨앗 80 naive 4.65/5.21/5.54 로 들어온다
 // (씨앗 40 에서는 균 naive 5.83 이 띠 밖 — 균은 어느 표본에서도 경계에 걸터앉는다).
 const YANG_K=0.12;
+// 역마 질주 밀기: push 는 칸 단위(등급 3 → 1.75칸)이고 YEOKMA_CAP(=선두 무리의 출발선. 뒤 무리와
+// 보스는 17~24에서 시작) 뒤로는 더 못 민다.
+// 옛 식은 `e.y+=push/60`(등급 3 → 3.5칸)에 상한이 없어서, 쿨 26초로 판마다 서너 번 나가면 적이
+// 출발선 뒤(y>12)까지 쌓여 웨이브가 통째로 초기화됐다 — 균(양인+역마) 사주가 이것 하나로 띠 위에 앉았다.
+// 판·적 규모를 안 타는 절대값이라(다른 신살의 초·%·비율과 달리) 판이 오를수록 상대적으로 세진다.
+// 그래서 둘을 같이 걸었다: 칸수 반으로(3.5 → 1.75) · 출발선 상한. 밀기는 절대 적을 앞으로 당기지 않는다.
+const YEOKMA_CAP=12;
 // 신살 스킬 쿨타임(초). 화면의 SKILL 표(desc·이름)와 봇이 같은 값을 봐야 해서 규칙 쪽에 둔다.
 // 실제 대기 = SKILL_CD[key] * run.skillCd (주간 '철벽' ×0.85 · 카드 '신살 가속' ×0.7 · 레벨 15부터 ×0.9).
 const SKILL_CD={goe:32,baek:38,yang:22,cheon:36,mun:40,dohwa:30,yeokma:26,hwagae:50};
@@ -1486,7 +1516,7 @@ function castSkill(B,run,key,grade){
     case 'cheon':B.buffT=v.dur;B.buffPct=v.pct/100;break;
     case 'mun':run.luck=Math.min(100,run.luck+v.luck);run.freeFlips++;run.guar=true;break;
     case 'dohwa':for(const e of activeEnemies(B)){e.stunT=v.st;e.vuln=v.st;}break;
-    case 'yeokma':for(const e of activeEnemies(B)){e.y+=v.push/60;e.slowT=4;}run.coins+=v.gold;break;
+    case 'yeokma':for(const e of activeEnemies(B)){e.y=Math.max(e.y,Math.min(YEOKMA_CAP,e.y+v.push));e.slowT=4;}run.coins+=v.gold;break;
     case 'hwagae':B.barrierT=v.dur;B.lives+=2;break;
   }
   return {ok:true,key};}
@@ -1556,9 +1586,9 @@ function restoreRun(o,opts){const run=newRun(Object.assign({},opts,{seed:o.seed}
 return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,tenStars,tenEffect,mixTiles,readTile,flipCost,flipCostOf,ITEMS,pickW,
   N,CELLS,idx,ROLE_BASE,unitBase,makeUnit,elMult,computeChains,
   armyWeights,strongest,stageElement,neededElement,combatPower,stageWarning,mergeCandidates,mergeAt,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
-  defaultMods,BOSS_NAMES,stageWaves,stageMobHp,damageOf,battleInit,battleTick,
+  defaultMods,BOSS_NAMES,stageWaves,stageMobHp,stagePreview,damageOf,battleInit,battleTick,
   CARDS,offerCards,applyCards,applyRunCard,takeCard,
-  q,SKV,SKILL_KEYS,SKILL_CD,YANG_K,castSkill,
+  q,SKV,SKILL_KEYS,SKILL_CD,YANG_K,YEOKMA_CAP,castSkill,
   seededRng,sajuArmy,newRun,runMods,emptyCell,flipTile,useItem,placeUnit,sellUnit,mergeUnit,equipTen,pickAlly,startBattle,finishStage,nextStage,scoreOf,stagesCleared,serializeRun,restoreRun};
 });
 
@@ -1809,7 +1839,7 @@ const SKILL={
   cheon: {name:'귀인 강림',h:'귀인',cd:SCD.cheon,desc:g=>`${SKV.cheon(g).dur}초간 아군 공격력 +${SKV.cheon(g).pct}%`},
   mun:   {name:'문창 통찰',h:'문창',cd:SCD.mun,desc:g=>`운 게이지 +${SKV.mun(g).luck}, 무료 골패 1장, 다음 패 희귀 이상`},
   dohwa: {name:'도화 매혹',h:'도화',cd:SCD.dohwa,desc:g=>`모든 적 ${SKV.dohwa(g).st}초 매혹(정지), 매혹 중 받는 피해 +30%`},
-  yeokma:{name:'역마 질주',h:'역마',cd:SCD.yeokma,desc:g=>`모든 적 ${(SKV.yeokma(g).push/60).toFixed(1)}칸 밀어내고 4초 둔화, 엽전 +${SKV.yeokma(g).gold}냥`},
+  yeokma:{name:'역마 질주',h:'역마',cd:SCD.yeokma,desc:g=>`앞쪽 적을 최대 ${SKV.yeokma(g).push}칸(선두 출발선까지) 밀어내고 모든 적 4초 둔화, 엽전 +${SKV.yeokma(g).gold}냥`},
   hwagae:{name:'화개 결계',h:'화개',cd:SCD.hwagae,desc:g=>`${SKV.hwagae(g).dur}초 결계(생명 보호) + 생명 +2`},
 };
 const SKILL_ANIM={goe:'거대한 장인(掌印)이 내려찍혀 땅이 갈라진다',baek:'백호가 화면을 가로질러 세 번 할퀸다',yang:'거대한 칼날이 영웅을 중심으로 회전하며 벤다',cheon:'귀인이 하늘에서 내려와 빛으로 아군을 감싼다',mun:'붓이 하늘에 오행 글자를 써 내린다',dohwa:'복사꽃 나무가 피어 꽃잎이 쏟아진다',yeokma:'역마가 화면을 질주하며 적을 밀어낸다',hwagae:'출구에 연꽃 결계가 피어난다'};
@@ -2851,7 +2881,7 @@ function roomSetup(){const st=$('roomStash');if(!st||st.dataset.done)return;st.d
   $('rsClose').onclick=()=>closeRoomSheet();$('roomSheet').addEventListener('click',ev=>{if(ev.target===$('roomSheet'))closeRoomSheet();});
   // 사당 전면: 결과 내용을 아래 패널로
   const box=document.querySelector('#revealOverlay .box');if(box&&!box.querySelector('.rv-panel')){const pn=document.createElement('div');pn.className='rv-panel';['rvTitle','rvText','rvBody'].forEach(id=>pn.appendChild($(id)));pn.appendChild(box.querySelector('.btns'));box.appendChild(pn);}
-  window.addEventListener('resize',()=>{const k=curRoom();if(k&&k!=='home')try{roomEnter(k);}catch(_){}});}
+  window.addEventListener('resize',()=>{PREVIEW_CACHE=null;const k=curRoom();if(k&&k!=='home')try{roomEnter(k);}catch(_){}});}
 
 function renderShow(){const hasS=!!SAJU;const el=hasS?SAJU.me:3;const g=hasS&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';const f=$('hsFace');if(!f)return;
   drawOn(f,()=>{ctx.translate(140,224);ctx.scale(2.6,2.6);BLINK=false;SWING=0;PHASE=0;HURT=false;if(!hasS)ctx.globalAlpha=0.4;drawHeroEq(el,g,TIER(metaHeroGrade()));});
@@ -3791,9 +3821,94 @@ function bossTop(el){
   return BOSS_TOP[el]=top;
 }
 // 전장 좌표계: 판(y<=5)은 칸 크기 그대로, 그 위 접근로는 원근 압축해 아무리 멀어도 화면 안에 둔다
+let PREVIEW=null;      // 마지막으로 그린 미리보기(스모크가 본다)
+let PREVIEW_CACHE=null; // 오프스크린에 구운 미리보기 {key,cv,result} — 매 프레임 다시 그리지 않는다
 function assaultLayout(){const cv=assaultCv;const cw=cv.clientWidth,ch=cv.clientHeight;const cs=cw/5,boardTop=ch-cs*5-44;
   const LANE=Math.max(60,boardTop),KZ=LANE/cs,far=d=>d/(d+KZ);
   return {cw,ch,cs,boardTop,X:x=>x*cs,Y:y=>y<=5?boardTop+cs*(5-y):boardTop-LANE*far(y-5),SCL:y=>y<=5?1:1-0.5*far(y-5)};}
+// ── 준비 화면 '이번 판 적 미리보기' ──
+// 준비 단계에는 판 위 접근로(원근 구간)가 텅 비어 있다. 그 자리에 이번 판에 오는 것을 흐린 실루엣과
+// 한 줄 요약으로 세워 둔다 — 골패를 뒤집기 전에 "무엇이 오는지" 알고 고르라는 뜻이다.
+// 수치는 전부 코어 ASSAULT.stagePreview 가 낸다(stageWaves 와 같은 식 · 런의 rng 을 안 쓰므로 실제 판 구성은
+// 하나도 안 바뀐다). 여기서는 배치와 글자만 맡고, 전투와 **같은 원근 매핑**(Y·SCL)을 쓴다.
+// 매 프레임 새로 그리면 그림이 안 바뀌는 준비 단계에서도 매번 잡몹·보스 실루엣을 다시 그리는 낭비가 난다 —
+// (판·오행·순도·캔버스 크기·경고 문구)가 그대로면 마지막에 구운 오프스크린 캔버스를 그대로 붙여 넣는다.
+function drawStagePreview(L){
+  if(!S||S.phase!=='prep')return null;
+  const {cw,ch}=L;
+  const dpr=Math.min(2,devicePixelRatio||1);
+  const hw=$('hudWarn'), warnText=hw?hw.textContent+'|'+hw.hidden:'';
+  const key=`${S.stage}|${S.stageEl}|${S.purity}|${cw}|${ch}|${warnText}`;
+  const cvw=Math.max(1,Math.round(cw*dpr)), cvh=Math.max(1,Math.round(ch*dpr));
+  if(PREVIEW_CACHE&&PREVIEW_CACHE.key===key&&PREVIEW_CACHE.cv.width===cvw&&PREVIEW_CACHE.cv.height===cvh){
+    ctx.drawImage(PREVIEW_CACHE.cv,0,0,cw,ch);
+    return PREVIEW_CACHE.result;
+  }
+  const cv=document.createElement('canvas');cv.width=cvw;cv.height=cvh;
+  let result=null;
+  drawOn(cv,()=>{ctx.scale(dpr,dpr);result=renderStagePreview(L);});
+  PREVIEW_CACHE={key,cv,result};
+  ctx.drawImage(cv,0,0,cw,ch);
+  return result;
+}
+// 실제 미리보기 그림(실루엣·요약판)을 그린다. drawStagePreview 가 오프스크린 캐시에 굽거나,
+// 캐시가 그대로 맞을 땐 이 함수를 아예 건너뛰고 구운 그림만 drawImage 한다.
+function renderStagePreview(L){
+  const {cw,X,Y,SCL,boardTop}=L, P=ASSAULT.stagePreview(S.stage,S.stageEl,S.purity,S.mods), el=S.stageEl;
+  // 접근로 맨 위 한 줄 요약을 실루엣보다 먼저 잰다 — 판(plate)이 차지할 높이를 알아야
+  // 뒤 무리 실루엣이 그 밑(위쪽 화면)으로 겹쳐 들어가는 걸 미리 걸러낼 수 있다.
+  const pc=v=>Math.round(v*100);
+  const parts=[`잡몹 ${P.count}`,`${EL[el].k} ${pc(P.elShare)}%`,`원거리 ${pc(P.kinds.ranged)}%`,`돌파형 ${P.kinds.rush>0?'있음':'없음'}`];
+  if(P.boss)parts.push(`보스 ${P.boss.name}`);
+  parts.push(`근접 체력 ${P.hp}`);
+  const head='이번 판: '+parts.join(' · ');
+  let fs=11;const fits=t=>{ctx.font=`700 ${fs}px 'Noto Sans KR'`;return ctx.measureText(t).width<=cw-26;};
+  while(fs>9&&!fits(head))fs--;
+  let lines=fits(head)?[head]:(()=>{const h=Math.ceil(parts.length/2);
+    return ['이번 판: '+parts.slice(0,h).join(' · '),parts.slice(h).join(' · ')];})();
+  // 오행 경고는 #hudWarn 이 이미 말하고 있으면 여기서 되풀이하지 않는다(4판부터가 그렇다).
+  const w=ASSAULT.stageWarning(S.stage,S.cnt,S.stageEl), hw=$('hudWarn');
+  const said=!hw.hidden&&hw.textContent.indexOf('비중 낮음')>=0;
+  const warn=(w.low&&!said)?`필요한 오행 ${EL[w.need].k}(${EL[w.need].h}) — 내 ${EL[w.need].k} 비중 낮음`:null;
+  if(warn)lines.push(warn);
+  const lh=fs+4, plateBottom=5+lines.length*lh+7;         // 판(plate)이 차지하는 화면 y 범위의 아래 끝
+  // 무리 줄 위치. 보스가 있는 판은 앞자리를 보스에게 내주고 한 칸씩 물러선다.
+  // 줄 간격은 남는 접근로 높이(boardTop-30)에 맞춰 줄인다 — 짧은 화면에서 뒷줄이 판 밑으로 밀려 올라가는 걸 막는다.
+  const laneH=Math.max(0,boardTop-30), spread=Math.max(0.45,Math.min(1,laneH/90));
+  const y0=P.boss?6.6:6.0, dy=(P.groups>1?2.2/(P.groups-1):0)*spread;
+  const shortLane=laneH<120;                              // 아주 짧은 접근로에서는 맨 뒷줄 하나를 아예 뺀다
+  const visGroups=shortLane?Math.max(1,P.groups-1):P.groups;
+  ctx.save();
+  ctx.globalAlpha=0.35;
+  for(let g=visGroups-1;g>=0;g--){                       // 먼 줄부터 — 앞줄이 위에 겹치게
+    const yv=y0+g*dy, py=Y(yv);
+    if(py<plateBottom+4)continue;                        // 판 밑(위쪽 화면)까지 밀려 올라온 줄은 그리지 않는다
+    const k=SCL(yv)*0.82, cnt=P.rows[g];
+    const sp=3.9/cnt;                                   // 0.55~4.45 칸 안에 고르게, 한 줄씩 반 칸 엇갈리게
+    for(let i=0;i<cnt;i++){const x=0.55+(i+0.5)*sp+(g%2?sp/2:0);
+      ctx.save();ctx.translate(X(Math.min(4.55,x)),py);ctx.scale(k,k);
+      HURT=false;SWING=0;PHASE=0;BLINK=false;drawCreature(el,1);ctx.restore();}
+  }
+  if(P.boss){const py=Y(5.7),k=SCL(5.7)*1.6;
+    if(py>=plateBottom+4){
+      ctx.globalAlpha=0.5;
+      ctx.save();ctx.translate(X(2.5),py);ctx.scale(k,k);HURT=false;SWING=0;PHASE=0;BLINK=false;drawCreature(el,2);ctx.restore();
+      ctx.globalAlpha=1;
+      const by=Math.max(52,py-bossTop(el)*k-10);          // 실측 높이 위 — 오행마다 다른 무기 끝을 안 가린다
+      ctx.font="700 11px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='alphabetic';
+      const bw=ctx.measureText(P.boss.name).width;        // 뒤에 선 잡몹 실루엣과 겹쳐도 읽히게 판을 깐다
+      ctx.fillStyle='rgba(38,22,10,.6)';rr(X(2.5)-bw/2-7,by-12,bw+14,17,7);ctx.fill();
+      ctx.fillStyle='#FFE0B2';ctx.fillText(P.boss.name,X(2.5),by);
+    }}
+  ctx.restore();
+  ctx.save();
+  ctx.font=`700 ${fs}px 'Noto Sans KR'`;ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  const wm=Math.max(...lines.map(t=>ctx.measureText(t).width));
+  ctx.fillStyle='rgba(38,22,10,.52)';rr(cw/2-wm/2-9,5,wm+18,lines.length*lh+7,7);ctx.fill();
+  lines.forEach((t,i)=>{ctx.fillStyle=(warn&&i===lines.length-1)?'#FFC9A8':'#F6ECD2';ctx.fillText(t,cw/2,5+fs+2+i*lh);});
+  ctx.restore();
+  return {head,lines,preview:P};
+}
 function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;const dpr=Math.min(2,devicePixelRatio||1);
   const L=assaultLayout(),{cw,ch,cs,boardTop,X,Y,SCL}=L;
   if(cv.width!==Math.round(cw*dpr)||cv.height!==Math.round(ch*dpr)){cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr);}
@@ -3823,7 +3938,8 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
     if(sieging.length){const t=(B&&B.barrierT>0)?'결계가 공성을 막는 중':'공성 중 · 1.5초마다 목숨 −1';ctx.font="700 10px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';
       const w=ctx.measureText(t).width;ctx.fillStyle='rgba(30,6,4,.72)';rr(cw/2-w/2-8,bandY+25,w+16,15,7);ctx.fill();
       ctx.fillStyle='#FFD6C4';ctx.fillText(t,cw/2,bandY+32.5);}
-    // 준비: 연환 선·합성 후보·선택 칸
+    // 준비: 이번 판 적 미리보기(빈 접근로에) → 연환 선·합성 후보·선택 칸
+    if(S.phase==='prep')PREVIEW=drawStagePreview(L);
     const units=S.phase==='prep'?S.units:null;
     if(units){const {bonus,chains}=A.computeChains(units,S.mods);
       for(const chn of chains){ctx.strokeStyle=chn.type==='cycle'?'#FFC83D':chn.type==='sheng'?'#E8B830':chn.type==='peer'?'#3FA66B':'#2F7BE8';ctx.lineWidth=chn.type==='cycle'?4:2.5;ctx.beginPath();chn.cells.forEach((c,i)=>{const r=Math.floor(c/5),cc=c%5;const px=X(cc)+cs/2,py=boardTop+r*cs+cs/2;i?ctx.lineTo(px,py):ctx.moveTo(px,py);});ctx.stroke();
@@ -3897,7 +4013,7 @@ function endStage(res){if(!res)return; // finishStage 가 이미 소진했다
   log(`${S.stage}판 클리어 · 엽전 +${res.coins}냥`,'hi');
   if(S.mode==='tutorial'&&S.stage>=3&&res.won){clearSave();$('assault').hidden=true;showHome();toastLower();toast('안내 끝. 자유 모드로 출전하라.');return;}
   if(res.done){finishRun(true);return;}
-  const go=()=>{ASSAULT.nextStage(S);ASEL=-1;assaultUI();drawAssault();assaultSave();};
+  const go=()=>{ASSAULT.nextStage(S);PREVIEW_CACHE=null;ASEL=-1;assaultUI();drawAssault();assaultSave();};
   if(res.cards)offerCardsUI(res.cards,go);else go();}
 // 카드 선택 (유물 오버레이 재사용)
 function offerCardsUI(kind,after){const A=ASSAULT;const cards=A.offerCards(kind,S.rng,S.cards,S.cnt);const ov=$('relicOverlay');
@@ -3952,6 +4068,7 @@ function assaultLoad(){let o=null;try{o=JSON.parse(localStorage.getItem('ubz_sav
 function assaultBind(){$('chargeBtn').onclick=()=>{if(!S||S.phase!=='prep')return;try{AU.init&&AU.init();}catch(_){}
     const nb=ASSAULT.startBattle(S);
     if(!nb){if(S.lastError==='allyFull'){toast('참전 자리가 없다 · 한 칸 비워라');buzz([20,30,20]);}return;}
+    PREVIEW=null;PREVIEW_CACHE=null;                       // 전투로 넘어가면 준비 화면 미리보기는 더 이상 유효하지 않다
     B=nb;ASEL=-1;ADRAG=null;AU.fanfare&&AU.fanfare();log(`돌격! ${S.stage}판`,'hi');assaultUI();drawAssault();};
   $('spdBtn').onclick=()=>{ASPD=ASPD===1?2:1;AU.buy&&AU.buy();assaultUI();};
   [0,1,2].forEach(i=>{const b=$('sk'+i);if(b)b.onclick=()=>castSkill(i);});
@@ -3989,7 +4106,7 @@ setTimeout(()=>{if(!$('startOverlay').hidden&&BUB.day!==todayStr()){BUB.day=toda
 setTimeout(fortunePrompt,400);
 // 디버그 / 시뮬레이션 훅
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
-window.__ubz={startAssault,migrateAch,loadAch,fortuneEffects,get BUB(){return BUB;},assaultUI,drawAssault,flipUI,bossTop,get BOSS_TOP(){return BOSS_TOP;},endStage,finishRun,offerCardsUI,castSkill,assaultLayout,checkAch,renderRec,recLine,get REC(){return REC;},get ACHS(){return ACHS;},get S(){return S;},get B(){return B;},drawRoomShrine,showShrine,shrineTap,AMB,roomWalkOut,get WALK(){return ROOM_WALK;},get SHRINE(){return {BOW_FX,SHAKE_FX,INC_FX,SHRINE_CANDLE};},heroTo:(cv,sc,x,y,el,g)=>drawOn(cv,()=>{ctx.translate(x,y);ctx.scale(sc,sc);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero(el==null?(SAJU?SAJU.me:3):el,g||'m',1);}),drawEndScene,perkCheck,roomSheet,closeRoomSheet,get ROOM_HOT(){return ROOM_HOT;},drawRoomHero,drawRoomSocial,drawRoomMore,renderGear,renderBoard,get QST(){return QST;},doorWipe,drawRecChart,renderStore,get GEAR(){return GEAR;},HOT,cheer:(c)=>cheerSuffix(c,todayStr()),GIFTv:()=>GIFT,crSheet:(sc)=>{sc=sc||2.6;const cv2=document.createElement('canvas');cv2.width=1280;cv2.height=720;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,1280,720);for(let el=0;el<5;el++)for(let t=0;t<3;t++){ctx.save();ctx.translate(128+el*256,120+t*240);ctx.scale(sc,sc);BLINK=false;SWING=t===1?1:0;PHASE=0;HURT=false;drawCreature(el,t);ctx.restore();}});return cv2;},scene:(dt)=>{sceneT+=(dt||0);drawScene();return sceneT;},HW,dexTick:(d)=>{DEXA.ang+=(d==null?0.5:d);dexFrame();return DEXA.ang;},heroBig:(opts)=>{opts=opts||{};const cv2=document.createElement('canvas');const n=(opts.list||[[0,0,'m']]).length;const cw=opts.cw||300,chh=opts.ch||400,sc=opts.sc||3.2;cv2.width=n*cw;cv2.height=chh;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,cv2.width,cv2.height);(opts.list||[[0,0,'m']]).forEach(([stem,br,g],i)=>{ctx.save();ctx.translate(i*cw+cw/2,chh*0.72);ctx.scale(sc,sc);BLINK=false;SWING=opts.sw||0;PHASE=opts.ph||0;HURT=!!opts.hurt;if(opts.skin)META.skin=opts.skin;HERO_SEASON=opts.season||null;try{drawHero3({el:STEM_EL[stem],g,stem,br,yang:stem%2===0},opts.tier==null?1:opts.tier);}finally{HERO_SEASON=null;}ctx.restore();});});return cv2;},og:()=>{const c=document.createElement('canvas');c.width=1200;c.height=630;const sk=META.skin;META.skin='basic';drawOn(c,()=>{const g=ctx;const bg=g.createLinearGradient(0,0,1200,630);bg.addColorStop(0,'#DCEBFA');bg.addColorStop(1,'#FBF7EE');g.fillStyle=bg;g.fillRect(0,0,1200,630);[['#3FA66B',150,520],['#E3553B',420,600],['#C9A24A',760,80],['#8FA3B8',1050,560],['#3D7FD9',980,140]].forEach(([col,x,y])=>{const gr=g.createRadialGradient(x,y,0,x,y,260);gr.addColorStop(0,col+'55');gr.addColorStop(1,col+'00');g.fillStyle=gr;g.fillRect(0,0,1200,630);});g.fillStyle='rgba(255,255,255,.65)';g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.fill();g.strokeStyle='#FFD27A';g.lineWidth=8;g.stroke();
+window.__ubz={startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,flipUI,bossTop,get BOSS_TOP(){return BOSS_TOP;},endStage,finishRun,offerCardsUI,castSkill,assaultLayout,checkAch,renderRec,recLine,get REC(){return REC;},get ACHS(){return ACHS;},get S(){return S;},get B(){return B;},drawRoomShrine,showShrine,shrineTap,AMB,roomWalkOut,get WALK(){return ROOM_WALK;},get SHRINE(){return {BOW_FX,SHAKE_FX,INC_FX,SHRINE_CANDLE};},heroTo:(cv,sc,x,y,el,g)=>drawOn(cv,()=>{ctx.translate(x,y);ctx.scale(sc,sc);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero(el==null?(SAJU?SAJU.me:3):el,g||'m',1);}),drawEndScene,perkCheck,roomSheet,closeRoomSheet,get ROOM_HOT(){return ROOM_HOT;},drawRoomHero,drawRoomSocial,drawRoomMore,renderGear,renderBoard,get QST(){return QST;},doorWipe,drawRecChart,renderStore,get GEAR(){return GEAR;},HOT,cheer:(c)=>cheerSuffix(c,todayStr()),GIFTv:()=>GIFT,crSheet:(sc)=>{sc=sc||2.6;const cv2=document.createElement('canvas');cv2.width=1280;cv2.height=720;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,1280,720);for(let el=0;el<5;el++)for(let t=0;t<3;t++){ctx.save();ctx.translate(128+el*256,120+t*240);ctx.scale(sc,sc);BLINK=false;SWING=t===1?1:0;PHASE=0;HURT=false;drawCreature(el,t);ctx.restore();}});return cv2;},scene:(dt)=>{sceneT+=(dt||0);drawScene();return sceneT;},HW,dexTick:(d)=>{DEXA.ang+=(d==null?0.5:d);dexFrame();return DEXA.ang;},heroBig:(opts)=>{opts=opts||{};const cv2=document.createElement('canvas');const n=(opts.list||[[0,0,'m']]).length;const cw=opts.cw||300,chh=opts.ch||400,sc=opts.sc||3.2;cv2.width=n*cw;cv2.height=chh;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,cv2.width,cv2.height);(opts.list||[[0,0,'m']]).forEach(([stem,br,g],i)=>{ctx.save();ctx.translate(i*cw+cw/2,chh*0.72);ctx.scale(sc,sc);BLINK=false;SWING=opts.sw||0;PHASE=opts.ph||0;HURT=!!opts.hurt;if(opts.skin)META.skin=opts.skin;HERO_SEASON=opts.season||null;try{drawHero3({el:STEM_EL[stem],g,stem,br,yang:stem%2===0},opts.tier==null?1:opts.tier);}finally{HERO_SEASON=null;}ctx.restore();});});return cv2;},og:()=>{const c=document.createElement('canvas');c.width=1200;c.height=630;const sk=META.skin;META.skin='basic';drawOn(c,()=>{const g=ctx;const bg=g.createLinearGradient(0,0,1200,630);bg.addColorStop(0,'#DCEBFA');bg.addColorStop(1,'#FBF7EE');g.fillStyle=bg;g.fillRect(0,0,1200,630);[['#3FA66B',150,520],['#E3553B',420,600],['#C9A24A',760,80],['#8FA3B8',1050,560],['#3D7FD9',980,140]].forEach(([col,x,y])=>{const gr=g.createRadialGradient(x,y,0,x,y,260);gr.addColorStop(0,col+'55');gr.addColorStop(1,col+'00');g.fillStyle=gr;g.fillRect(0,0,1200,630);});g.fillStyle='rgba(255,255,255,.65)';g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.fill();g.strokeStyle='#FFD27A';g.lineWidth=8;g.stroke();
     g.save();g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.clip();g.translate(300,500);g.scale(4.7,4.7);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero3({el:1,g:'m',stem:2,br:10,yang:true},2);g.restore();
     [0,1,2,3,4].forEach((el,i)=>{g.save();g.translate(640+i*118,470);g.scale(1.9,1.9);BLINK=false;SWING=0;PHASE=0;HURT=false;drawCreature(el,2);g.restore();});
     const bs=bossSprite(3,0,false);g.drawImage(bs,930,40,240,240);
