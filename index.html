@@ -708,7 +708,10 @@
   .store-f .ghost.sm{width:auto;min-height:0;padding:4px 10px;font-size:11.5px;margin-left:auto}
 
   /* ───── 돌격 전투 화면 ───── */
-  .assault{position:fixed;inset:0;display:flex;flex-direction:column;background:#EFE6D2;z-index:8}
+  .assault{position:fixed;inset:0;display:flex;flex-direction:column;background:#EFE6D2;z-index:8;
+    /* 주소창이 접혔다 펴지는 모바일에서 아래쪽(준비바)이 잘리지 않게 동적 뷰포트를 쓴다. dvh 를 모르는
+       브라우저는 위의 inset:0 이 그대로 받는다(속성을 통째로 무시하므로 순서가 곧 대체값이다). */
+    height:100dvh}
   #assault[hidden]{display:none}
   .assault .hud{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-weight:700;background:#FBF5E6;border-bottom:1.5px solid var(--line)}
   .assault .hud-l span,.assault .hud-r span{margin-left:8px;font-size:12px;color:#5A3A1C}
@@ -737,6 +740,21 @@
   .charge small{display:block;font-size:10px;font-weight:400}
   .uinfo{font-size:12px;display:flex;justify-content:space-between;align-items:center}
   .battlebar .skills{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  /* 짧은 화면(360×640·375×667 …): 판은 폭에 맞춰 정사각이라 높이도 화면 폭만큼 먹는다
+     (assaultLayout: boardTop = 캔버스높이 − 폭 − 44). 경고가 두 줄이 되면 캔버스가 그만큼 줄어
+     판 윗줄이 캔버스 밖으로 잘려 나갔다 — 눌러야 할 칸이 화면 밖으로 나간다.
+     그래서 짧은 화면에서만 머리·경고·준비바를 눌러 그 44+α 를 캔버스에 돌려준다. 손가락이 닿는
+     크기(돌격 56px · 골패 폭 52px 이상)는 그대로 둔다. */
+  @media (max-height:700px){
+    .assault .hud{padding:5px 12px}
+    .assault .hud-l span,.assault .hud-r span{font-size:11.5px}
+    .assault .warn{font-size:11px;line-height:1.25;padding:3px 12px}
+    .prepbar{padding:4px 8px calc(4px + env(safe-area-inset-bottom));gap:5px}
+    .assault .tiles{gap:5px}
+    .assault .tile{aspect-ratio:2/2.2}
+    .assault .prow{gap:5px}
+    .tenrow button,.allyrow button{min-height:30px;padding:1px 8px}
+  }
 </style>
 
 <div class="app">
@@ -866,7 +884,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.6</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.7</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -1468,12 +1486,12 @@ function sajuArmy(saju){const units=Array(CELLS).fill(null);if(!saju||!saju.p)re
 // q: 표시 단위(st)로 반올림. 등급이 오를수록 수치가 계단식으로 오르도록 한다.
 const q=(v,st)=>Math.round(v/st)*st;
 const SKV={
-  goe:g=>({st:q(3+0.7*g,0.5)}),
+  goe:g=>({st:q(2.4+0.6*g,0.5)}),      // 기절 초 — 등급 3 → 4.0 (v10.7 에서 5.0 에서 내렸다)
   baek:g=>({pct:q(14+3*g,5)}),
   yang:g=>({mult:q(16+4*g,2)}),
   cheon:g=>({dur:q(8+g,1),pct:q(35+8*g,5)}),
   mun:g=>({luck:q(50+8*g,5)}),
-  dohwa:g=>({st:q(2.5+0.6*g,0.5)}),
+  dohwa:g=>({st:q(2+0.5*g,0.5)}),      // 기절 초 — 등급 3 → 3.5 (v10.7 에서 4.5 에서 내렸다)
   yeokma:g=>({push:q(1+0.25*g,0.25),gold:q(20+5*g,5)}),   // push 는 칸(lane) 단위다
   hwagae:g=>({dur:q(6+1.5*g,1)}),
 };
@@ -1484,6 +1502,11 @@ const SKILL_KEYS=Object.keys(SKV);
 // 0.5 는 씨앗 40 naive 6.15/7.63/6.92(띠 4~5.5), 0.12 는 씨앗 80 naive 4.65/5.21/5.54 로 들어온다
 // (씨앗 40 에서는 균 naive 5.83 이 띠 밖 — 균은 어느 표본에서도 경계에 걸터앉는다).
 const YANG_K=0.12;
+// 괴강 취약 창: 기절이 풀린 뒤에도 이만큼 더 취약(받는 피해 +30%)이 남는다. 총 취약 = 기절 + 이 값.
+// v10.7 에서 6 → 4.5 로 내렸다(창 −25%). 괴강 조합이 신살 조합 전수 표에서 제일 크게 띠를 넘었다 —
+// 기절 5초 + 취약 11초가 쿨 32초로 돌아오면 판마다 웨이브 하나가 통째로 멈춘 채 맞는다.
+// 화면의 SKILL.goe.desc 가 이 값을 그대로 읽는다(숫자를 두 군데 적지 않는다).
+const GOE_VULN=4.5;
 // 역마 질주 밀기: push 는 칸 단위(등급 3 → 1.75칸)이고 YEOKMA_CAP(=선두 무리의 출발선. 뒤 무리와
 // 보스는 17~24에서 시작) 뒤로는 더 못 민다.
 // 옛 식은 `e.y+=push/60`(등급 3 → 3.5칸)에 상한이 없어서, 쿨 26초로 판마다 서너 번 나가면 적이
@@ -1504,7 +1527,7 @@ function castSkill(B,run,key,grade){
   if(!B||!run||!SKV[key]||B.result)return {ok:false};
   const v=SKV[key](grade||0);const M=B.mods||run.mods||defaultMods();
   switch(key){
-    case 'goe':for(const e of activeEnemies(B)){e.stunT=v.st;e.vuln=v.st+6;}break;
+    case 'goe':for(const e of activeEnemies(B)){e.stunT=v.st;e.vuln=v.st+GOE_VULN;}break;
     // 백호: 현재 체력 비례 피해라 절대 처치가 안 나므로, 피해 뒤 남은 체력이 최대 체력의 5% 이하(최소 1)면 처치로 마무리한다.
     case 'baek':for(const e of activeEnemies(B)){let d=Math.round(e.hp*(e.boss?0.6:1)*v.pct/100);if(e.hp-d<=Math.max(1,(e.max||e.hp)*0.05))d=e.hp;if(skillHit(B,e,d))run.coins+=3;}break;
     // 양인 참격: 피해가 판을 탄다. 옛 식 `40×mult`(등급 3 → 1120)는 절대값이라 1판 잡몹(67~95)을 통째로
@@ -1588,7 +1611,7 @@ return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,
   armyWeights,strongest,stageElement,neededElement,combatPower,stageWarning,mergeCandidates,mergeAt,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
   defaultMods,BOSS_NAMES,stageWaves,stageMobHp,stagePreview,damageOf,battleInit,battleTick,
   CARDS,offerCards,applyCards,applyRunCard,takeCard,
-  q,SKV,SKILL_KEYS,SKILL_CD,YANG_K,YEOKMA_CAP,castSkill,
+  q,SKV,SKILL_KEYS,SKILL_CD,YANG_K,YEOKMA_CAP,GOE_VULN,castSkill,
   seededRng,sajuArmy,newRun,runMods,emptyCell,flipTile,useItem,placeUnit,sellUnit,mergeUnit,equipTen,pickAlly,startBattle,finishStage,nextStage,scoreOf,stagesCleared,serializeRun,restoreRun};
 });
 
@@ -1831,9 +1854,9 @@ const TEN=[
   {k:'관성',name:'규율',desc:'상극 폭발을 반 등급 높게 계산'},
   {k:'인성',name:'학습',desc:'골패마다 운 게이지 +3'},
 ];
-const SKV=ASSAULT.SKV,SCD=ASSAULT.SKILL_CD,YK=ASSAULT.YANG_K; // 등급→수치·쿨타임·양인 계수는 코어(src/assault-core.js)에 있다
+const SKV=ASSAULT.SKV,SCD=ASSAULT.SKILL_CD,YK=ASSAULT.YANG_K,GVL=ASSAULT.GOE_VULN; // 등급→수치·쿨타임·양인 계수·괴강 취약 창은 코어(src/assault-core.js)에 있다
 const SKILL={
-  goe:   {name:'괴강 진압',h:'괴강',cd:SCD.goe,desc:g=>`모든 적 ${SKV.goe(g).st}초 기절, 이후 6초간 받는 피해 +30%`},
+  goe:   {name:'괴강 진압',h:'괴강',cd:SCD.goe,desc:g=>`모든 적 ${SKV.goe(g).st}초 기절, 이후 ${GVL}초간 받는 피해 +30%`},
   baek:  {name:'백호 포효',h:'백호',cd:SCD.baek,desc:g=>`모든 적 현재 체력 ${SKV.baek(g).pct}% 피해 (보스 60%), 남은 체력 5% 이하면 처치, 처치마다 엽전 +3냥`},
   yang:  {name:'양인 참격',h:'양인',cd:SCD.yang,desc:g=>`전장 앞쪽(판 위 두 줄 안)의 적에게 그 판 잡몹 체력의 ${Math.round(YK*(SKV.yang(g).mult/28)*100)}% 피해 — 판이 오를수록 강해진다`},
   cheon: {name:'귀인 강림',h:'귀인',cd:SCD.cheon,desc:g=>`${SKV.cheon(g).dur}초간 아군 공격력 +${SKV.cheon(g).pct}%`},
@@ -3756,7 +3779,15 @@ const TUT2=[
 // ── HUD·준비 패널 ──
 function assaultUI(){if(!S)return;const A=ASSAULT;$('hudStage').textContent=`${S.stage}판${S.stage%5===0?' · 보스':''}`;$('hudEl').textContent=`적 ${A.EL_K[S.stageEl]} ${Math.round(S.purity*100)}% · 다음 ${A.EL_K[S.nextEl]}`;
   $('hudLives').textContent=`목숨 ${B?B.lives:S.lives}`;$('hudCoins').textContent=`${S.coins}냥`;
-  const w=A.stageWarning(S.stage,S.cnt,S.stageEl);$('hudWarn').hidden=!(S.phase==='prep'&&S.stage>=4);$('hudWarn').textContent=w.text+(w.low&&!S.ally?' · 구원 요청 →':'');$('hudWarn').onclick=()=>{if(w.low&&!S.ally)goSocial();};
+  // 주간 도전은 이번 주 규칙이 판을 통째로 바꾼다(적 속도·보스 체력·엽전·골패 값…). 그 이름을 말하는
+  // 곳이 마당의 #weeklyTag 뿐이라, 출전하고 나면 무슨 규칙으로 싸우는지 전장에서 확인할 길이 없었다.
+  // 준비 단계 경고 줄 맨 앞에 규칙을 붙인다 — 4판부터 뜨던 오행 경고와 같은 줄을 쓰고, 1~3판에는
+  // 규칙만 뜬다(자유·일일 모드는 예전 그대로 4판부터).
+  const w=A.stageWarning(S.stage,S.cnt,S.stageEl);
+  const wkTag=S.mode==='weekly'?`주간 · ${weeklyMod().s}`:'';
+  const wTxt=S.stage>=4?w.text+(w.low&&!S.ally?' · 구원 요청 →':''):'';
+  const warnTxt=[wkTag,wTxt].filter(Boolean).join(' · ');
+  $('hudWarn').hidden=!(S.phase==='prep'&&warnTxt);$('hudWarn').textContent=warnTxt;$('hudWarn').onclick=()=>{if(wTxt&&w.low&&!S.ally)goSocial();};
   $('prepBar').hidden=S.phase!=='prep';$('battleBar').hidden=S.phase!=='battle';$('hudHome').disabled=S.phase==='battle';
   if(S.phase==='prep'){const cost=S.freeFlips>0?'무료':`${A.flipCostOf(S)}냥`;
     $('tilesRow').innerHTML=S.tiles.map((t,i)=>`<div class="tile ${t.flipped?'flipped':''}" data-i="${i}">${t.flipped?`<canvas width="120" height="180" data-top="${t.top}" data-bot="${t.bottom}"></canvas>`:`<span>${cost}</span>`}</div>`).join('');
@@ -3878,12 +3909,32 @@ function renderStagePreview(L){
   const y0=P.boss?6.6:6.0, dy=(P.groups>1?2.2/(P.groups-1):0)*spread;
   const shortLane=laneH<120;                              // 아주 짧은 접근로에서는 맨 뒷줄 하나를 아예 뺀다
   const visGroups=shortLane?Math.max(1,P.groups-1):P.groups;
+  const rowsY=[];let bossY=null;                         // 실제로 그린 줄·보스의 화면 y — 스모크가 판과 안 겹치는지 잰다
+  // 짧은 화면에서는 접근로가 통째로 판(plate) 뒤로 숨는다. assaultLayout 의 LANE 은 최소 60 이라
+  // boardTop 이 그보다 얕으면 Y(y>5) = boardTop − LANE·far 가 판 위 — 심하면 캔버스 밖(음수) — 으로
+  // 나가고, 위의 컷("판 밑까지 밀려 올라온 줄은 안 그린다")이 모든 줄을 걸러 미리보기가 글자만 남았다
+  // (360×640 1판: boardTop 60 · 첫 줄 y 27.3 < 판 아래끝 31 → 실루엣 0줄).
+  // 남은 띠[bandTop..bandBot]가 한 줄이라도 받을 만하면 줄을 그 안으로 눌러 넣는다. 한 줄에 slot 만큼
+  // 주고 배율을 slot/실측높이로 깎으므로, 그린 것은 반드시 띠 안에 들어온다(판을 절대 안 침범한다).
+  // 띠가 아예 없으면(360×640 + 두 줄 경고 → boardTop 26) 그냥 글자 요약만 남긴다 — 없는 자리를
+  // 억지로 만들어 판 위에 덧그리느니, 판이 이미 잡몹 수·오행·보스 이름을 다 말하고 있다.
+  const bandTop=plateBottom+4, bandBot=boardTop-6, ROW_MIN=16;
+  let plan=[];
+  for(let g=visGroups-1;g>=0;g--)plan.push({g,yv:y0+g*dy});   // 먼 줄부터 — 앞줄이 위에 겹치게
+  for(const o of plan){o.py=Y(o.yv);o.k=SCL(o.yv)*0.82;}
+  if(plan.some(o=>o.py<bandTop)){
+    const room=bandBot-bandTop;
+    const fit=room>=ROW_MIN?Math.min(plan.length,Math.floor(room/ROW_MIN)):0;
+    plan=plan.slice(plan.length-fit);                    // 띠가 받는 만큼만 — 가까운 줄부터 남긴다
+    const slot=fit?room/fit:0, hMax=Math.max(1,bossTop(el));
+    plan.forEach((o,i)=>{o.py=bandTop+(i+1)*slot;o.k=Math.min(o.k,slot/hMax);});
+  }
   ctx.save();
   ctx.globalAlpha=0.35;
-  for(let g=visGroups-1;g>=0;g--){                       // 먼 줄부터 — 앞줄이 위에 겹치게
-    const yv=y0+g*dy, py=Y(yv);
-    if(py<plateBottom+4)continue;                        // 판 밑(위쪽 화면)까지 밀려 올라온 줄은 그리지 않는다
-    const k=SCL(yv)*0.82, cnt=P.rows[g];
+  for(const {g,py,k} of plan){
+    if(py<bandTop)continue;                              // 판 밑(위쪽 화면)까지 밀려 올라온 줄은 그리지 않는다
+    rowsY.push(py);
+    const cnt=P.rows[g];
     const sp=3.9/cnt;                                   // 0.55~4.45 칸 안에 고르게, 한 줄씩 반 칸 엇갈리게
     for(let i=0;i<cnt;i++){const x=0.55+(i+0.5)*sp+(g%2?sp/2:0);
       ctx.save();ctx.translate(X(Math.min(4.55,x)),py);ctx.scale(k,k);
@@ -3891,6 +3942,7 @@ function renderStagePreview(L){
   }
   if(P.boss){const py=Y(5.7),k=SCL(5.7)*1.6;
     if(py>=plateBottom+4){
+      bossY=py;
       ctx.globalAlpha=0.5;
       ctx.save();ctx.translate(X(2.5),py);ctx.scale(k,k);HURT=false;SWING=0;PHASE=0;BLINK=false;drawCreature(el,2);ctx.restore();
       ctx.globalAlpha=1;
@@ -3907,7 +3959,7 @@ function renderStagePreview(L){
   ctx.fillStyle='rgba(38,22,10,.52)';rr(cw/2-wm/2-9,5,wm+18,lines.length*lh+7,7);ctx.fill();
   lines.forEach((t,i)=>{ctx.fillStyle=(warn&&i===lines.length-1)?'#FFC9A8':'#F6ECD2';ctx.fillText(t,cw/2,5+fs+2+i*lh);});
   ctx.restore();
-  return {head,lines,preview:P};
+  return {head,lines,preview:P,plateBottom,rowsY,bossY,bandTop,bandBot};
 }
 function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;const dpr=Math.min(2,devicePixelRatio||1);
   const L=assaultLayout(),{cw,ch,cs,boardTop,X,Y,SCL}=L;
@@ -4106,7 +4158,7 @@ setTimeout(()=>{if(!$('startOverlay').hidden&&BUB.day!==todayStr()){BUB.day=toda
 setTimeout(fortunePrompt,400);
 // 디버그 / 시뮬레이션 훅
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
-window.__ubz={startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,flipUI,bossTop,get BOSS_TOP(){return BOSS_TOP;},endStage,finishRun,offerCardsUI,castSkill,assaultLayout,checkAch,renderRec,recLine,get REC(){return REC;},get ACHS(){return ACHS;},get S(){return S;},get B(){return B;},drawRoomShrine,showShrine,shrineTap,AMB,roomWalkOut,get WALK(){return ROOM_WALK;},get SHRINE(){return {BOW_FX,SHAKE_FX,INC_FX,SHRINE_CANDLE};},heroTo:(cv,sc,x,y,el,g)=>drawOn(cv,()=>{ctx.translate(x,y);ctx.scale(sc,sc);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero(el==null?(SAJU?SAJU.me:3):el,g||'m',1);}),drawEndScene,perkCheck,roomSheet,closeRoomSheet,get ROOM_HOT(){return ROOM_HOT;},drawRoomHero,drawRoomSocial,drawRoomMore,renderGear,renderBoard,get QST(){return QST;},doorWipe,drawRecChart,renderStore,get GEAR(){return GEAR;},HOT,cheer:(c)=>cheerSuffix(c,todayStr()),GIFTv:()=>GIFT,crSheet:(sc)=>{sc=sc||2.6;const cv2=document.createElement('canvas');cv2.width=1280;cv2.height=720;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,1280,720);for(let el=0;el<5;el++)for(let t=0;t<3;t++){ctx.save();ctx.translate(128+el*256,120+t*240);ctx.scale(sc,sc);BLINK=false;SWING=t===1?1:0;PHASE=0;HURT=false;drawCreature(el,t);ctx.restore();}});return cv2;},scene:(dt)=>{sceneT+=(dt||0);drawScene();return sceneT;},HW,dexTick:(d)=>{DEXA.ang+=(d==null?0.5:d);dexFrame();return DEXA.ang;},heroBig:(opts)=>{opts=opts||{};const cv2=document.createElement('canvas');const n=(opts.list||[[0,0,'m']]).length;const cw=opts.cw||300,chh=opts.ch||400,sc=opts.sc||3.2;cv2.width=n*cw;cv2.height=chh;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,cv2.width,cv2.height);(opts.list||[[0,0,'m']]).forEach(([stem,br,g],i)=>{ctx.save();ctx.translate(i*cw+cw/2,chh*0.72);ctx.scale(sc,sc);BLINK=false;SWING=opts.sw||0;PHASE=opts.ph||0;HURT=!!opts.hurt;if(opts.skin)META.skin=opts.skin;HERO_SEASON=opts.season||null;try{drawHero3({el:STEM_EL[stem],g,stem,br,yang:stem%2===0},opts.tier==null?1:opts.tier);}finally{HERO_SEASON=null;}ctx.restore();});});return cv2;},og:()=>{const c=document.createElement('canvas');c.width=1200;c.height=630;const sk=META.skin;META.skin='basic';drawOn(c,()=>{const g=ctx;const bg=g.createLinearGradient(0,0,1200,630);bg.addColorStop(0,'#DCEBFA');bg.addColorStop(1,'#FBF7EE');g.fillStyle=bg;g.fillRect(0,0,1200,630);[['#3FA66B',150,520],['#E3553B',420,600],['#C9A24A',760,80],['#8FA3B8',1050,560],['#3D7FD9',980,140]].forEach(([col,x,y])=>{const gr=g.createRadialGradient(x,y,0,x,y,260);gr.addColorStop(0,col+'55');gr.addColorStop(1,col+'00');g.fillStyle=gr;g.fillRect(0,0,1200,630);});g.fillStyle='rgba(255,255,255,.65)';g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.fill();g.strokeStyle='#FFD27A';g.lineWidth=8;g.stroke();
+window.__ubz={startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,flipUI,bossTop,get BOSS_TOP(){return BOSS_TOP;},endStage,finishRun,offerCardsUI,castSkill,assaultLayout,checkAch,renderRec,recLine,get REC(){return REC;},get ACHS(){return ACHS;},get S(){return S;},get B(){return B;},drawRoomShrine,showShrine,shrineTap,AMB,roomWalkOut,get WALK(){return ROOM_WALK;},get SHRINE(){return {BOW_FX,SHAKE_FX,INC_FX,SHRINE_CANDLE};},heroTo:(cv,sc,x,y,el,g)=>drawOn(cv,()=>{ctx.translate(x,y);ctx.scale(sc,sc);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero(el==null?(SAJU?SAJU.me:3):el,g||'m',1);}),drawEndScene,perkCheck,roomSheet,closeRoomSheet,get ROOM_HOT(){return ROOM_HOT;},drawRoomHero,drawRoomSocial,drawRoomMore,renderGear,renderBoard,get QST(){return QST;},doorWipe,drawRecChart,renderStore,get GEAR(){return GEAR;},HOT,cheer:(c)=>cheerSuffix(c,todayStr()),GIFTv:()=>GIFT,crSheet:(sc)=>{sc=sc||2.6;const cv2=document.createElement('canvas');cv2.width=1280;cv2.height=720;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,1280,720);for(let el=0;el<5;el++)for(let t=0;t<3;t++){ctx.save();ctx.translate(128+el*256,120+t*240);ctx.scale(sc,sc);BLINK=false;SWING=t===1?1:0;PHASE=0;HURT=false;drawCreature(el,t);ctx.restore();}});return cv2;},scene:(dt)=>{sceneT+=(dt||0);drawScene();return sceneT;},HW,dexTick:(d)=>{DEXA.ang+=(d==null?0.5:d);dexFrame();return DEXA.ang;},heroBig:(opts)=>{opts=opts||{};const cv2=document.createElement('canvas');const n=(opts.list||[[0,0,'m']]).length;const cw=opts.cw||300,chh=opts.ch||400,sc=opts.sc||3.2;cv2.width=n*cw;cv2.height=chh;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,cv2.width,cv2.height);(opts.list||[[0,0,'m']]).forEach(([stem,br,g],i)=>{ctx.save();ctx.translate(i*cw+cw/2,chh*0.72);ctx.scale(sc,sc);BLINK=false;SWING=opts.sw||0;PHASE=opts.ph||0;HURT=!!opts.hurt;if(opts.skin)META.skin=opts.skin;HERO_SEASON=opts.season||null;try{drawHero3({el:STEM_EL[stem],g,stem,br,yang:stem%2===0},opts.tier==null?1:opts.tier);}finally{HERO_SEASON=null;}ctx.restore();});});return cv2;},og:()=>{const c=document.createElement('canvas');c.width=1200;c.height=630;const sk=META.skin;META.skin='basic';drawOn(c,()=>{const g=ctx;const bg=g.createLinearGradient(0,0,1200,630);bg.addColorStop(0,'#DCEBFA');bg.addColorStop(1,'#FBF7EE');g.fillStyle=bg;g.fillRect(0,0,1200,630);[['#3FA66B',150,520],['#E3553B',420,600],['#C9A24A',760,80],['#8FA3B8',1050,560],['#3D7FD9',980,140]].forEach(([col,x,y])=>{const gr=g.createRadialGradient(x,y,0,x,y,260);gr.addColorStop(0,col+'55');gr.addColorStop(1,col+'00');g.fillStyle=gr;g.fillRect(0,0,1200,630);});g.fillStyle='rgba(255,255,255,.65)';g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.fill();g.strokeStyle='#FFD27A';g.lineWidth=8;g.stroke();
     g.save();g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.clip();g.translate(300,500);g.scale(4.7,4.7);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero3({el:1,g:'m',stem:2,br:10,yang:true},2);g.restore();
     [0,1,2,3,4].forEach((el,i)=>{g.save();g.translate(640+i*118,470);g.scale(1.9,1.9);BLINK=false;SWING=0;PHASE=0;HURT=false;drawCreature(el,2);g.restore();});
     const bs=bossSprite(3,0,false);g.drawImage(bs,930,40,240,240);
