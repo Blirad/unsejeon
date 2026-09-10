@@ -740,12 +740,19 @@
   .charge small{display:block;font-size:10px;font-weight:400}
   .uinfo{font-size:12px;display:flex;justify-content:space-between;align-items:center}
   .battlebar .skills{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-  /* 짧은 화면(360×640·375×667 …): 판은 폭에 맞춰 정사각이라 높이도 화면 폭만큼 먹는다
+  /* 짧은 **세로** 화면(360×640·375×667 …): 판은 폭에 맞춰 정사각이라 높이도 화면 폭만큼 먹는다
      (assaultLayout: boardTop = 캔버스높이 − 폭 − 44). 경고가 두 줄이 되면 캔버스가 그만큼 줄어
      판 윗줄이 캔버스 밖으로 잘려 나갔다 — 눌러야 할 칸이 화면 밖으로 나간다.
      그래서 짧은 화면에서만 머리·경고·준비바를 눌러 그 44+α 를 캔버스에 돌려준다. 손가락이 닿는
-     크기(돌격 56px · 골패 폭 52px 이상)는 그대로 둔다. */
-  @media (max-height:700px){
+     크기(돌격 56px · 골패 폭 52px 이상)는 그대로 둔다.
+     `orientation: portrait` 를 함께 거는 이유: 높이로만 가르면 가로로 눕힌 큰 폰(844×390 …)도 걸린다.
+     가로는 애초에 지원 범위 밖이다 — assaultLayout 은 판을 폭으로 잡는다(cs = cw/5) 이므로
+     844×390 처럼 폭이 좁아지면 판 자체가 화면에 맞지 않는다; 이 미디어 쿼리를 걸어도 안 걸어도
+     가로에서는 플레이가 안 된다. 여기서 세로로 한정하는 건 "가로도 괜찮다"는 뜻이 아니라
+     세로에서만 의미 있는 이 압축을 세로가 아닌 화면에 잘못 적용하지 않기 위해서다(이 게임은 세로 전용).
+     `tools/viewport.mjs` 의 844×390 줄은 그 플레이 가능 여부가 아니라 이 규칙이 안 걸리는 것과
+     콘솔 에러가 없는 것만 잰다(INFO: 가로 플레이 가능성은 검증 대상이 아니다). */
+  @media (max-height:700px) and (orientation: portrait){
     .assault .hud{padding:5px 12px}
     .assault .hud-l span,.assault .hud-r span{font-size:11.5px}
     .assault .warn{font-size:11px;line-height:1.25;padding:3px 12px}
@@ -884,7 +891,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.7</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.8</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -919,7 +926,6 @@
         <p id="winMsg">10판을 버텼다.</p>
         <div class="bonus" id="winBonus" style="justify-content:center"></div>
         <div class="btns"><button id="winBtn">마당으로</button><button class="ghost" id="winShare">공유 카드</button></div>
-        <button class="ghost sm" id="winHome" style="margin-top:8px;width:100%">홈으로</button>
       </div>
     </div>
     <div class="overlay" id="relicOverlay" hidden>
@@ -1489,11 +1495,11 @@ const SKV={
   goe:g=>({st:q(2.4+0.6*g,0.5)}),      // 기절 초 — 등급 3 → 4.0 (v10.7 에서 5.0 에서 내렸다)
   baek:g=>({pct:q(14+3*g,5)}),
   yang:g=>({mult:q(16+4*g,2)}),
-  cheon:g=>({dur:q(8+g,1),pct:q(35+8*g,5)}),
+  cheon:g=>({dur:q(6.8+0.85*g,1),pct:q(26.25+6*g,5)}),  // 등급 3 → 9초·+45% (v10.8 에서 11초·+60% 에서 내렸다)
   mun:g=>({luck:q(50+8*g,5)}),
   dohwa:g=>({st:q(2+0.5*g,0.5)}),      // 기절 초 — 등급 3 → 3.5 (v10.7 에서 4.5 에서 내렸다)
   yeokma:g=>({push:q(1+0.25*g,0.25),gold:q(20+5*g,5)}),   // push 는 칸(lane) 단위다
-  hwagae:g=>({dur:q(6+1.5*g,1)}),
+  hwagae:g=>({dur:q(5.1+1.275*g,1)}),  // 결계 초 — 등급 3 → 9 (v10.8 에서 11 에서 내렸다)
 };
 const SKILL_KEYS=Object.keys(SKV);
 // 양인 참격 계수: 등급 3에서 그 판 잡몹 바닥 체력의 몇 배를 때리는가.
@@ -1507,6 +1513,14 @@ const YANG_K=0.12;
 // 기절 5초 + 취약 11초가 쿨 32초로 돌아오면 판마다 웨이브 하나가 통째로 멈춘 채 맞는다.
 // 화면의 SKILL.goe.desc 가 이 값을 그대로 읽는다(숫자를 두 군데 적지 않는다).
 const GOE_VULN=4.5;
+// 화개 결계가 한 번에 주는 생명. v10.8 표에서는 2 → 1.5(−25%, 예산 안)로만 내렸으나,
+// 컨트롤러 재정으로 1(−50%, 예산 밖)까지 내렸다 — 손잡이를 하나씩 뺀 표(§10)에서 1.5는
+// 사주 둘 이상 이탈 6/친구1 93%, 1은 4/90%로 더 나았고, 그 차이가 25% 예산보다 중요하다고 봤다.
+// 결계 지속(초)은 판을 거의 안 타는데(전수 표에서 11 → 9 로 내려도 칸이 0.1 도 안 움직였다) 이 생명은
+// 쿨 50초로 판마다 한두 번 들어와 **판을 넘어 쌓인다**(finishStage 가 B.lives 를 run.lives 로 돌려준다).
+// 화개가 든 조합이 표에서 제일 크게 띠를 넘던 진짜 이유가 이것이다. 화면 문구(SKILL.hwagae.desc)가
+// 이 값을 그대로 읽는다 — 숫자를 두 군데 적지 않는다. 정수라 목숨이 반쪽(x.5)으로 남지 않는다.
+const HWAGAE_LIVES=1;
 // 역마 질주 밀기: push 는 칸 단위(등급 3 → 1.75칸)이고 YEOKMA_CAP(=선두 무리의 출발선. 뒤 무리와
 // 보스는 17~24에서 시작) 뒤로는 더 못 민다.
 // 옛 식은 `e.y+=push/60`(등급 3 → 3.5칸)에 상한이 없어서, 쿨 26초로 판마다 서너 번 나가면 적이
@@ -1540,7 +1554,7 @@ function castSkill(B,run,key,grade){
     case 'mun':run.luck=Math.min(100,run.luck+v.luck);run.freeFlips++;run.guar=true;break;
     case 'dohwa':for(const e of activeEnemies(B)){e.stunT=v.st;e.vuln=v.st;}break;
     case 'yeokma':for(const e of activeEnemies(B)){e.y=Math.max(e.y,Math.min(YEOKMA_CAP,e.y+v.push));e.slowT=4;}run.coins+=v.gold;break;
-    case 'hwagae':B.barrierT=v.dur;B.lives+=2;break;
+    case 'hwagae':B.barrierT=v.dur;B.lives+=HWAGAE_LIVES;break;
   }
   return {ok:true,key};}
 function newRun(o){const seed=o.seed==null?Math.floor(Math.random()*1e9):o.seed;const rng=seededRng(seed);const d=o.daily||{},g=o.gear||{},pk=o.perks||{};
@@ -1611,7 +1625,7 @@ return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,
   armyWeights,strongest,stageElement,neededElement,combatPower,stageWarning,mergeCandidates,mergeAt,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
   defaultMods,BOSS_NAMES,stageWaves,stageMobHp,stagePreview,damageOf,battleInit,battleTick,
   CARDS,offerCards,applyCards,applyRunCard,takeCard,
-  q,SKV,SKILL_KEYS,SKILL_CD,YANG_K,YEOKMA_CAP,GOE_VULN,castSkill,
+  q,SKV,SKILL_KEYS,SKILL_CD,YANG_K,YEOKMA_CAP,GOE_VULN,HWAGAE_LIVES,castSkill,
   seededRng,sajuArmy,newRun,runMods,emptyCell,flipTile,useItem,placeUnit,sellUnit,mergeUnit,equipTen,pickAlly,startBattle,finishStage,nextStage,scoreOf,stagesCleared,serializeRun,restoreRun};
 });
 
@@ -1686,7 +1700,6 @@ const TIPS=[];
 let tipShown={},tip=null;function loadTips(){try{return JSON.parse(localStorage.getItem('ubz_tips'))||{};}catch(_){return {};}}function saveTips(){try{localStorage.setItem('ubz_tips',JSON.stringify(tipShown));}catch(_){}}
 const MODS={shield:{k:'방패',color:'#C8CCD6'},split:{k:'분열',color:'#A86BE0'},swift:{k:'질주',color:'#F2A23A'}};
 const GCOL  = ['#3E5A2E','#5CBF7A','#4C8DE0','#A86BE0','#F2A23A','#F25C5C','#3DD6D0'];
-const PORTRAIT=matchMedia('(orientation: portrait)').matches&&window.innerWidth<880;
 const COLS=5, ROWS=5, SLOT=88, GAP=6;
 const W=540, H=540;
 const BX=(W-(COLS*SLOT+(COLS-1)*GAP))/2, BY=(H-(ROWS*SLOT+(ROWS-1)*GAP))/2;
@@ -1854,7 +1867,7 @@ const TEN=[
   {k:'관성',name:'규율',desc:'상극 폭발을 반 등급 높게 계산'},
   {k:'인성',name:'학습',desc:'골패마다 운 게이지 +3'},
 ];
-const SKV=ASSAULT.SKV,SCD=ASSAULT.SKILL_CD,YK=ASSAULT.YANG_K,GVL=ASSAULT.GOE_VULN; // 등급→수치·쿨타임·양인 계수·괴강 취약 창은 코어(src/assault-core.js)에 있다
+const SKV=ASSAULT.SKV,SCD=ASSAULT.SKILL_CD,YK=ASSAULT.YANG_K,GVL=ASSAULT.GOE_VULN,HWL=ASSAULT.HWAGAE_LIVES; // 등급→수치·쿨타임·양인 계수·괴강 취약 창·화개 생명은 코어(src/assault-core.js)에 있다
 const SKILL={
   goe:   {name:'괴강 진압',h:'괴강',cd:SCD.goe,desc:g=>`모든 적 ${SKV.goe(g).st}초 기절, 이후 ${GVL}초간 받는 피해 +30%`},
   baek:  {name:'백호 포효',h:'백호',cd:SCD.baek,desc:g=>`모든 적 현재 체력 ${SKV.baek(g).pct}% 피해 (보스 60%), 남은 체력 5% 이하면 처치, 처치마다 엽전 +3냥`},
@@ -1863,7 +1876,7 @@ const SKILL={
   mun:   {name:'문창 통찰',h:'문창',cd:SCD.mun,desc:g=>`운 게이지 +${SKV.mun(g).luck}, 무료 골패 1장, 다음 패 희귀 이상`},
   dohwa: {name:'도화 매혹',h:'도화',cd:SCD.dohwa,desc:g=>`모든 적 ${SKV.dohwa(g).st}초 매혹(정지), 매혹 중 받는 피해 +30%`},
   yeokma:{name:'역마 질주',h:'역마',cd:SCD.yeokma,desc:g=>`앞쪽 적을 최대 ${SKV.yeokma(g).push}칸(선두 출발선까지) 밀어내고 모든 적 4초 둔화, 엽전 +${SKV.yeokma(g).gold}냥`},
-  hwagae:{name:'화개 결계',h:'화개',cd:SCD.hwagae,desc:g=>`${SKV.hwagae(g).dur}초 결계(생명 보호) + 생명 +2`},
+  hwagae:{name:'화개 결계',h:'화개',cd:SCD.hwagae,desc:g=>`${SKV.hwagae(g).dur}초 결계(생명 보호) + 생명 +${HWL}`},
 };
 const SKILL_ANIM={goe:'거대한 장인(掌印)이 내려찍혀 땅이 갈라진다',baek:'백호가 화면을 가로질러 세 번 할퀸다',yang:'거대한 칼날이 영웅을 중심으로 회전하며 벤다',cheon:'귀인이 하늘에서 내려와 빛으로 아군을 감싼다',mun:'붓이 하늘에 오행 글자를 써 내린다',dohwa:'복사꽃 나무가 피어 꽃잎이 쏟아진다',yeokma:'역마가 화면을 질주하며 적을 밀어낸다',hwagae:'출구에 연꽃 결계가 피어난다'};
 const TRIAD=b=>[8,0,4].includes(b)?0:[2,6,10].includes(b)?1:[5,9,1].includes(b)?2:3; // 申子辰·寅午戌·巳酉丑·亥卯未
@@ -2192,7 +2205,7 @@ function saveSaju(){const v=$('bDate').value;if(!v){$('bDate').focus();return;}c
   SAJU=computeSaju({y,m,d,h});SAJU.raw={y,m,d,h,g};loadDaily();$('sajuModal').hidden=true;renderSaju();renderDex();renderHome();BUB.until=0;BUB.text='';BUB.day='';heroSay(greetLine(),5);if(firstTime&&!(S&&S.running))openReveal('onboard');log(`사주 등록: 영웅 ${SAJU.ilju} · 특기 ${SAJU.skills.map(k=>SKILL[k].name).join(', ')} · 성향 ${SAJU.ten2.map(i=>TEN[i].k).join(', ')}`,'hi');}
 
 // ───── 기록 ─────
-let REC={bestStage:0,bestWave:0,bestKills:0,bestFusions:0,games:0,mythic:0,totalKills:0,totalClashes:0,totalUlts:0,wins:0,seen:{}};
+let REC={bestStage:0,bestWave:0,bestScore:0,bestKills:0,bestFusions:0,games:0,mythic:0,totalKills:0,totalClashes:0,totalUlts:0,wins:0,seen:{}};
 function markSeen(){if(!S)return;let ch=false;for(const u of S.units){if(!u||u.friend)continue;const k=`${u.el}-${TIER(u.grade)}`;if(!REC.seen[k]){REC.seen[k]=1;ch=true;}}if(ch){saveRec();dexRewardCheck();renderDex();}}
 const dexSeenN=()=>Object.keys(REC.seen).filter(k=>+k.split('-')[1]<=2).length;
 const dexElDone=el=>[0,1,2].every(t=>REC.seen[`${el}-${t}`]);
@@ -2877,7 +2890,7 @@ function roomTap(kind,ev){const cv=ev.currentTarget;const r=cv.getBoundingClient
   if(id==='door'){document.querySelector('.tabbar button[data-s="home"]').click();return;}
   if(kind==='shrine'){shrineTap(id,hot);return;}
   if(kind==='hero'){if(id==='lamp'){const nite=(()=>{const hr=window.__hr!=null?window.__hr:new Date().getHours();return hr>=20||hr<5;})();const lit=ROOM_LAMP==='on'||(ROOM_LAMP!=='off'&&nite);ROOM_LAMP=lit?'off':'on';try{localStorage.setItem('ubz_lamp',ROOM_LAMP);}catch(_){}try{AU.tone(lit?520:780,0.06,'sine',0.04);}catch(_){}drawRoomHero();return;}if(id==='fortune'){if(onTag){$('hFortuneBtn').click();return;}if(WIN_FX)return;WIN_FX={t0:performance.now()};try{AU.tone(220,0.08,'triangle',0.04);}catch(_){}const fin=()=>{if(!WIN_FX)return;WIN_FX=null;document.querySelector('.tabbar button[data-s="home"]').click();};const loop=()=>{if(!WIN_FX)return;const u=(performance.now()-WIN_FX.t0)/520;drawRoomHero();if(u>=1){fin();return;}requestAnimationFrame(loop);};requestAnimationFrame(loop);setTimeout(fin,600);return;}if(id==='grow'){roomSheet('성장 · 특전',[RS.grow()],()=>{renderMeta();});return;}if(id==='gear'){DOLL_SEL=null;roomSheet('장비 · 갑옷걸이',[RS.gear()],()=>renderGear());return;}if(id==='quest'){roomSheet('오늘의 과제 · 아래 서랍',[RS.quest()],()=>{ROOM_TAB='quest';questFxCheck();});return;}if(id==='rec'){roomSheet('내 기록 · 업적 · 위 서랍',[RS.rec(),RS.ach()],()=>{renderRec();renderAch();});return;}if(id==='dex'){roomSheet('도감 · 서책',[RS.dex()],()=>{try{renderDex();}catch(_){}});return;}if(id==='self'){if(onTag||!SAJU){roomPop('hero',hot,'영웅 · 옷차림',[RS.self()],()=>{renderSkins();});return;}ROOM_POSE={t0:performance.now()};const R=roomPrep($('roomHeroCv'));ROOM_SAY={room:'hero',x:176,y:(R?R.H*0.87:400)-150*1.22-6,text:greetLine(),until:Date.now()+5000};try{AU.buy();}catch(_){}const loop=()=>{const alive=(ROOM_POSE&&performance.now()-ROOM_POSE.t0<1000)||(ROOM_SAY&&ROOM_SAY.room==='hero'&&ROOM_SAY.until>Date.now());if(!alive){ROOM_POSE=null;drawRoomHero();return;}if(ROOM_POSE&&performance.now()-ROOM_POSE.t0>=1000)ROOM_POSE=null;drawRoomHero();requestAnimationFrame(loop);};loop();return;}}
-  if(kind==='social'){if(id==='guests'){roomSheet('오늘의 손님 맞기',[RS.friends()],()=>{renderFriends();setTimeout(()=>{const i=$('friendIn');i&&i.focus();},200);});return;}if(id==='table'){if(onTag){roomPop('social',hot,'내 사주 코드 · 초대',[RS.code()]);return;}if(TEA_FX)return;TEA_FX={t0:performance.now()};try{AU.tone(880,0.05,'sine',0.03);AU.tone(660,0.12,'sine',0.03,0,0.1);}catch(_){}const fin=()=>{if(!TEA_FX)return;TEA_FX=null;drawRoomSocial();roomPop('social',hot,'내 사주 코드 · 초대',[RS.code()]);};const loop=()=>{if(!TEA_FX)return;if(performance.now()-TEA_FX.t0>900){fin();return;}drawRoomSocial();requestAnimationFrame(loop);};requestAnimationFrame(loop);setTimeout(fin,980);return;}if(id==='shelf'){roomSheet('내 기록 · 업적',[RS.rec(),RS.ach()],()=>{renderRec();renderAch();});return;}if(id==='board'){roomSheet('순위 방(榜)',[RS.board()]);return;}if(id==='screen'){roomSheet('병풍 · 사군자',[$('pane-screen')],()=>drawScreenArt());return;}
+  if(kind==='social'){if(id==='guests'){roomSheet('오늘의 손님 맞기',[RS.friends()],()=>{renderFriends();setTimeout(()=>{const i=$('friendIn');i&&i.focus();},200);});return;}if(id==='table'){if(onTag){roomPop('social',hot,'내 사주 코드 · 초대',[RS.code()]);return;}if(TEA_FX)return;TEA_FX={t0:performance.now()};try{AU.tone(880,0.05,'sine',0.03);AU.tone(660,0.12,'sine',0.03,0,0.1);}catch(_){}const fin=()=>{if(!TEA_FX)return;TEA_FX=null;drawRoomSocial();roomPop('social',hot,'내 사주 코드 · 초대',[RS.code()]);};const loop=()=>{if(!TEA_FX)return;if(performance.now()-TEA_FX.t0>900){fin();return;}drawRoomSocial();requestAnimationFrame(loop);};requestAnimationFrame(loop);setTimeout(fin,980);return;}if(id==='shelf'){roomSheet('내 기록 · 업적',[RS.rec(),RS.ach()],()=>{renderRec();renderAch();});return;}if(id==='board'){roomSheet('순위 방(榜)',[RS.board()],()=>{if(!DB)boardOffline();});return;}if(id==='screen'){roomSheet('병풍 · 사군자',[$('pane-screen')],()=>drawScreenArt());return;}
     if(id.startsWith('seat')){const k2=+id.slice(4);const f=FR.list[k2];if(!f)return;const seat=[[70,0.86],[176,0.93],[282,0.86]][k2];const R=roomPrep($('roomSocialCv'));const sy=R?R.H*seat[1]-150:200;if(ROOM_SAY&&ROOM_SAY.k===k2&&ROOM_SAY.until>Date.now()&&!ROOM_SAY.sent){ROOM_SAY.sent=1;cheerShare();ROOM_SAY={room:'social',k:k2,x:seat[0],y:sy,text:`${f.ilju}: 고맙네, 나도 자네를 응원하지!`,until:Date.now()+4000};}else ROOM_SAY={room:'social',k:k2,x:seat[0],y:sy,text:`${f.ilju}: ${friendGreet(f)} (한 번 더 누르면 응원)`,until:Date.now()+6000};const loop=()=>{if(!ROOM_SAY||ROOM_SAY.until<Date.now()){ROOM_SAY=null;drawRoomSocial();return;}drawRoomSocial();requestAnimationFrame(loop);};loop();return;}}
   if(kind==='more'){if(id==='settings'){roomPop('more',hot,'설정 · 살림',[RS.settings()]);return;}if(id==='rice'){const gearG=gearStat('gold')||0;const att=ATT.used?0:attendGold();const fort=DAILY.level?(DAILY.startGold||0):0;const gift=(GIFT&&GIFT.list&&!GIFT.used)?GIFT.list.length*40:0;const ft=friendTotal();const base=120;const total=base+att+fort+gearG+gift;const rows=[['기본 밑천',base],['출석',att],['오늘 운세',fort],['장비',gearG],['응원 코드',gift]];$('riceBody').innerHTML=`<div class="bonus">${rows.map(([k,v])=>`<span class="${v?'':'dim'}">${k} +${v}</span>`).join('')}</div><div class="fscore" style="margin:6px 0"><b style="font-size:30px">${total}</b><span>냥으로 시작</span></div><div class="note">클리어 엽전 배율 ${ft.gold?'+'+Math.round(ft.gold*100)+'% (친구 기운)':'기본'} · 무료 골패 ${(ATT.used?0:(ATT.streak===6?2:1))+(gift?GIFT.list.length:0)}회${DAILY.level?'':' · 사당에서 운세를 뽑으면 시작 엽전이 더 붙는다'}</div>`;roomPop('more',hot,'오늘의 살림',[$('pane-rice')]);return;}if(id==='store'){if(CHEST_TAP)return;CHEST_TAP={t0:performance.now()};try{AU.tone(90,0.22,'sawtooth',0.03,60);AU.tone(180,0.08,'square',0.02,0,0.2);}catch(_){}const fin=()=>{if(!CHEST_TAP)return;CHEST_TAP=null;drawRoomMore();roomSheet('장비 창고',[RS.store()],()=>renderStore());};const loop=()=>{if(!CHEST_TAP)return;if(performance.now()-CHEST_TAP.t0>420){fin();return;}drawRoomMore();requestAnimationFrame(loop);};requestAnimationFrame(loop);setTimeout(fin,480);return;}if(id==='data'){roomSheet('두루마리 · 백업',[RS.data()]);return;}if(id==='help'){roomSheet('도움 · 안내',[RS.help(),RS.quick(),RS.rules()]);return;}}}
 function openRoomPane(p){const map={grow:'성장 · 특전',gear:'장비 · 갑옷걸이',quest:'오늘의 과제 · 문갑',dex:'도감 · 서책',self:'영웅 · 옷차림'};if(!RS[p])return;roomSheet(map[p]||p,[RS[p]()],()=>{try{if(p==='gear')renderGear();else if(p==='quest'){ROOM_TAB='quest';questFxCheck();}else if(p==='dex')renderDex();else if(p==='grow')renderMeta();else if(p==='self')renderSkins();}catch(_){}});}
@@ -3024,18 +3037,26 @@ let boardMode='free',boardUnsub=null;
 function weekKey(){const d=new Date();const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y0=new Date(Date.UTC(t.getUTCFullYear(),0,1));const wk=Math.ceil(((t-y0)/86400000+1)/7);return `${t.getUTCFullYear()}-W${String(wk).padStart(2,'0')}`;}
 const scorePath=mode=>mode==='daily'?`daily/${todayStr()}/scores_v10`:mode==='weekly'?`weekly/${weekKey()}/scores_v10`:'scores_v10';
 async function initBoard(){
-  const sec=$('pane-board');
-  if(!(window.claude&&typeof claude.use==='function')){sec.hidden=true;return;}
+  if(!(window.claude&&typeof claude.use==='function')){boardOffline();return;}
   try{DB=await claude.use('db');}catch(_){DB=null;}
-  if(!DB){sec.hidden=true;return;}
+  if(!DB){boardOffline();return;}
   subscribeBoard();
+}
+// db 없는 환경(GitHub Pages · 공개판 · 로컬)에서는 시트를 숨기지 않고 안내 문구 + 내 기록으로 채운다 —
+// #pane-board 는 사랑방 roomSheet('board')로도 열리므로 숨기면 빈 시트가 뜬다.
+function boardOffline(){
+  $('boardHint').textContent='오프라인';
+  const tabs=document.querySelector('.tabs');if(tabs)tabs.hidden=true;
+  $('boardList').innerHTML='<li class="note">순위 방은 claude.ai 판에서 열린다. 여기서는 내 기록만 남는다.</li>'
+    +`<li class="note">내 기록 · 최고 ${REC.bestStage||0}판 · 점수 ${(REC.bestScore||0).toLocaleString()}${REC.games?` (${REC.games}회 출전)`:''}</li>`;
+  $('boardFriends').textContent='';$('boardPop').textContent='';
 }
 function subscribeBoard(){
   if(!DB)return;if(boardUnsub){boardUnsub();boardUnsub=null;}
   $('boardHint').textContent='TOP 10 · 연결 중…';$('boardList').innerHTML='';
   try{boardUnsub=DB.collection(scorePath(boardMode)).orderBy('wave','desc').limit(10).onSnapshot(snap=>{$('boardHint').textContent=(boardMode==='daily'?todayStr()+' · ':boardMode==='weekly'?weekKey()+' · ':'')+'TOP 10 · 실시간';renderBoard(snap.docs.map(d=>({id:d.id,...d.data()})));},
-    ()=>{$('boardHint').textContent='순위표를 불러올 수 없다';});}
-  catch(_){$('pane-board').hidden=true;}
+    ()=>{boardOffline();$('boardHint').textContent='순위표를 불러올 수 없다';});}
+  catch(_){DB=null;boardOffline();}
 }
 function renderBoard(rows){
   LB_ROWS=rows;try{$('rankVal').textContent=headerBadge();}catch(_){}
@@ -4083,7 +4104,7 @@ function finishRun(won){const A=ASSAULT;S.phase='result';S.over=true;
   if(S.mode!=='tutorial'){
     updateQuests();
     REC.games=(REC.games||0)+1;REC.lastPlay=todayStr();
-    REC.bestStage=Math.max(REC.bestStage||0,st);REC.bestKills=Math.max(REC.bestKills||0,S.kills);REC.bestFusions=Math.max(REC.bestFusions||0,S.fusions);
+    REC.bestStage=Math.max(REC.bestStage||0,st);REC.bestScore=Math.max(REC.bestScore||0,sc);REC.bestKills=Math.max(REC.bestKills||0,S.kills);REC.bestFusions=Math.max(REC.bestFusions||0,S.fusions);
     REC.totalKills=(REC.totalKills||0)+S.kills;REC.totalClashes=(REC.totalClashes||0)+S.clashes;REC.totalUlts=(REC.totalUlts||0)+(S.ults||0);
     REC.mythic=(REC.mythic||0)+S.mythic;if(won)REC.wins=(REC.wins||0)+1;
     {const wk=wkKey();REC.weeks=REC.weeks||{};const w=REC.weeks[wk]||(REC.weeks[wk]={best:0,games:0,kills:0});w.games++;w.kills+=S.kills;w.best=Math.max(w.best,st);REC.weekly={key:wk,best:w.best};}
@@ -4141,12 +4162,12 @@ $('sajuModal').addEventListener('click',ev=>{if(ev.target===$('sajuModal'))$('sa
 let lastMode='free';
 $('startBtn').onclick=()=>{typeof startAssault==='function'&&startAssault('free');};$('dailyBtn').onclick=()=>{typeof startAssault==='function'&&startAssault('daily');};$('weeklyBtn').onclick=()=>{typeof startAssault==='function'&&startAssault('weekly');};$('tutBtn').onclick=()=>{typeof startAssault==='function'&&startAssault('tutorial');};$('setNameBtn').onclick=()=>{const v=$('setName').value.trim().slice(0,12);NAME=v;try{localStorage.setItem('ubz_name',v);}catch(_){}toast(v?`닉네임: ${v}`:'닉네임을 지웠다');};$('hsFortT').onclick=()=>$('hFortuneBtn').click();document.querySelectorAll('#heroSeg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#heroSeg button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.hp').forEach(p=>p.classList.toggle('on',p.dataset.p===b.dataset.p));ROOM_TAB=b.dataset.p;try{drawRoomHero();if(ROOM_TAB==='grow')setTimeout(perkCheck,200);if(ROOM_TAB==='quest')setTimeout(questFxCheck,200);}catch(_){}AU.buy();});$('setHaptic').onclick=()=>{HAPTIC=!HAPTIC;saveSettings();if(HAPTIC)buzz(20);renderHome();};$('setTut').onclick=()=>{$('goSheet').hidden=true;typeof startAssault==='function'&&startAssault('tutorial');};$('setShare').onclick=()=>$('copyInvite').click();$('restartBtn').onclick=()=>{typeof startAssault==='function'&&startAssault(lastMode);};
 $('resumeBtn').onclick=()=>{$('goSheet').hidden=true;typeof assaultLoad==='function'&&assaultLoad();};
-$('homeBtn').onclick=()=>showHome();$('winHome').onclick=()=>{$('winOverlay').hidden=true;showHome();};$('endHome').onclick=()=>{$('endOverlay').hidden=true;showHome();};
+$('homeBtn').onclick=()=>showHome();$('endHome').onclick=()=>{$('endOverlay').hidden=true;showHome();};
 $('endShare').onclick=openCard;$('winShare').onclick=openCard;$('cardClose').onclick=()=>{$('cardModal').hidden=true;};$('dexClose').onclick=()=>{$('dexModal').hidden=true;};$('tbFortune').onclick=()=>$('hFortuneBtn').click();$('tbAttend').onclick=()=>{renderAttend();$('attModal').hidden=false;};$('attClose').onclick=()=>{$('attModal').hidden=true;};$('wcStart').onclick=()=>{$('welcome').hidden=true;openSaju();};$('wcSkip').onclick=()=>{$('welcome').hidden=true;};$('cardShare').onclick=()=>shareCardFile($('cardCopy'));$('cardCopy').onclick=()=>copyShare($('cardCopy'));
 $('winBtn').onclick=()=>{$('winOverlay').hidden=true;showHome();};$('submitBtn').onclick=()=>{try{submitScore();}catch(_){}};
 $('rvShare').onclick=()=>shareFortune($('rvShare'));$('endMoreBtn').onclick=()=>{const m=$('endMore');m.hidden=!m.hidden;$('endMoreBtn').textContent=m.hidden?'자세히 보기 ▾':'접기 ▴';};$('friendPaste').onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){$('friendIn').value=t.trim();addFriend();}else fmsg('클립보드가 비어 있다.','bad');}catch(_){fmsg('붙여넣기 권한이 없다. 코드를 직접 입력하라.','bad');$('friendIn').focus();}};$('unitCardClose').onclick=()=>{$('unitModal').hidden=true;};$('unitModal').addEventListener('click',ev=>{if(ev.target===$('unitModal'))$('unitCardClose').click();});
 document.querySelector('.tabbar').addEventListener('click',ev=>{if(ev.target.closest('button'))buzz(8);});
-document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{boardMode=t.dataset.b;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));subscribeBoard();});
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{if(!DB)return;boardMode=t.dataset.b;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));subscribeBoard();});
 dailyPreview();
 
 $('bHour').innerHTML=`<option value="-1">모름 (시주 제외)</option>`+BRANCH_K.map((b,i)=>`<option value="${i*2}">${b}시 ${BRANCH_H[i]}</option>`).join('');
