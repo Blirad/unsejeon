@@ -257,6 +257,8 @@
   #splash{position:fixed}
   #toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:rgba(34,48,71,.94);color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:60;opacity:0;pointer-events:none;transition:all .25s;max-width:90vw;text-align:center}
   #toast.on{opacity:1;transform:translate(-50%,0)}
+  /* 돌격 화면에서는 골패 줄(#prepBar)을 가리지 않게 준비바 위로 올린다. 높이는 toast()가 잴 때 --tup 로 넣는다. */
+  #toast.toast-up{bottom:calc(var(--tup, 150px) + env(safe-area-inset-bottom))}
   #splash .logo{font-family:'Jua','Noto Sans KR',sans-serif;font-size:56px;color:#2F7BE8;letter-spacing:2px;text-shadow:0 3px 0 #fff,0 6px 14px rgba(47,123,232,.25)}
   #splash .sub{font-size:14px;color:#5B6B85;font-weight:700}
   #splash .dots{display:flex;gap:10px;margin-top:8px} #splash .dots i{width:14px;height:14px;border-radius:50%;display:block;animation:sp 1.2s infinite ease-in-out}
@@ -864,7 +866,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.4</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.5</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -878,7 +880,7 @@
     <div class="modal" id="attModal" hidden style="z-index:26"><div class="mbox"><h3 style="margin:0">출석 보상</h3><div class="stats" id="attGrid" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div><div class="note" id="attNote"></div><button class="ghost sm" id="attClose" style="width:100%">닫기</button></div></div>
     <div class="modal" id="welcome" hidden style="z-index:25"><div class="mbox" style="text-align:center;gap:10px"><div style="font-family:'Jua','Noto Sans KR',sans-serif;font-size:34px;color:#2F7BE8">운세전</div><div class="note" style="font-size:14px;color:#223047">내 사주가 영웅이 되어 오행 군대를 이끈다.<br>매일 운세를 뽑고, 친구와 기운을 나눈다.</div>
       <div class="r" style="justify-content:center;gap:6px;margin:4px 0"><span class="chip" title="木" style="background:#3FA66B;color:#fff">목</span><span class="chip" title="火" style="background:#E3553B;color:#fff">화</span><span class="chip" title="土" style="background:#C9A24A;color:#fff">토</span><span class="chip" title="金" style="background:#C8CCD6;color:#223047">금</span><span class="chip" title="水" style="background:#3D7FD9;color:#fff">수</span></div>
-      <div style="text-align:left;display:grid;gap:6px;font-size:13px"><div><i class="num">1</i><b>생년월일</b> 하나로 나만의 <b>영웅</b>이 생긴다</div><div><i class="num">2</i>같은 오행은 <b>승급</b>, 상생 짝은 <b>융합</b></div><div><i class="num">3</i>매일 <b>사당</b>에서 운세를 뽑으면 그날 전투가 세진다</div></div>
+      <div style="text-align:left;display:grid;gap:6px;font-size:13px"><div><i class="num">1</i><b>생년월일</b> 하나로 나만의 <b>영웅</b>이 생긴다</div><div><i class="num">2</i>같은 용병 셋을 모으면 <b>합성</b>, 상생으로 이으면 <b>연환</b></div><div><i class="num">3</i>매일 <b>사당</b>에서 운세를 뽑으면 그날 전투가 세진다</div></div>
       <div class="btns"><button id="wcStart">내 사주로 시작</button><button class="ghost" id="wcSkip">먼저 둘러보기</button></div></div></div>
     <div class="modal" id="cardModal" hidden style="z-index:30"><div class="mbox" style="padding:12px"><h3 style="margin:0">공유 카드</h3><img id="cardImg" alt="결과 카드" style="width:100%;border-radius:12px;display:block"><div class="note">이미지를 길게 누르면 저장할 수 있다.</div><div class="btns"><button class="sm" id="cardShare">공유하기</button><button class="ghost sm" id="cardCopy">글로 복사</button></div><button class="ghost sm" id="cardClose" style="width:100%">닫기</button></div></div>
     <div class="overlay" id="revealOverlay" hidden>
@@ -1096,6 +1098,15 @@ function defaultMods(){
     bossDmg:0,elBonus:[0,0,0,0,0],enemyHp:1,enemySpd:1,bossHp:1,sorcDiag:false,archerRange:0,clashMult:1.4,lives:0,rate:1};
 }
 const BOSS_NAMES=['만목왕','겁화왕','지신','금강왕','해룡'];
+const KNEE=5, LATE=8, LATE_HP=[1,2,2.75], STAGE5_HP=0.9;
+const EM_HALF=3;   // 적 체력 배율(enemyHp)을 절반만 얹기 시작하는 판
+// stageMobHp(stage,mods): 그 판 잡몹의 바닥 체력(hpBase). stageWaves 가 잡몹·보스 체력을 여기서 얹고,
+// 신살 '양인 참격'도 이 값을 봐서 피해가 판을 탄다 — 곡선 손잡이는 한 군데(이 식)뿐이어야 한다.
+function stageMobHp(stage,mods){
+  const m=mods||{};
+  const em=m.enemyHp||1, emEff=stage>=EM_HALF?1+(em-1)*0.5:em;
+  return Math.round(95*Math.pow(1.556,Math.min(stage,KNEE)-1)*Math.pow(1.12,Math.max(0,stage-KNEE))*LATE_HP[Math.min(2,Math.max(0,stage-LATE))])*emEff;
+}
 function stageWaves(stage,el,purity,rng,mods){
   const out=[];
   // 난이도 곡선: 5판까지 가파르게(×1.556) 올라 첫 벽을 세우고, 6~8판은 완만하게(×1.12) 오른다.
@@ -1119,8 +1130,6 @@ function stageWaves(stage,el,purity,rng,mods){
   // 씨앗 40 기준 친구 없는 smart 평균이 5.53/6.05/6.05 → 6.25/7.22/7.55 로 목표 띠(6~8.3) 안에 들어온다.
   // 이탈 목숨 손실(breachEnemy 의 `3*hp/max`)을 2로 낮추는 쪽도 재 봤지만 wood 가 5.60 에 그쳤고, 위 둘과 겹치면
   // 5판이 벽에서 아예 내려와(wood 6.47) 관문이 사라진다 — 손실 계수는 그대로 두는 편이 낫다.
-  const KNEE=5, LATE=8, LATE_HP=[1,2,2.75], STAGE5_HP=0.9;
-  const EM_HALF=3;   // 적 체력 배율(enemyHp)을 절반만 얹기 시작하는 판
   // n은 목표 마리 수 상한이다. stage===KNEE(5판)만 무리별로 정확히 나눠(floor+나머지) n에 딱 맞추고,
   // 그 외 판은 무리마다 Math.ceil(n/groups)를 쓰므로 n이 groups로 안 나눠떨어지면 총 마리 수가 n을 넘을 수 있다
   // (예: 1판 n=8,groups=3 → ceil(8/3)=3×3=9기, 8이 아니라 9). 지금 갈리는 판(6~10)은 우연히 나눠떨어져
@@ -1132,8 +1141,7 @@ function stageWaves(stage,el,purity,rng,mods){
   // 내려앉았다. 5판부터 절반으로 올려도 wood 5.22 로 아직 5판에 막혀(씨앗 40) 3판까지 당겼다 —
   // 5.90/6.25/6.75 로 세 사주 모두 5.5 위이고 친구 1명 10판 클리어도 42/120(35%)으로 남는다.
   // 배율이 1이면 식이 그대로라 평시 곡선은 하나도 변하지 않는다.
-  const em=mods.enemyHp||1, emEff=stage>=EM_HALF?1+(em-1)*0.5:em;
-  const hpBase=Math.round(95*Math.pow(1.556,Math.min(stage,KNEE)-1)*Math.pow(1.12,Math.max(0,stage-KNEE))*LATE_HP[Math.min(2,Math.max(0,stage-LATE))])*emEff;
+  const hpBase=stageMobHp(stage,mods);
   const atkBase=Math.round(6*Math.pow(1.24,stage-1));
   const groups=3+(stage>=6?1:0);
   let id=1;
@@ -1438,7 +1446,7 @@ function sajuArmy(saju){const units=Array(CELLS).fill(null);if(!saju||!saju.p)re
 const q=(v,st)=>Math.round(v/st)*st;
 const SKV={
   goe:g=>({st:q(3+0.7*g,0.5)}),
-  baek:g=>({pct:q(22+5*g,5)}),
+  baek:g=>({pct:q(14+3*g,5)}),
   yang:g=>({mult:q(16+4*g,2)}),
   cheon:g=>({dur:q(8+g,1),pct:q(35+8*g,5)}),
   mun:g=>({luck:q(50+8*g,5)}),
@@ -1447,6 +1455,15 @@ const SKV={
   hwagae:g=>({dur:q(6+1.5*g,1)}),
 };
 const SKILL_KEYS=Object.keys(SKV);
+// 양인 참격 계수: 등급 3에서 그 판 잡몹 바닥 체력의 몇 배를 때리는가.
+// 0.8 부터 0.05 까지 씨앗 40·80으로 훑었다(plans/2026-09-10-v10.2-followups.md v10.5 §1 의 표).
+// 사거리 안 적을 **전부** 때리는 광역이라 한 번에 잡몹 하나치를 넘기면 곡선이 통째로 무너진다 —
+// 0.5 는 씨앗 40 naive 6.15/7.63/6.92(띠 4~5.5), 0.12 는 씨앗 80 naive 4.65/5.21/5.54 로 들어온다
+// (씨앗 40 에서는 균 naive 5.83 이 띠 밖 — 균은 어느 표본에서도 경계에 걸터앉는다).
+const YANG_K=0.12;
+// 신살 스킬 쿨타임(초). 화면의 SKILL 표(desc·이름)와 봇이 같은 값을 봐야 해서 규칙 쪽에 둔다.
+// 실제 대기 = SKILL_CD[key] * run.skillCd (주간 '철벽' ×0.85 · 카드 '신살 가속' ×0.7 · 레벨 15부터 ×0.9).
+const SKILL_CD={goe:32,baek:38,yang:22,cheon:36,mun:40,dohwa:30,yeokma:26,hwagae:50};
 // 활성 적 = 살아 있고 이미 등장한 적
 function activeEnemies(B){return B.enemies.filter(e=>e.hp>0&&e.t0<=B.t);}
 // 스킬 피해는 취약 배율을 타지 않는다(원래 규칙). 처치하면 die 이펙트와 처치 수를 남긴다.
@@ -1460,7 +1477,12 @@ function castSkill(B,run,key,grade){
     case 'goe':for(const e of activeEnemies(B)){e.stunT=v.st;e.vuln=v.st+6;}break;
     // 백호: 현재 체력 비례 피해라 절대 처치가 안 나므로, 피해 뒤 남은 체력이 최대 체력의 5% 이하(최소 1)면 처치로 마무리한다.
     case 'baek':for(const e of activeEnemies(B)){let d=Math.round(e.hp*(e.boss?0.6:1)*v.pct/100);if(e.hp-d<=Math.max(1,(e.max||e.hp)*0.05))d=e.hp;if(skillHit(B,e,d))run.coins+=3;}break;
-    case 'yang':{const dmg=Math.round(40*v.mult*M.atk);for(const e of activeEnemies(B))if(e.y<7)skillHit(B,e,dmg);break;}
+    // 양인 참격: 피해가 판을 탄다. 옛 식 `40×mult`(등급 3 → 1120)는 절대값이라 1판 잡몹(67~95)을 통째로
+    // 쓸어 버리고 뒷판에서는 종잇장이었다 — 신살을 쓰는 사람에게 곡선이 통째로 무너졌다.
+    // 이제 그 판 잡몹 바닥 체력의 YANG_K 배(등급 3 기준)다. 0.12 라 성한 잡몹은 한 번에 안 죽고
+    // 부대가 깎아 놓은 놈만 마무리한다. 등급은 mult/28(등급 3 = 28)로 견준다 — 등급 0 이면 ×0.57, 등급 5 면 ×1.29.
+    // 보스도 잡몹과 같은 값을 맞는다(skillHit 은 취약·보스 감산을 안 탄다 — 백호만 제 case 에서 0.6 을 건다).
+    case 'yang':{const dmg=Math.round(stageMobHp(run.stage||1,M)*YANG_K*(v.mult/28)*M.atk);for(const e of activeEnemies(B))if(e.y<7)skillHit(B,e,dmg);break;}
     case 'cheon':B.buffT=v.dur;B.buffPct=v.pct/100;break;
     case 'mun':run.luck=Math.min(100,run.luck+v.luck);run.freeFlips++;run.guar=true;break;
     case 'dohwa':for(const e of activeEnemies(B)){e.stunT=v.st;e.vuln=v.st;}break;
@@ -1534,9 +1556,9 @@ function restoreRun(o,opts){const run=newRun(Object.assign({},opts,{seed:o.seed}
 return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,tenStars,tenEffect,mixTiles,readTile,flipCost,flipCostOf,ITEMS,pickW,
   N,CELLS,idx,ROLE_BASE,unitBase,makeUnit,elMult,computeChains,
   armyWeights,strongest,stageElement,neededElement,combatPower,stageWarning,mergeCandidates,mergeAt,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
-  defaultMods,BOSS_NAMES,stageWaves,damageOf,battleInit,battleTick,
+  defaultMods,BOSS_NAMES,stageWaves,stageMobHp,damageOf,battleInit,battleTick,
   CARDS,offerCards,applyCards,applyRunCard,takeCard,
-  q,SKV,SKILL_KEYS,castSkill,
+  q,SKV,SKILL_KEYS,SKILL_CD,YANG_K,castSkill,
   seededRng,sajuArmy,newRun,runMods,emptyCell,flipTile,useItem,placeUnit,sellUnit,mergeUnit,equipTen,pickAlly,startBattle,finishStage,nextStage,scoreOf,stagesCleared,serializeRun,restoreRun};
 });
 
@@ -1621,7 +1643,15 @@ for(let i=0;i<4;i++){const a=PATH[i],b=PATH[(i+1)%4];const len=Math.hypot(b[0]-a
 const BASE_WAVE=22, LIVES=20;
 
 // ───── 사운드 ─────
-function toast(msg,ms){let t=$('toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}t.textContent=msg;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),ms||2400);}
+function toast(msg,ms){let t=$('toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}t.textContent=msg;
+  // 돌격 화면이 떠 있으면 준비바(골패 줄) 위로 올린다 — 안내 힌트가 정작 눌러야 할 골패를 덮고 있었다.
+  const as=$('assault'),pb=$('prepBar');const up=as&&!as.hidden;
+  if(up)t.style.setProperty('--tup',((pb&&pb.offsetHeight?pb.offsetHeight:120)+12)+'px');
+  t.classList.toggle('toast-up',!!up);
+  t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>{t.classList.remove('on');requestAnimationFrame(()=>t.classList.remove('toast-up'));},ms||2400);}
+// 돌격 화면이 내려갈 때(마당으로·판 종료) 붙어 있던 toast-up 을 떼어낸다 — 안 떼면 다음 토스트가
+// 화면이 없는데도 준비바 위치만큼 붕 뜬 채로 뜬다.
+function toastLower(){const t=$('toast');if(t)t.classList.remove('toast-up');}
 window.addEventListener('error',ev=>{toast('문제가 생겼다. 화면을 새로고침하면 이어진다.',4000);});
 // ───── 홈 앰비언트: 빗소리 · 밤 풀벌레 · 낮 새소리와 바람 ─────
 let SCENE_KIND={night:false,rain:false,season:'summer'};
@@ -1771,16 +1801,16 @@ const TEN=[
   {k:'관성',name:'규율',desc:'상극 폭발을 반 등급 높게 계산'},
   {k:'인성',name:'학습',desc:'골패마다 운 게이지 +3'},
 ];
-const SKV=ASSAULT.SKV; // 등급→수치는 코어(src/assault-core.js)에 있다
+const SKV=ASSAULT.SKV,SCD=ASSAULT.SKILL_CD,YK=ASSAULT.YANG_K; // 등급→수치·쿨타임·양인 계수는 코어(src/assault-core.js)에 있다
 const SKILL={
-  goe:   {name:'괴강 진압',h:'괴강',cd:32,desc:g=>`모든 적 ${SKV.goe(g).st}초 기절, 이후 6초간 받는 피해 +30%`},
-  baek:  {name:'백호 포효',h:'백호',cd:38,desc:g=>`모든 적 현재 체력 ${SKV.baek(g).pct}% 피해 (보스 60%), 남은 체력 5% 이하면 처치, 처치마다 엽전 +3냥`},
-  yang:  {name:'양인 참격',h:'양인',cd:22,desc:g=>`영웅 사거리 1.5배 안 적에게 영웅 공격력 ×${SKV.yang(g).mult}`},
-  cheon: {name:'귀인 강림',h:'귀인',cd:36,desc:g=>`${SKV.cheon(g).dur}초간 아군 공격력 +${SKV.cheon(g).pct}%`},
-  mun:   {name:'문창 통찰',h:'문창',cd:40,desc:g=>`운 게이지 +${SKV.mun(g).luck}, 무료 골패 1장, 다음 패 희귀 이상`},
-  dohwa: {name:'도화 매혹',h:'도화',cd:30,desc:g=>`모든 적 ${SKV.dohwa(g).st}초 매혹(정지), 매혹 중 받는 피해 +30%`},
-  yeokma:{name:'역마 질주',h:'역마',cd:26,desc:g=>`모든 적 ${(SKV.yeokma(g).push/60).toFixed(1)}칸 밀어내고 4초 둔화, 엽전 +${SKV.yeokma(g).gold}냥`},
-  hwagae:{name:'화개 결계',h:'화개',cd:50,desc:g=>`${SKV.hwagae(g).dur}초 결계(생명 보호) + 생명 +2`},
+  goe:   {name:'괴강 진압',h:'괴강',cd:SCD.goe,desc:g=>`모든 적 ${SKV.goe(g).st}초 기절, 이후 6초간 받는 피해 +30%`},
+  baek:  {name:'백호 포효',h:'백호',cd:SCD.baek,desc:g=>`모든 적 현재 체력 ${SKV.baek(g).pct}% 피해 (보스 60%), 남은 체력 5% 이하면 처치, 처치마다 엽전 +3냥`},
+  yang:  {name:'양인 참격',h:'양인',cd:SCD.yang,desc:g=>`전장 앞쪽(판 위 두 줄 안)의 적에게 그 판 잡몹 체력의 ${Math.round(YK*(SKV.yang(g).mult/28)*100)}% 피해 — 판이 오를수록 강해진다`},
+  cheon: {name:'귀인 강림',h:'귀인',cd:SCD.cheon,desc:g=>`${SKV.cheon(g).dur}초간 아군 공격력 +${SKV.cheon(g).pct}%`},
+  mun:   {name:'문창 통찰',h:'문창',cd:SCD.mun,desc:g=>`운 게이지 +${SKV.mun(g).luck}, 무료 골패 1장, 다음 패 희귀 이상`},
+  dohwa: {name:'도화 매혹',h:'도화',cd:SCD.dohwa,desc:g=>`모든 적 ${SKV.dohwa(g).st}초 매혹(정지), 매혹 중 받는 피해 +30%`},
+  yeokma:{name:'역마 질주',h:'역마',cd:SCD.yeokma,desc:g=>`모든 적 ${(SKV.yeokma(g).push/60).toFixed(1)}칸 밀어내고 4초 둔화, 엽전 +${SKV.yeokma(g).gold}냥`},
+  hwagae:{name:'화개 결계',h:'화개',cd:SCD.hwagae,desc:g=>`${SKV.hwagae(g).dur}초 결계(생명 보호) + 생명 +2`},
 };
 const SKILL_ANIM={goe:'거대한 장인(掌印)이 내려찍혀 땅이 갈라진다',baek:'백호가 화면을 가로질러 세 번 할퀸다',yang:'거대한 칼날이 영웅을 중심으로 회전하며 벤다',cheon:'귀인이 하늘에서 내려와 빛으로 아군을 감싼다',mun:'붓이 하늘에 오행 글자를 써 내린다',dohwa:'복사꽃 나무가 피어 꽃잎이 쏟아진다',yeokma:'역마가 화면을 질주하며 적을 밀어낸다',hwagae:'출구에 연꽃 결계가 피어난다'};
 const TRIAD=b=>[8,0,4].includes(b)?0:[2,6,10].includes(b)?1:[5,9,1].includes(b)?2:3; // 申子辰·寅午戌·巳酉丑·亥卯未
@@ -1907,7 +1937,13 @@ const META_PERK=[{lv:5,t:'첫 판 무료 골패 +1'},{lv:10,t:'영웅이 영웅 
 function loadMeta(){try{const m=JSON.parse(localStorage.getItem('ubz_meta'));if(m)META={...META,...m};}catch(_){}}
 function saveMeta(){try{localStorage.setItem('ubz_meta',JSON.stringify(META));}catch(_){}}
 const wkKey=()=>{const d=new Date();const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
-const WEEKLY_MODS=[{id:'swift',s:'빠른 적 · 엽전 +40%',t:'적 속도 +20% · 클리어 엽전 +40%',spd:1.2,gold:1.4},{id:'rich',s:'부자 시작 · 골패 비쌈',t:'시작 엽전 300냥 · 골패 비용 +40%',gold0:300,cost:1.4},{id:'thin',s:'생명 +10 · 엽전 2배',t:'목숨 +10 · 클리어 엽전 2배',lives:10,gold:2},{id:'iron',s:'보스 강함 · 특기 빠름',t:'보스 체력 +50% · 특기 대기 -30%',boss:1.5,skill:0.7},{id:'tide',s:'적 튼튼 · 운 40 시작',t:'적 체력 +25%(3판부터 절반) · 시작 운 게이지 40',hp:1.25,luck:40}];
+// 주간 도전 규칙 다섯 (문서에서 부르는 이름: swift 질풍 · rich 부자 · harvest 풍년 · iron 철벽 · tide 해일).
+// 한 주에 하나만 뽑히므로 서로 겹치지 않는다. 규칙마다 이득 하나와 대가 하나를 같이 쥔다 —
+// 'harvest'(옛 'thin')는 v10.5 전까지 이득만 둘이라 사실상 쉬는 주였다(v10.5 문서 항목 2).
+// 'iron'(철벽)도 같은 병이었다 — 신살 대기 -30%가 보스 체력 +50%를 이겨 기준선보다 쉬운 주였다(v10.5 2차 항목 2).
+// 이득(특기 대기)을 -15%로 순하게 줄이고 대가(보스 체력)를 +120%로 올렸다. smart 평균은 보스로 안 움직인다 —
+// smart 의 벽은 보스가 없는 9판이라, 철벽의 무게는 10판 돌파율에서만 보인다(기준선 63% → 56%, 씨앗 80).
+const WEEKLY_MODS=[{id:'swift',s:'빠른 적 · 엽전 +40%',t:'적 속도 +20% · 클리어 엽전 +40%',spd:1.2,gold:1.4},{id:'rich',s:'부자 시작 · 골패 비쌈',t:'시작 엽전 300냥 · 골패 비용 +40%',gold0:300,cost:1.4},{id:'harvest',s:'목숨 +10 · 엽전 두 배 · 적 빠름 · 골패 비쌈',t:'목숨 +10 · 클리어 엽전 두 배 · 적 속도 +15% · 골패 비용 +30%',lives:10,gold:2,spd:1.15,cost:1.3},{id:'iron',s:'보스 아주 강함 · 특기 조금 빠름',t:'보스 체력 +120% · 특기 대기 -15%',boss:2.2,skill:0.85},{id:'tide',s:'적 튼튼 · 운 40 시작',t:'적 체력 +25%(3판부터 절반) · 시작 운 게이지 40',hp:1.25,luck:40}];
 const weeklyMod=()=>WEEKLY_MODS[hash(wkKey()+'|wk')%WEEKLY_MODS.length];
 const wk=k=>(S&&S.wk&&S.wk[k])||1;
 const metaHeroGrade=()=>META.lv>=30?5:META.lv>=10?4:3;
@@ -2100,7 +2136,7 @@ function drawFortuneAnim(){
 function openSaju(){const m=$('sajuModal');m.hidden=false;if(SAJU){const r=SAJU.raw;$('bDate').value=`${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')}`;$('bHour').value=r.h;$('bGender').value=r.g||'m';}$('bDate').focus();}
 function saveSaju(){const v=$('bDate').value;if(!v){$('bDate').focus();return;}const firstTime=!SAJU;const [y,m,d]=v.split('-').map(Number);const h=+$('bHour').value;const g=$('bGender').value;
   try{localStorage.setItem('ubz_saju',JSON.stringify({y,m,d,h,g}));}catch(_){}
-  SAJU=computeSaju({y,m,d,h});SAJU.raw={y,m,d,h,g};loadDaily();$('sajuModal').hidden=true;renderSaju();renderDex();renderHome();if(firstTime&&!(S&&S.running))openReveal('onboard');log(`사주 등록: 영웅 ${SAJU.ilju} · 특기 ${SAJU.skills.map(k=>SKILL[k].name).join(', ')} · 성향 ${SAJU.ten2.map(i=>TEN[i].k).join(', ')}`,'hi');}
+  SAJU=computeSaju({y,m,d,h});SAJU.raw={y,m,d,h,g};loadDaily();$('sajuModal').hidden=true;renderSaju();renderDex();renderHome();BUB.until=0;BUB.text='';BUB.day='';heroSay(greetLine(),5);if(firstTime&&!(S&&S.running))openReveal('onboard');log(`사주 등록: 영웅 ${SAJU.ilju} · 특기 ${SAJU.skills.map(k=>SKILL[k].name).join(', ')} · 성향 ${SAJU.ten2.map(i=>TEN[i].k).join(', ')}`,'hi');}
 
 // ───── 기록 ─────
 let REC={bestStage:0,bestWave:0,bestKills:0,bestFusions:0,games:0,mythic:0,totalKills:0,totalClashes:0,totalUlts:0,wins:0,seen:{}};
@@ -2145,7 +2181,7 @@ let RV={step:0,mode:'onboard'};
 // 보유 십성패만 등급과 함께 (없는 십성은 표시하지 않는다)
 function tenChipsHtml(){if(!SAJU||!ASSAULT.tenStars)return '';const t=ASSAULT.tenStars(SAJU.p),L=['','하품','중품','상품'];
   return ASSAULT.TEN10.map((n,i)=>{const g=t.grade[i];return g?`<span class="pill on" title="${ASSAULT.TEN_DESC[i]}">${n} ${L[g]}</span>`:'';}).join('');}
-function heroSkillsHtml(){if(!SAJU)return '';const g=3;return `<div class="r" style="justify-content:center">${SAJU.skills.map(k=>`<span class="chip relic" title="${SKILL[k].desc(g)}">${SKILL[k].name}</span>`).join('')}${tenChipsHtml()}</div><ul class="rules" style="margin-top:10px">${SAJU.skills.map(k=>`<li><b>${SKILL[k].name}</b> ${SKILL[k].desc(g)} · 쿨타임 ${SKILL[k].cd}초</li>`).join('')}<li class="note">처치할수록 레벨이 오른다. 레벨마다 공격력 +8%, 스킬 쿨타임 -3%. 같은 오행 유닛과 합치면 등급이 오르고 스킬 위력도 커진다.</li></ul>`;}
+function heroSkillsHtml(){if(!SAJU)return '';const g=3;return `<div class="r" style="justify-content:center">${SAJU.skills.map(k=>`<span class="chip relic" title="${SKILL[k].desc(g)}">${SKILL[k].name}</span>`).join('')}${tenChipsHtml()}</div><ul class="rules" style="margin-top:10px">${SAJU.skills.map(k=>`<li><b>${SKILL[k].name}</b> ${SKILL[k].desc(g)} · 쿨타임 ${SKILL[k].cd}초</li>`).join('')}<li class="note">영웅은 본진에 서서 신살 스킬로 전황을 뒤집는다. 판을 치를수록 성장 레벨이 올라 영웅 등급과 특전이 붙는다.</li></ul>`;}
 let SANTONG={t0:0,score:null,level:''};
 function santongAnim(cv2){if(!cv2)return;SANTONG={t0:performance.now(),score:null,level:'',cv:cv2};const step=()=>{const cvx=SANTONG.cv;if(!cvx||!cvx.isConnected)return;const t=(performance.now()-SANTONG.t0)/1000;
   drawOn(cvx,()=>{ctx.scale(2,2);const W2=260,H2=180;ctx.clearRect(0,0,W2,H2);
@@ -3676,7 +3712,7 @@ function startAssault(mode){try{AU.init&&AU.init();}catch(_){}mode=mode||'free';
   hideHome();$('assault').hidden=false;$('endOverlay').hidden=true;$('relicOverlay').hidden=true;$('winOverlay').hidden=true;
   log(`출전 · ${S.stage}판 · 적 ${ASSAULT.EL_K[S.stageEl]} 부대`,'hi');
   assaultUI();drawAssault();assaultSave();if(!ALAST){ALAST=performance.now();requestAnimationFrame(assaultLoop);}}
-function assaultPause(){assaultSave();$('assault').hidden=true;showHome();}
+function assaultPause(){assaultSave();$('assault').hidden=true;showHome();toastLower();}
 function goSocial(){assaultPause();const t=document.querySelector('.tabbar button[data-s="social"]');if(t)t.click();}
 // ── 안내 판(튜토리얼) ──
 const TUT2=[
@@ -3859,7 +3895,7 @@ function endStage(res){if(!res)return; // finishStage 가 이미 소진했다
   if(!res.won){if(res.revived){toast('부활 부적이 발동했다. 목숨 5로 다시 준비한다.');assaultUI();drawAssault();assaultSave();return;}finishRun(false);return;}
   if(S.ally)S.allyWin=true;
   log(`${S.stage}판 클리어 · 엽전 +${res.coins}냥`,'hi');
-  if(S.mode==='tutorial'&&S.stage>=3&&res.won){clearSave();$('assault').hidden=true;showHome();toast('안내 끝. 자유 모드로 출전하라.');return;}
+  if(S.mode==='tutorial'&&S.stage>=3&&res.won){clearSave();$('assault').hidden=true;showHome();toastLower();toast('안내 끝. 자유 모드로 출전하라.');return;}
   if(res.done){finishRun(true);return;}
   const go=()=>{ASSAULT.nextStage(S);ASEL=-1;assaultUI();drawAssault();assaultSave();};
   if(res.cards)offerCardsUI(res.cards,go);else go();}
@@ -3886,7 +3922,7 @@ function finishRun(won){const A=ASSAULT;S.phase='result';S.over=true;
     saveRec();checkAch();
     try{if(typeof gainMeta==='function'&&gainMeta(st*12+(won?60:0)))META.celebrate=META.lv;}catch(_){}
     if(S.mode==='daily'&&S.ranked)saveDS({started:true,wave:st});}
-  clearSave();B=null;ADRAG=null;$('assault').hidden=true;showHome();
+  clearSave();B=null;ADRAG=null;$('assault').hidden=true;showHome();toastLower();
   const face=(id,g2)=>{const cv=$(id);if(!cv)return;const el=SAJU?SAJU.me:3,gd=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';drawOn(cv,()=>{ctx.translate(60,92);ctx.scale(1.05,1.05);BLINK=false;SWING=0;PHASE=0;HURT=!g2;drawHero(el,gd,TIER(metaHeroGrade()));});};
   // 순위 등록 상자는 승패와 무관하게 공용 — 어느 오버레이가 뜨든 그 안으로 옮겨 붙인다
   const canRank=!!(S.ranked&&S.mode!=='tutorial');
@@ -3953,7 +3989,7 @@ setTimeout(()=>{if(!$('startOverlay').hidden&&BUB.day!==todayStr()){BUB.day=toda
 setTimeout(fortunePrompt,400);
 // 디버그 / 시뮬레이션 훅
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
-window.__ubz={startAssault,migrateAch,loadAch,assaultUI,drawAssault,flipUI,bossTop,get BOSS_TOP(){return BOSS_TOP;},endStage,finishRun,offerCardsUI,castSkill,assaultLayout,checkAch,renderRec,recLine,get REC(){return REC;},get ACHS(){return ACHS;},get S(){return S;},get B(){return B;},drawRoomShrine,showShrine,shrineTap,AMB,roomWalkOut,get WALK(){return ROOM_WALK;},get SHRINE(){return {BOW_FX,SHAKE_FX,INC_FX,SHRINE_CANDLE};},heroTo:(cv,sc,x,y,el,g)=>drawOn(cv,()=>{ctx.translate(x,y);ctx.scale(sc,sc);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero(el==null?(SAJU?SAJU.me:3):el,g||'m',1);}),drawEndScene,perkCheck,roomSheet,closeRoomSheet,get ROOM_HOT(){return ROOM_HOT;},drawRoomHero,drawRoomSocial,drawRoomMore,renderGear,renderBoard,get QST(){return QST;},doorWipe,drawRecChart,renderStore,get GEAR(){return GEAR;},HOT,cheer:(c)=>cheerSuffix(c,todayStr()),GIFTv:()=>GIFT,crSheet:(sc)=>{sc=sc||2.6;const cv2=document.createElement('canvas');cv2.width=1280;cv2.height=720;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,1280,720);for(let el=0;el<5;el++)for(let t=0;t<3;t++){ctx.save();ctx.translate(128+el*256,120+t*240);ctx.scale(sc,sc);BLINK=false;SWING=t===1?1:0;PHASE=0;HURT=false;drawCreature(el,t);ctx.restore();}});return cv2;},scene:(dt)=>{sceneT+=(dt||0);drawScene();return sceneT;},HW,dexTick:(d)=>{DEXA.ang+=(d==null?0.5:d);dexFrame();return DEXA.ang;},heroBig:(opts)=>{opts=opts||{};const cv2=document.createElement('canvas');const n=(opts.list||[[0,0,'m']]).length;const cw=opts.cw||300,chh=opts.ch||400,sc=opts.sc||3.2;cv2.width=n*cw;cv2.height=chh;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,cv2.width,cv2.height);(opts.list||[[0,0,'m']]).forEach(([stem,br,g],i)=>{ctx.save();ctx.translate(i*cw+cw/2,chh*0.72);ctx.scale(sc,sc);BLINK=false;SWING=opts.sw||0;PHASE=opts.ph||0;HURT=!!opts.hurt;if(opts.skin)META.skin=opts.skin;HERO_SEASON=opts.season||null;try{drawHero3({el:STEM_EL[stem],g,stem,br,yang:stem%2===0},opts.tier==null?1:opts.tier);}finally{HERO_SEASON=null;}ctx.restore();});});return cv2;},og:()=>{const c=document.createElement('canvas');c.width=1200;c.height=630;const sk=META.skin;META.skin='basic';drawOn(c,()=>{const g=ctx;const bg=g.createLinearGradient(0,0,1200,630);bg.addColorStop(0,'#DCEBFA');bg.addColorStop(1,'#FBF7EE');g.fillStyle=bg;g.fillRect(0,0,1200,630);[['#3FA66B',150,520],['#E3553B',420,600],['#C9A24A',760,80],['#8FA3B8',1050,560],['#3D7FD9',980,140]].forEach(([col,x,y])=>{const gr=g.createRadialGradient(x,y,0,x,y,260);gr.addColorStop(0,col+'55');gr.addColorStop(1,col+'00');g.fillStyle=gr;g.fillRect(0,0,1200,630);});g.fillStyle='rgba(255,255,255,.65)';g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.fill();g.strokeStyle='#FFD27A';g.lineWidth=8;g.stroke();
+window.__ubz={startAssault,migrateAch,loadAch,fortuneEffects,get BUB(){return BUB;},assaultUI,drawAssault,flipUI,bossTop,get BOSS_TOP(){return BOSS_TOP;},endStage,finishRun,offerCardsUI,castSkill,assaultLayout,checkAch,renderRec,recLine,get REC(){return REC;},get ACHS(){return ACHS;},get S(){return S;},get B(){return B;},drawRoomShrine,showShrine,shrineTap,AMB,roomWalkOut,get WALK(){return ROOM_WALK;},get SHRINE(){return {BOW_FX,SHAKE_FX,INC_FX,SHRINE_CANDLE};},heroTo:(cv,sc,x,y,el,g)=>drawOn(cv,()=>{ctx.translate(x,y);ctx.scale(sc,sc);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero(el==null?(SAJU?SAJU.me:3):el,g||'m',1);}),drawEndScene,perkCheck,roomSheet,closeRoomSheet,get ROOM_HOT(){return ROOM_HOT;},drawRoomHero,drawRoomSocial,drawRoomMore,renderGear,renderBoard,get QST(){return QST;},doorWipe,drawRecChart,renderStore,get GEAR(){return GEAR;},HOT,cheer:(c)=>cheerSuffix(c,todayStr()),GIFTv:()=>GIFT,crSheet:(sc)=>{sc=sc||2.6;const cv2=document.createElement('canvas');cv2.width=1280;cv2.height=720;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,1280,720);for(let el=0;el<5;el++)for(let t=0;t<3;t++){ctx.save();ctx.translate(128+el*256,120+t*240);ctx.scale(sc,sc);BLINK=false;SWING=t===1?1:0;PHASE=0;HURT=false;drawCreature(el,t);ctx.restore();}});return cv2;},scene:(dt)=>{sceneT+=(dt||0);drawScene();return sceneT;},HW,dexTick:(d)=>{DEXA.ang+=(d==null?0.5:d);dexFrame();return DEXA.ang;},heroBig:(opts)=>{opts=opts||{};const cv2=document.createElement('canvas');const n=(opts.list||[[0,0,'m']]).length;const cw=opts.cw||300,chh=opts.ch||400,sc=opts.sc||3.2;cv2.width=n*cw;cv2.height=chh;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,cv2.width,cv2.height);(opts.list||[[0,0,'m']]).forEach(([stem,br,g],i)=>{ctx.save();ctx.translate(i*cw+cw/2,chh*0.72);ctx.scale(sc,sc);BLINK=false;SWING=opts.sw||0;PHASE=opts.ph||0;HURT=!!opts.hurt;if(opts.skin)META.skin=opts.skin;HERO_SEASON=opts.season||null;try{drawHero3({el:STEM_EL[stem],g,stem,br,yang:stem%2===0},opts.tier==null?1:opts.tier);}finally{HERO_SEASON=null;}ctx.restore();});});return cv2;},og:()=>{const c=document.createElement('canvas');c.width=1200;c.height=630;const sk=META.skin;META.skin='basic';drawOn(c,()=>{const g=ctx;const bg=g.createLinearGradient(0,0,1200,630);bg.addColorStop(0,'#DCEBFA');bg.addColorStop(1,'#FBF7EE');g.fillStyle=bg;g.fillRect(0,0,1200,630);[['#3FA66B',150,520],['#E3553B',420,600],['#C9A24A',760,80],['#8FA3B8',1050,560],['#3D7FD9',980,140]].forEach(([col,x,y])=>{const gr=g.createRadialGradient(x,y,0,x,y,260);gr.addColorStop(0,col+'55');gr.addColorStop(1,col+'00');g.fillStyle=gr;g.fillRect(0,0,1200,630);});g.fillStyle='rgba(255,255,255,.65)';g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.fill();g.strokeStyle='#FFD27A';g.lineWidth=8;g.stroke();
     g.save();g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.clip();g.translate(300,500);g.scale(4.7,4.7);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero3({el:1,g:'m',stem:2,br:10,yang:true},2);g.restore();
     [0,1,2,3,4].forEach((el,i)=>{g.save();g.translate(640+i*118,470);g.scale(1.9,1.9);BLINK=false;SWING=0;PHASE=0;HURT=false;drawCreature(el,2);g.restore();});
     const bs=bossSprite(3,0,false);g.drawImage(bs,930,40,240,240);
