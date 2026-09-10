@@ -713,6 +713,9 @@
   .assault .hud-l,.assault .hud-r{display:flex;align-items:center;min-width:0}
   .assault .hud-r #hudHome{margin-left:10px;padding:5px 10px;font-size:11.5px;border-radius:8px;min-height:0;box-shadow:0 2px 0 #D9CFBC}
   .assault .hud button:disabled{opacity:.4}
+  /* 공성으로 목숨이 깎일 때(siegeHit) 목숨 숫자가 짧게 하얗게 튄다 — 잡몹 이탈의 붉은 띠와 구별한다 */
+  .assault .hud-r #hudLives{transition:color .12s,text-shadow .12s,transform .12s}
+  .assault .hud-r #hudLives.hit{color:#fff;text-shadow:0 0 10px rgba(255,255,255,.95),0 0 5px rgba(184,53,44,.9);transform:scale(1.14)}
   .assault .uinfo button{padding:5px 10px;font-size:11.5px;min-height:0;border-radius:8px}
   .assault .warn{font-size:11.5px;color:#7A2E1E;background:#FFE6D6;padding:4px 12px}
   #assaultCv{flex:1;min-height:0;width:100%;display:block;touch-action:none}
@@ -861,7 +864,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.2</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v10.3</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -1079,6 +1082,13 @@ function friendBuff(fel,me){const b={k:'응원',t:'공격력 +3%',power:0,luck:0
 // 참전 중인 친구 한 명의 기운(friendList 에서 run.allyCode 로 찾는다). runMods 는 등록 친구 전원 합계(opts.friends)에
 // 이 값을 한 번 더 얹어 "참전 중인 친구의 기운만 두 배"가 되게 한다 — 전원 합계에 ×2 를 하면 안 된다.
 function allyBuffOf(run){const o=run.opts;if(!run.ally)return null;const f=(o.friendList||[]).find(x=>x.code===run.allyCode);return f?friendBuff(f.el,o.saju?o.saju.me:-1):null;}
+// 등록 친구(최대 3명) 기운 합산 상한. 같은 관계를 세 번 쌓아도 "한 명 반 몫"까지만 먹힌다 —
+// 관계별 한 명 최대치(생조 power 0.06 · 극제 clash 0.25 · 재성 boss 0.06)의 1.5배다.
+// 참전 친구가 한 번 더 얹는 기운(allyBuffOf)은 상한 밖이라 "부르면 세진다"는 감각은 그대로 남는다.
+// 두 명분(0.12/0.5/0.12)으로도 재 봤지만 친구 3명 구성 10판 클리어가 33/40(83%) 그대로였고(씨앗 40),
+// 1.5배에서 30/40(75%)로 내려와 상한선(≈80%) 안에 든다. 친구 1명 구성은 어느 관계도 상한에 못 닿아 그대로다.
+const FRIEND_CAP={power:0.09,clash:0.375,boss:0.09};
+const capFriend=fr=>Object.assign({},fr,{power:Math.min(fr.power||0,FRIEND_CAP.power),clash:Math.min(fr.clash||0,FRIEND_CAP.clash),boss:Math.min(fr.boss||0,FRIEND_CAP.boss)});
 
 // --- 전투 시뮬레이션 ---
 function defaultMods(){
@@ -1110,15 +1120,19 @@ function stageWaves(stage,el,purity,rng,mods){
   // 이탈 목숨 손실(breachEnemy 의 `3*hp/max`)을 2로 낮추는 쪽도 재 봤지만 wood 가 5.60 에 그쳤고, 위 둘과 겹치면
   // 5판이 벽에서 아예 내려와(wood 6.47) 관문이 사라진다 — 손실 계수는 그대로 두는 편이 낫다.
   const KNEE=5, LATE=8, LATE_HP=[1,2,2.75], STAGE5_HP=0.9;
+  const EM_HALF=3;   // 적 체력 배율(enemyHp)을 절반만 얹기 시작하는 판
   // n은 목표 마리 수 상한이다. stage===KNEE(5판)만 무리별로 정확히 나눠(floor+나머지) n에 딱 맞추고,
   // 그 외 판은 무리마다 Math.ceil(n/groups)를 쓰므로 n이 groups로 안 나눠떨어지면 총 마리 수가 n을 넘을 수 있다
   // (예: 1판 n=8,groups=3 → ceil(8/3)=3×3=9기, 8이 아니라 9). 지금 갈리는 판(6~10)은 우연히 나눠떨어져
   // 넘치지 않을 뿐, 일반적으로는 상한이 아니라 "무리당 올림" 규칙임을 유의한다.
   const n=Math.min(stage>LATE?20:16,6+stage*2);
-  // 오늘의 운세·주간 도전이 얹는 적 체력 배율(daily.enemyHp, 실제 최대는 주간 '해일' ×1.25)은 8판까지 그대로 걸고
-  // 9판부터는 절반만 얹는다. 보스 공성 규칙 뒤 9·10판은 "잡몹 20기 + 반드시 잡아야 하는 보스"라 배율이 그대로
-  // 곱해지면 친구 참전 부대의 10판 클리어가 30/60 → 8/60 으로 무너진다(절반만 얹으면 22/60).
-  const em=mods.enemyHp||1, emEff=stage>LATE?1+(em-1)*0.5:em;
+  // 오늘의 운세·주간 도전이 얹는 적 체력 배율(daily.enemyHp, 실제 최대는 주간 '해일' ×1.25)은 1·2판만 그대로 걸고
+  // EM_HALF(3)판부터는 절반만 얹는다(보스도 같은 hpBase 를 쓰므로 함께 절반이다). 원래는 9판부터였는데,
+  // ×1.25 가 걸린 '해일' 주에는 5판 잡몹 관문이 세 사주 모두의 벽이 되어 친구 없는 smart 평균이 4.80/5.65/6.35 로
+  // 내려앉았다. 5판부터 절반으로 올려도 wood 5.22 로 아직 5판에 막혀(씨앗 40) 3판까지 당겼다 —
+  // 5.90/6.25/6.75 로 세 사주 모두 5.5 위이고 친구 1명 10판 클리어도 42/120(35%)으로 남는다.
+  // 배율이 1이면 식이 그대로라 평시 곡선은 하나도 변하지 않는다.
+  const em=mods.enemyHp||1, emEff=stage>=EM_HALF?1+(em-1)*0.5:em;
   const hpBase=Math.round(95*Math.pow(1.556,Math.min(stage,KNEE)-1)*Math.pow(1.12,Math.max(0,stage-KNEE))*LATE_HP[Math.min(2,Math.max(0,stage-LATE))])*emEff;
   const atkBase=Math.round(6*Math.pow(1.24,stage-1));
   const groups=3+(stage>=6?1:0);
@@ -1322,7 +1336,7 @@ function battleTick(B,dt,rng,mods){
         e.siegeT-=dt;
         if(e.siegeT<=0){
           e.siegeT=SIEGE_HIT;
-          if(B.barrierT<=0){B.lives-=1;B.fx.push({k:'breach',x:e.x,y:0,t:B.t});}
+          if(B.barrierT<=0){B.lives-=1;B.fx.push({k:'siegeHit',x:e.x,y:0,t:B.t});}  // 이탈('breach')과 달리 공성으로 깎이는 목숨
         }
         const tgt=nearestUnit(B,e.x,e.y,e.range,null);
         if(tgt){
@@ -1463,8 +1477,8 @@ function newRun(o){const seed=o.seed==null?Math.floor(Math.random()*1e9):o.seed;
     opts:o,cnt,history:[],items:[]};
   const se=stageElement(1,cnt,rng);run.stageEl=se.el;run.purity=se.purity;const ne=stageElement(2,cnt,rng);run.nextEl=ne.el;run.nextPurity=ne.purity;
   run.tiles=mixTiles(rng,armyWeights(cnt,run.ally?run.ally.el:-1));run.mods=runMods(run);return run;}
-function runMods(run){const o=run.opts,d=o.daily||{},g=o.gear||{},fr=o.friends||{},ab=allyBuffOf(run)||{};const m=defaultMods();
-  m.atk=(1+(d.power||0))*(1+(g.dmg||0))*(1+(fr.power||0)+(ab.power||0));m.clashMult+=(fr.clash||0)+(ab.clash||0);m.bossDmg+=(fr.boss||0)+(ab.boss||0);m.enemyHp=d.enemyHp||1;m.enemySpd=d.enemySpd||1;m.bossHp=d.bossHp||1;m.archerRange+=(g.range||0)+(o.perks?o.perks.range||0:0);m.rate*=1+(g.rate||0);
+function runMods(run){const o=run.opts,d=o.daily||{},g=o.gear||{},fr=capFriend(o.friends||{}),ab=allyBuffOf(run)||{};const m=defaultMods();
+  m.atk=(1+(d.power||0))*(1+(g.dmg||0))*(1+fr.power+(ab.power||0));m.clashMult+=fr.clash+(ab.clash||0);m.bossDmg+=fr.boss+(ab.boss||0);m.enemyHp=d.enemyHp||1;m.enemySpd=d.enemySpd||1;m.bossHp=d.bossHp||1;m.archerRange+=(g.range||0)+(o.perks?o.perks.range||0:0);m.rate*=1+(g.rate||0);
   if(d.el>=0&&d.elBonus)m.elBonus[d.el]+=d.elBonus*(run.almanac?2:1);
   applyCards(m,run.cards);
   for(const t of run.tenCards){const e=tenEffect(t,o.ten?o.ten.grade[t]:0);m.atkMy=(m.atkMy||0)+e.atkMy;m.vanguardAtk+=e.vanguardAtk;m.vanguardSpd+=e.vanguardSpd;m.hpAll+=e.hpAll;m.crit+=e.crit;m.pierce+=e.pierce;m.wallHp+=e.wallHp;m.magic+=e.magic;m.shieldStart+=e.shieldStart;m.lives+=e.lives;m.coinBack=(m.coinBack||0)+e.coinBackChance;m.clearCoin=(m.clearCoin||0)+e.clearCoin;}
@@ -1519,7 +1533,7 @@ function restoreRun(o,opts){const run=newRun(Object.assign({},opts,{seed:o.seed}
 
 return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,tenStars,tenEffect,mixTiles,readTile,flipCost,flipCostOf,ITEMS,pickW,
   N,CELLS,idx,ROLE_BASE,unitBase,makeUnit,elMult,computeChains,
-  armyWeights,strongest,stageElement,neededElement,combatPower,stageWarning,mergeCandidates,mergeAt,sellPrice,allyUnit,friendBuff,allyBuffOf,
+  armyWeights,strongest,stageElement,neededElement,combatPower,stageWarning,mergeCandidates,mergeAt,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
   defaultMods,BOSS_NAMES,stageWaves,damageOf,battleInit,battleTick,
   CARDS,offerCards,applyCards,applyRunCard,takeCard,
   q,SKV,SKILL_KEYS,castSkill,
@@ -1838,7 +1852,7 @@ const guestOpen=el=>!SAJU||el===SAJU.me||dexElDone(el)||META.lv>=20;
 function renderBonus(){const b=$('goBonus');if(!b)return;const items=[];
   if(!ATT.used)items.push([`출석 ${ATT.streak}일째 · 엽전 +${attendGold()}냥 · 무료 골패 +${ATT.streak===6?2:1}`,1]);else items.push(['출석 보상 받음',0]);
   if(DAILY.level){items.push([`🔮 운세 ${DAILY.score}점 ${DAILY.level}`,DAILY.power>=0?1:0]);fortuneEffects(DAILY).slice(0,4).forEach(t=>items.push([t,1]));}else items.push(['운세 미확인 · 사당에서 뽑으면 보너스',0]);
-  const ft=friendTotal();if(FR.list.length)items.push([`친구 기운 ${FR.list.length}명 · 공격력 +${Math.round(ft.power*100)}%${ft.gold?` · 엽전 +${Math.round(ft.gold*100)}%`:''}`,1]);
+  const ft=friendShown();if(FR.list.length)items.push([`친구 기운 ${FR.list.length}명 · 공격력 +${Math.round(ft.power*100)}%${ft.gold?` · 엽전 +${Math.round(ft.gold*100)}%`:''}`,1]);
   if(GIFT.list.length&&!GIFT.used)items.push([`응원 ${GIFT.list.length}회 · 무료 골패 +${GIFT.list.length} · 엽전 +${40*GIFT.list.length}냥`,1]);
   if(daysSince(REC.lastPlay)>=3&&REC.games>0)items.push(['복귀 선물 · 엽전 +150냥 · 무료 골패 +2',1]);
   if(META.lv>=5)items.push(['Lv.5 특전 · 첫 판 무료 골패 +1',1]);
@@ -1893,7 +1907,7 @@ const META_PERK=[{lv:5,t:'첫 판 무료 골패 +1'},{lv:10,t:'영웅이 영웅 
 function loadMeta(){try{const m=JSON.parse(localStorage.getItem('ubz_meta'));if(m)META={...META,...m};}catch(_){}}
 function saveMeta(){try{localStorage.setItem('ubz_meta',JSON.stringify(META));}catch(_){}}
 const wkKey=()=>{const d=new Date();const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
-const WEEKLY_MODS=[{id:'swift',s:'빠른 적 · 엽전 +40%',t:'적 속도 +20% · 클리어 엽전 +40%',spd:1.2,gold:1.4},{id:'rich',s:'부자 시작 · 골패 비쌈',t:'시작 엽전 300냥 · 골패 비용 +40%',gold0:300,cost:1.4},{id:'thin',s:'생명 +10 · 엽전 2배',t:'목숨 +10 · 클리어 엽전 2배',lives:10,gold:2},{id:'iron',s:'보스 강함 · 특기 빠름',t:'보스 체력 +50% · 특기 대기 -30%',boss:1.5,skill:0.7},{id:'tide',s:'적 튼튼 · 운 40 시작',t:'적 체력 +25%(9판부터 절반) · 시작 운 게이지 40',hp:1.25,luck:40}];
+const WEEKLY_MODS=[{id:'swift',s:'빠른 적 · 엽전 +40%',t:'적 속도 +20% · 클리어 엽전 +40%',spd:1.2,gold:1.4},{id:'rich',s:'부자 시작 · 골패 비쌈',t:'시작 엽전 300냥 · 골패 비용 +40%',gold0:300,cost:1.4},{id:'thin',s:'생명 +10 · 엽전 2배',t:'목숨 +10 · 클리어 엽전 2배',lives:10,gold:2},{id:'iron',s:'보스 강함 · 특기 빠름',t:'보스 체력 +50% · 특기 대기 -30%',boss:1.5,skill:0.7},{id:'tide',s:'적 튼튼 · 운 40 시작',t:'적 체력 +25%(3판부터 절반) · 시작 운 게이지 40',hp:1.25,luck:40}];
 const weeklyMod=()=>WEEKLY_MODS[hash(wkKey()+'|wk')%WEEKLY_MODS.length];
 const wk=k=>(S&&S.wk&&S.wk[k])||1;
 const metaHeroGrade=()=>META.lv>=30?5:META.lv>=10?4:3;
@@ -1997,6 +2011,8 @@ function parseCode(t){t=(t||'').trim();const m=t.match(/^([갑을병정무기경
 // 친구 기운 규칙은 코어(ASSAULT.friendBuff)에 있다 — 참전 친구 두 배 계산(runMods)과 같은 표를 써야 한다.
 function friendBuffOf(fel){return ASSAULT.friendBuff(fel,SAJU?SAJU.me:-1);}
 function friendTotal(){const tot={power:0,luck:0,clash:0,gold:0,boss:0};for(const f of FR.list){const b=friendBuffOf(f.el);for(const k in tot)tot[k]+=b[k]||0;}return tot;}
+// 화면에 보여 줄 합계는 코어와 같은 상한(FRIEND_CAP)을 씌운다 — 실제로 안 먹히는 수치를 적어 두지 않는다.
+function friendShown(){const t=friendTotal(),C=ASSAULT.FRIEND_CAP;return Object.assign({},t,{power:Math.min(t.power,C.power),clash:Math.min(t.clash,C.clash),boss:Math.min(t.boss,C.boss)});}
 let FRR=[];function loadRecent(){try{FRR=JSON.parse(localStorage.getItem('ubz_frrecent'))||[];}catch(_){FRR=[];}}function saveRecent(){try{localStorage.setItem('ubz_frrecent',JSON.stringify(FRR.slice(0,5)));}catch(_){}}
 function fmsg(t,bad){const m=$('friendMsg');if(!m)return;m.textContent=t;m.style.color=bad?'#C0392B':'var(--good,#2E7D4F)';}
 function addFriend(){const raw=$('friendIn').value;const clean=raw.trim().toLowerCase().replace(/\s+/g,'');if(/^.+-[a-z0-9]{4}-[a-z0-9]{2}$/.test(clean)){const r=receiveCheer(clean);if(r&&r.bad){fmsg(r.bad,'bad');buzz([20,30,20]);return;}if(r&&r.ok){$('friendIn').value='';fmsg(r.ok);AU.buy();buzz(25);renderHome();renderGiftNote();return;}}const p=parseCode(clean);
@@ -2009,7 +2025,7 @@ function renderRecent(){const box=$('friendRecent');if(!box)return;if(!FRR.lengt
 function renderGiftNote(){const n=$('giftNote');if(!n)return;loadGift();n.innerHTML=`<span class="pill on">응원 ${GIFT.list.length}/3</span> <span class="pill">보냄 ${REC.cheerSent||0}</span> <span style="margin-left:4px">응원 코드(오늘만)는 다음 판 무료 골패 +1 · 엽전 +40냥</span>`;}
 function renderFriends(){renderRecent();renderGiftNote();$('myCode').textContent=myCode();try{renderSeats();if($('scr-social')&&$('scr-social').classList.contains('on'))drawRoomSocial();}catch(_){}
   {const fc=$('frCount');if(fc)fc.textContent=`${FR.list.length}/3`;}
-  {const sm=$('friendSum');if(sm){const ft=friendTotal();const it=[];if(ft.power)it.push(`⚔ 공격력 +${Math.round(ft.power*100)}%`);if(ft.gold)it.push(`💰 엽전 +${Math.round(ft.gold*100)}%`);if(ft.luck)it.push(`🎲 운 +${ft.luck}`);if(ft.clash)it.push(`⚡ 폭발 +${ft.clash}등급`);if(ft.boss)it.push(`👹 보스 피해 +${Math.round(ft.boss*100)}%`);sm.innerHTML=FR.list.length?`<span class="dim" style="background:none;border:none;padding-left:0">오늘 받은 효과</span>`+it.map(t=>`<span>${t}</span>`).join(''):'';}}
+  {const sm=$('friendSum');if(sm){const ft=friendShown();const it=[];if(ft.power)it.push(`⚔ 공격력 +${Math.round(ft.power*100)}%`);if(ft.gold)it.push(`💰 엽전 +${Math.round(ft.gold*100)}%`);if(ft.luck)it.push(`🎲 운 +${ft.luck}`);if(ft.clash)it.push(`⚡ 폭발 +${ft.clash}등급`);if(ft.boss)it.push(`👹 보스 피해 +${Math.round(ft.boss*100)}%`);sm.innerHTML=FR.list.length?`<span class="dim" style="background:none;border:none;padding-left:0">오늘 받은 효과</span>`+it.map(t=>`<span>${t}</span>`).join('')+`<small class="note" style="display:block;width:100%;margin-top:2px">합산에는 상한이 있다 · 참전 친구는 두 배</small>`:'';}}
   $('friendList').innerHTML=FR.list.length?FR.list.map((f,i)=>{const b=friendBuffOf(f.el);return `<div class="fcard"><canvas class="fface" data-el="${f.el}" width="88" height="88"></canvas><div class="fm"><b>${f.ilju} ${HERO_STYLE[f.el].job}</b><span style="color:${EL[f.el].color}">${EL[f.el].k} 기운 · ${b.k}</span><small>${b.t}</small></div></div>`;}).join(''):'<span class="note">친구 코드를 넣으면 오늘 하루 그 오행의 기운을 받는다. 최대 3명.</span>';
   $('friendList').querySelectorAll('.fface').forEach(cv2=>{const el=+cv2.dataset.el;drawOn(cv2,()=>{ctx.translate(44,70);ctx.scale(0.82,0.82);BLINK=false;SWING=0;PHASE=0;drawHero(el,'m',1);});});}
 async function copyText(t,btn,ok){try{await navigator.clipboard.writeText(t);}catch(_){try{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}catch(__){}}const o=btn.textContent;btn.textContent=ok||'복사됨 ✓';setTimeout(()=>{btn.textContent=o;},1500);}
@@ -2053,7 +2069,7 @@ function drawFortune(){
   DAILY=res;if(res.gear&&GR.daily!==todayStr()){GR.daily=todayStr();gainGear(res.gear,'daily');}return res;
 }
 function tomorrowTeaser(){if(!SAJU)return '';const t=new Date();t.setDate(t.getDate()+1);const i=dayIdx(t.getFullYear(),t.getMonth()+1,t.getDate());const ts=i%10,tb=i%12;const T=STEM_EL[ts],M=SAJU.me;const rel=T===M?0:GEN(M)===T?1:OVER(M)===T?2:OVER(T)===M?3:4;const R=[['같은 기운(비겁)','내 오행이 짙어지는 날. 같은 오행 골패가 잘 나온다','평'],['표현(식상)','내가 낳는 기운. 융합이 잘 되는 날','길'],['재물(재성)','내가 다스리는 기운. 엽전이 붙는 길일','대길 기대'],['규율(관살)','나를 누르는 기운. 조심할 날, 대신 상극 폭발이 세다','흉 조심'],['학습(인성)','나를 돕는 기운. 영웅이 든든한 날','길']][rel];return `<div class="teaser">내일 일진 <b>${STEM_K[ts]}${BRANCH_K[tb]}</b> · ${EL[T].k}의 날 · <b>${R[0]}</b> — ${R[1]} <span class="note">(${R[2]})</span></div>`;}
-function fortuneEffects(d){if(!d||!d.level)return [];const o=[];if(d.power)o.push(`⚔ 아군 공격력 +${Math.round(d.power*100)}%`);if(d.startGold)o.push(`💰 시작 엽전 +${d.startGold}냥`);if(d.luckStart)o.push(`🎲 시작 운 게이지 ${d.luckStart}`);if(d.freeSummon)o.push(`✨ 무료 골패 ${d.freeSummon}회`);if(d.guar)o.push('🔒 첫 골패 희귀 확정');if(d.el>=0&&d.elBonus)o.push(`${EL[d.el].k} 유닛 +${Math.round(d.elBonus*100)}%`);if(d.costMult&&d.costMult!==1)o.push(`골패 비용 ${d.costMult<1?'-':'+'}${Math.round(Math.abs(1-d.costMult)*100)}%`);if(d.goldMult&&d.goldMult!==1)o.push(`클리어 엽전 ${d.goldMult>1?'+':'-'}${Math.round(Math.abs(d.goldMult-1)*100)}%`);if(d.enemyHp&&d.enemyHp!==1)o.push(`적 체력 ${d.enemyHp<1?'-':'+'}${Math.round(Math.abs(1-d.enemyHp)*100)}%`);if(d.luckExtra)o.push(`골패마다 운 +${d.luckExtra}`);if(d.fuseExtra)o.push(`융합 공격력 +${Math.round(d.fuseExtra*100)}%`);if(d.gear)o.push(`🎁 장비 ${gearById(d.gear).name}`);return o;}
+function fortuneEffects(d){if(!d||!d.level)return [];const o=[];if(d.power)o.push(`⚔ 아군 공격력 +${Math.round(d.power*100)}%`);if(d.startGold)o.push(`💰 시작 엽전 +${d.startGold}냥`);if(d.luckStart)o.push(`🎲 시작 운 게이지 ${d.luckStart}`);if(d.freeSummon)o.push(`✨ 무료 골패 ${d.freeSummon}회`);if(d.guar)o.push('🔒 첫 골패 희귀 확정');if(d.el>=0&&d.elBonus)o.push(`${EL[d.el].k} 유닛 +${Math.round(d.elBonus*100)}%`);if(d.costMult&&d.costMult!==1)o.push(`골패 비용 ${d.costMult<1?'-':'+'}${Math.round(Math.abs(1-d.costMult)*100)}%`);if(d.goldMult&&d.goldMult!==1)o.push(`클리어 엽전 ${d.goldMult>1?'+':'-'}${Math.round(Math.abs(d.goldMult-1)*100)}%`);if(d.enemyHp&&d.enemyHp!==1)o.push(`적 체력 ${d.enemyHp<1?'-':'+'}${Math.round(Math.abs(1-d.enemyHp)*100)}%${d.enemyHp>1?'(3판부터 절반)':''}`);if(d.luckExtra)o.push(`골패마다 운 +${d.luckExtra}`);if(d.fuseExtra)o.push(`융합 공격력 +${Math.round(d.fuseExtra*100)}%`);if(d.gear)o.push(`🎁 장비 ${gearById(d.gear).name}`);return o;}
 const fxHtml=d=>{const fx=fortuneEffects(d);return fx.length?`<div class="fx"><b>오늘 전투에 붙는 효과</b><div class="fxr">${fx.map(t=>`<span>${t}</span>`).join('')}</div><small>오늘 치르는 모든 판에 자동으로 붙는다.</small></div>`:'';};
 function relLine(d){if(!SAJU||!d||d.el<0)return '';const [ts,tb]=todayPillar();const M={'같은 기운(비겁)':'내 오행과 같은 기운 · 같은 오행 골패가 잘 나온다','표현(식상)':'내가 낳는 기운 · 융합이 잘 된다','재물(재성)':'내가 다스리는 기운 · 엽전이 붙는다','규율(관성)':'나를 누르는 기운 · 조심, 대신 상극 폭발이 세다','학습(인성)':'나를 돕는 기운 · 영웅이 든든하다'}[d.rel]||'';return `<div class="relline">오늘 일진 <b>${STEM_K[ts]}${BRANCH_K[tb]}</b> · ${EL[d.el].k}의 날 · <b>${d.rel}</b><span>${M}</span></div>`;}
 const fortuneHtml=d=>`<div class="fscore"><b>${d.score}</b><span>점</span><em class="${d.level==='흉'||d.level==='소흉'?'bad':d.level==='대길'?'great':''}">${d.level}</em><i>${d.rel}의 날</i></div>${relLine(d)}${fxHtml(d)}<div class="ftitle">${d.title||''}</div><div class="note">${d.advice||''}</div>${tomorrowTeaser()}`;
@@ -2188,7 +2204,7 @@ $('copyCheer').onclick=()=>{if(!SAJU){openSaju();return;}copyText(`운세전 응
 $('homePortrait').onclick=()=>{if(SAJU)openReveal('detail');else openSaju();};
 let HOME_FROM_GAME=false;
 // ── 전투력: 영웅 등급 · 운세 · 친구 기운 · 출석 ──
-function combatPower(){const fr=friendTotal();const heroG=metaHeroGrade();const base=1000*(1+0.25*(heroG-3))*(1+0.015*(META.lv-1));
+function combatPower(){const fr=friendShown();const heroG=metaHeroGrade();const base=1000*(1+0.25*(heroG-3))*(1+0.015*(META.lv-1));
   const ac=armyCounts();const armyF=ac?1+0.06*ac.reduce((a,b)=>a+b,0):1;const cp=base*armyF*(1+(DAILY.power||0)+(DAILY.elBonus||0)*0.3)*(1+fr.power+0.02*fr.luck+0.2*fr.clash+fr.gold+fr.boss)*(1+0.02*Math.min(7,ATT.streak||0))*(1+0.01*(DAILY.luckStart||0)/5)*(1+gearPower()+questPower());return Math.round(cp);}
 let LB_ROWS=[];
 function headerBadge(){const best=REC.bestStage||0;const me=LB_ROWS.findIndex(r=>r.id===PID);if(me>=0)return `${me+1}위 · ${LB_ROWS[me].wave}판`;if(!REC.games)return '첫 출전 대기';if(REC.lastPlay!==todayStr())return `오늘 첫 판 · 최고 ${best}판`;return `최고 ${best}판`;}
@@ -3714,6 +3730,10 @@ function drawMerc(el,role,grade,star,friend,ilju){const tier=TIER(grade);if(frie
   else if(role===2){ctx.fillStyle='#F2E6C9';ctx.beginPath();ctx.moveTo(0,6);ctx.arc(0,6,9,Math.PI*1.15,Math.PI*1.85);ctx.closePath();ctx.fill();ctx.strokeStyle='#8A5A2A';ctx.lineWidth=1;ctx.stroke();}
   ctx.restore();if(star){ctx.fillStyle='#FFC83D';ctx.font="700 10px 'Noto Sans KR'";ctx.textAlign='center';ctx.fillText('★',0,-24);}
   if(grade>=2){ctx.fillStyle=['','','#3FA66B','#2F7BE8','#B8352C','#8A2BE2'][grade];for(let i=0;i<grade-1;i++){ctx.beginPath();ctx.arc(-14+i*6,-22,2.2,0,Math.PI*2);ctx.fill();}}}
+// 공성으로 목숨이 깎일 때 목숨 HUD 숫자를 짧게 하얗게 튀긴다(잡몹 이탈은 본진 띠 붉은 섬광 그대로)
+let LIVES_FLASH=0;
+function flashLives(){const el=$('hudLives');if(!el)return;el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');
+  clearTimeout(LIVES_FLASH);LIVES_FLASH=setTimeout(()=>el.classList.remove('hit'),420);}
 // 전장 좌표계: 판(y<=5)은 칸 크기 그대로, 그 위 접근로는 원근 압축해 아무리 멀어도 화면 안에 둔다
 function assaultLayout(){const cv=assaultCv;const cw=cv.clientWidth,ch=cv.clientHeight;const cs=cw/5,boardTop=ch-cs*5-44;
   const LANE=Math.max(60,boardTop),KZ=LANE/cs,far=d=>d/(d+KZ);
@@ -3729,8 +3749,23 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
     for(let r=0;r<5;r++)for(let c=0;c<5;c++){ctx.fillStyle=(r+c)%2?'#E8D7AE':'#F0E2BE';ctx.fillRect(X(c)+1,boardTop+r*cs+1,cs-2,cs-2);}
     ctx.strokeStyle='#8A5A2A';ctx.lineWidth=2;ctx.strokeRect(1,boardTop,cw-2,cs*5);
     ctx.fillStyle='#5A2A1E';ctx.fillRect(0,boardTop+cs*5,cw,44);
+    // 공성 중: 본진 띠에 검붉은 비네트가 맥동하고, 무엇이 목숨을 깎는지 띠에 적어 둔다
+    const bandY=boardTop+cs*5, sieging=B?B.enemies.filter(e=>e.hp>0&&e.sieging&&e.t0<=B.t):[];
+    if(sieging.length){const pu=0.55+0.45*Math.sin(performance.now()/1000*4);
+      const vg=ctx.createLinearGradient(0,bandY,cw,bandY);        // 좌우 가장자리가 짙은 비네트
+      vg.addColorStop(0,`rgba(122,16,12,${0.72*pu})`);vg.addColorStop(0.5,`rgba(122,16,12,${0.26*pu})`);vg.addColorStop(1,`rgba(122,16,12,${0.72*pu})`);
+      ctx.fillStyle=vg;ctx.fillRect(0,bandY,cw,44);
+      ctx.fillStyle=`rgba(232,84,60,${0.5+0.5*pu})`;ctx.fillRect(0,bandY,cw,2);}
+    // 공성 보스는 본진 문 앞(띠 안)에 선다 — 뒷줄 용병 위에 겹쳐 그리지 않고, 영웅보다 먼저 그려 "문 앞"으로 읽힌다
+    for(const e of sieging){if(!e.boss)continue;const px=X(e.x),py=Y(-0.35);
+      ctx.save();ctx.translate(px,py);ctx.scale(1.6,1.6);HURT=false;SWING=0;PHASE=0;BLINK=false;drawCreature(e.el,2);ctx.restore();
+      ctx.fillStyle='#3A2A1C';ctx.fillRect(px-16,py-148,32,5);ctx.fillStyle='#B8352C';ctx.fillRect(px-16,py-148,32*Math.max(0,e.hp/e.max),5);   // 1.6배로 커진 몸(치켜든 무기·불길 끝)보다 위로 올린다
+      ctx.fillStyle='#fff';ctx.font="700 11px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(e.boss.name,px,py-156);}
     // 본진 영웅
     {const el=SAJU?SAJU.me:3,gd=SAJU&&SAJU.raw&&SAJU.raw.g==='f'?'f':'m';ctx.save();ctx.translate(cw-40,boardTop+cs*5+40);ctx.scale(0.42,0.42);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHeroEq(el,gd,TIER(metaHeroGrade()));ctx.restore();ctx.fillStyle='#F2E6C9';ctx.font="700 11px 'Noto Sans KR'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(`본진 · ${SAJU?SAJU.ilju:'무명'}`,10,boardTop+cs*5+22);}
+    if(sieging.length){const t=(B&&B.barrierT>0)?'결계가 공성을 막는 중':'공성 중 · 1.5초마다 목숨 −1';ctx.font="700 10px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';
+      const w=ctx.measureText(t).width;ctx.fillStyle='rgba(30,6,4,.72)';rr(cw/2-w/2-8,bandY+25,w+16,15,7);ctx.fill();
+      ctx.fillStyle='#FFD6C4';ctx.fillText(t,cw/2,bandY+32.5);}
     // 준비: 연환 선·합성 후보·선택 칸
     const units=S.phase==='prep'?S.units:null;
     if(units){const {bonus,chains}=A.computeChains(units,S.mods);
@@ -3745,7 +3780,7 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
       if(S.ally&&!units.includes(S.ally)){const c=A.emptyCell(S);if(c!=null){const r=Math.floor(c/5),cc=c%5;ctx.save();ctx.globalAlpha=0.6;ctx.translate(X(cc)+cs/2,boardTop+r*cs+cs/2+MERC_DY);drawMerc(S.ally.el,3,3,false,true,S.ally.ilju);ctx.restore();}}
       if(ADRAG&&ADRAG.moved){const u=units[ADRAG.from];if(u){ctx.save();ctx.translate(ADRAG.x,ADRAG.y);ctx.globalAlpha=0.85;drawMerc(u.el,u.role,u.grade,u.star,u.friend,u.ilju);ctx.restore();}}}
     // 전투: 개체 위치로 그림
-    if(B){for(const e of B.enemies){if(e.hp<=0||e.t0>B.t)continue;const px=X(e.x),py=Y(e.y),k=SCL(e.y);if(py<-40)continue;ctx.save();ctx.translate(px,py);ctx.scale(e.boss?1.6*k:k,e.boss?1.6*k:k);HURT=false;SWING=0;PHASE=0;BLINK=false;drawCreature(e.el,e.boss?2:e.kind===2?0:1);ctx.restore();
+    if(B){for(const e of B.enemies){if(e.hp<=0||e.t0>B.t)continue;if(e.boss&&e.sieging)continue;const px=X(e.x),py=Y(e.y),k=SCL(e.y);if(py<-40)continue;ctx.save();ctx.translate(px,py);ctx.scale(e.boss?1.6*k:k,e.boss?1.6*k:k);HURT=false;SWING=0;PHASE=0;BLINK=false;drawCreature(e.el,e.boss?2:e.kind===2?0:1);ctx.restore();
         ctx.fillStyle='#3A2A1C';ctx.fillRect(px-14*k,py-30*k,28*k,4*k);ctx.fillStyle=e.boss?'#B8352C':'#3FA66B';ctx.fillRect(px-14*k,py-30*k,28*k*Math.max(0,e.hp/e.max),4*k);if(e.boss){ctx.fillStyle='#fff';ctx.font="700 10px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(e.boss.name,px,py-36*k);}}
       for(const u of B.units){if(!u.alive)continue;const px=X(u.x),py=Y(u.y),k=SCL(u.y);ctx.save();ctx.translate(px,py+MERC_DY*k);ctx.scale(k,k);BLINK=false;PHASE=0;HURT=false;SWING=(u.role===0||u.role===3)?Math.abs(Math.sin(B.t*8))*0.6:0;drawMerc(u.el,u.role,u.grade,u.star,u.friend,u.ilju);ctx.restore();
         ctx.fillStyle='#3A2A1C';ctx.fillRect(px-12*k,py-28*k,24*k,3*k);ctx.fillStyle='#2F7BE8';ctx.fillRect(px-12*k,py-28*k,24*k*Math.max(0,u.hp/u.max),3*k);if(u.shield>0){ctx.strokeStyle='rgba(120,180,255,.8)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(px,py,18*k,0,Math.PI*2);ctx.stroke();}}
@@ -3753,7 +3788,13 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
         else if(f.k==='shot'){ctx.strokeStyle=`rgba(60,40,20,${1-u})`;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(X(f.x),Y(f.y));ctx.lineTo(X(f.x)+(X(f.tx)-X(f.x))*Math.min(1,u*3),Y(f.y)+(Y(f.ty)-Y(f.y))*Math.min(1,u*3));ctx.stroke();}
         else if(f.k==='magic'){ctx.strokeStyle=['#3FA66B','#E05A4A','#E0B23C','#CFD6E0','#2F7BE8'][f.el];ctx.lineWidth=2;ctx.globalAlpha=1-u;ctx.beginPath();ctx.arc(X(f.x),Y(f.y),10+u*40,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
         else if(f.k==='breach'){ctx.fillStyle=`rgba(184,53,44,${0.6*(1-u)})`;ctx.fillRect(0,boardTop+cs*5,cw,44);}
-        else if(f.k==='siege'){ctx.fillStyle=`rgba(255,200,61,${1-u})`;ctx.font="700 15px 'Jua','Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText('본진 공성!',X(f.x),Y(f.y)-46);}
+        else if(f.k==='siege'){                       // 보스가 문 앞에 붙는 순간 한 번 뜨는 배너
+          const a=Math.max(0,1-u);ctx.save();ctx.globalAlpha=a;ctx.font="800 22px 'Jua','Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';
+          const w=ctx.measureText('보스 공성!').width, by=boardTop+cs*5-104;   // 문 앞 보스 이름표 위
+          ctx.fillStyle='rgba(60,10,8,.62)';rr(cw/2-w/2-16,by-20,w+32,40,10);ctx.fill();
+          ctx.lineWidth=3;ctx.strokeStyle='rgba(42,26,10,.85)';ctx.strokeText('보스 공성!',cw/2,by);
+          ctx.fillStyle='#FF7A55';ctx.fillText('보스 공성!',cw/2,by);ctx.restore();}
+        else if(f.k==='siegeHit'){if(!f.shown){f.shown=true;flashLives();}}   // 공성 목숨 손실: 붉은 띠 대신 목숨 숫자가 튄다
         else if(f.k==='shift'||f.k==='push'){ctx.fillStyle=`rgba(255,200,61,${1-u})`;ctx.font="700 14px 'Jua','Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(f.k==='shift'?'오행 전환!':'밀치기!',X(f.x),Y(f.y)-50);}}
       if(typeof drawSkillFx==='function')drawSkillFx(L);}
     for(const f of AFX.slice()){const u=(performance.now()-f.t)/500;if(u>=1){AFX.splice(AFX.indexOf(f),1);continue;}if(f.k==='pop'){const r=Math.floor(f.cell/5),c=f.cell%5;ctx.strokeStyle=`rgba(255,200,61,${1-u})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(X(c)+cs/2,boardTop+r*cs+cs/2,10+u*40,0,Math.PI*2);ctx.stroke();}}
