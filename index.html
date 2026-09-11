@@ -997,7 +997,7 @@
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v11.0</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v11.1</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -1010,7 +1010,7 @@
     <div class="modal" id="dexModal" hidden style="z-index:27"><div class="mbox" style="text-align:center;gap:8px"><canvas id="dexBig" width="480" height="480" style="width:220px;height:220px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#fff,#EEF3F8);border:3px solid #FFD27A;box-shadow:0 0 0 6px rgba(255,210,122,.25);margin:0 auto"></canvas><h3 id="dexBigName" style="margin:0"></h3><div class="note" id="dexBigDesc" style="text-align:left"></div><div style="display:flex;gap:8px"><button class="ghost sm" id="dexPose" style="flex:1">⚔ 공격 포즈</button><button class="ghost sm" id="dexClose" style="flex:1">닫기</button></div></div></div>
     <div class="modal" id="attModal" hidden style="z-index:26"><div class="mbox"><h3 style="margin:0">출석 보상</h3><div class="stats" id="attGrid" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div><div class="note" id="attNote"></div><button class="ghost sm" id="attClose" style="width:100%">닫기</button></div></div>
     <div class="modal" id="welcome" hidden style="z-index:25"><div class="mbox" style="text-align:center;gap:10px"><div style="font-family:'Jua','Noto Sans KR',sans-serif;font-size:34px;color:#2F7BE8">운세전</div><div class="note" style="font-size:14px;color:#223047">내 사주가 영웅이 되어 오행 군대를 이끈다.<br>매일 운세를 뽑고, 친구와 기운을 나눈다.</div>
-      <div class="r" style="justify-content:center;gap:6px;margin:4px 0"><span class="chip" title="木" style="background:var(--el-wood);color:#fff">목</span><span class="chip" title="火" style="background:var(--el-fire);color:#fff">화</span><span class="chip" title="土" style="background:var(--el-earth);color:#fff">토</span><span class="chip" title="金" style="background:var(--el-metal);color:#223047">금</span><span class="chip" title="水" style="background:var(--el-water);color:#fff">수</span></div>
+      <div class="r" style="justify-content:center;gap:6px;margin:4px 0"><span class="chip" title="木" style="background:var(--el-wood-bg);color:var(--el-wood-ink);border:1px solid var(--el-wood-ink)">목</span><span class="chip" title="火" style="background:var(--el-fire-bg);color:var(--el-fire-ink);border:1px solid var(--el-fire-ink)">화</span><span class="chip" title="土" style="background:var(--el-earth-bg);color:var(--el-earth-ink);border:1px solid var(--el-earth-ink)">토</span><span class="chip" title="金" style="background:var(--el-metal-bg);color:var(--el-metal-ink);border:1px solid var(--el-metal-ink)">금</span><span class="chip" title="水" style="background:var(--el-water-bg);color:var(--el-water-ink);border:1px solid var(--el-water-ink)">수</span></div>
       <div style="text-align:left;display:grid;gap:6px;font-size:13px"><div><i class="num">1</i><b>생년월일</b> 하나로 나만의 <b>영웅</b>이 생긴다</div><div><i class="num">2</i>같은 용병 셋을 모으면 <b>합성</b>, 상생으로 이으면 <b>연환</b></div><div><i class="num">3</i>매일 <b>사당</b>에서 운세를 뽑으면 그날 전투가 세진다</div></div>
       <div class="btns"><button id="wcStart">내 사주로 시작</button><button class="ghost" id="wcSkip">먼저 둘러보기</button></div></div></div>
     <div class="modal" id="cardModal" hidden style="z-index:30"><div class="mbox" style="padding:12px"><h3 style="margin:0">공유 카드</h3><img id="cardImg" alt="결과 카드" style="width:100%;border-radius:12px;display:block"><div class="note">이미지를 길게 누르면 저장할 수 있다.</div><div class="btns"><button class="sm" id="cardShare">공유하기</button><button class="ghost sm" id="cardCopy">글로 복사</button></div><button class="ghost sm" id="cardClose" style="width:100%">닫기</button></div></div>
@@ -1753,7 +1753,7 @@ const SPIRIT_PAL=[
  {main:'#2F7BE8',light:'#9CD1FF',shade:'#1E3F73',eye:'#E6F6FF'}];
 const OL='#223047',OLW=2.2;
 const SCALE=[0,0.75,0.88,1.00,1.12,1.25];
-const VERSION='art-3적보스';
+const VERSION='art-4죽음';
 
 // ── 색 ──
 function hx(c){c=String(c).replace('#','');return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
@@ -1774,7 +1774,8 @@ function cel(ctx,path,fill,shade,sx,sy,srx,sry){const A0=ctx.globalAlpha;path();
   ctx.ellipse(sx==null?6:sx,sy==null?-8:sy,srx==null?26:srx,sry==null?30:sry,0.3,0,Math.PI*2);ctx.fill();ctx.restore();
   path();ctx.strokeStyle=OL;ctx.lineWidth=OLW;ctx.stroke();}
 
-function drawFace(ctx,el,grade,opt,cx,cy,rx,ry){opt=opt||{};const P=pal(el,opt.enemy);const eye=P.eye;const pose=opt.pose||'idle';
+// opt.dead 면 자세와 무관하게 × 눈·입 없음(죽음 자세가 hurt 얼굴에서 시작한다).
+function drawFace(ctx,el,grade,opt,cx,cy,rx,ry){opt=opt||{};const P=pal(el,opt.enemy);const eye=P.eye;const pose=opt.dead?'hurt':(opt.pose||'idle');
   const EK=opt.boss?1.2:1;                            // 보스는 눈만 1.2 배 — 자리는 그대로라 얼굴 밖으로 안 나간다
   // 눈동자는 눈빛색을 외곽선 쪽으로 45% 당겨 어둡게 — 흰 하이라이트가 보이려면 바탕이 어두워야 한다.
   // 번짐(shadowColor)만 원래 눈빛색이라 눈은 여전히 오행 색으로 빛난다.
@@ -2138,14 +2139,15 @@ function bodyMetal(ctx,grade,opt){
   if(g>=5){const gr=ctx.createLinearGradient(0,M.y-M.h,0,M.y);   // 등급 5: 금빛 그라데이션
     gr.addColorStop(0,'#FFE08A');gr.addColorStop(0.45,C.light);gr.addColorStop(1,mix(C.main,'#C9903F',0.35));fill=gr;}
   cel(ctx,mp,fill,C.shade,M.hw*0.50,M.y-M.h*0.40,M.hw*0.80,M.h*0.50);
-  // 직선 하이라이트 — 얼굴 위쪽 면에만 둔다
+  // 직선 하이라이트 — 얼굴 위쪽 면에만 둔다. 죽을 때(opt.dead)는 날이 빛을 잃는다(하이라이트 알파 0).
+  if(!opt.dead){
   ctx.save();mp();ctx.clip();ctx.fillStyle=C.light;ctx.globalAlpha=A0*0.9;
   ctx.beginPath();ctx.moveTo(-M.hw*0.30,M.y-M.h*0.82);ctx.lineTo(-M.hw*0.10,M.y-M.h*0.76);
   ctx.lineTo(-M.hw*0.34,M.y-M.h*0.56);ctx.lineTo(-M.hw*0.54,M.y-M.h*0.62);ctx.closePath();ctx.fill();
   ctx.globalAlpha=A0*0.58;
   ctx.beginPath();ctx.moveTo(M.hw*0.34,M.y-M.h*0.70);ctx.lineTo(M.hw*0.46,M.y-M.h*0.66);
   ctx.lineTo(M.hw*0.40,M.y-M.h*0.50);ctx.lineTo(M.hw*0.28,M.y-M.h*0.54);ctx.closePath();ctx.fill();
-  ctx.restore();
+  ctx.restore();}
   // 결정 왕관(등급 4+): 뿔 셋, 금색 테두리
   let crownTop=0;
   if(g>=4){for(const h of [[0,3,4.4,13.5,0],[-7.0,8,3.2,10,-0.35],[7.0,8,3.2,10,0.35]]){
@@ -2217,25 +2219,64 @@ function faceAnchor(el,grade){const g=Math.max(1,Math.min(5,grade|0));
   if(el===4){const W=WATER[g];return {cx:0,cy:W.cy+2,rx:W.rx*0.90,ry:W.ry*0.86};}
   const CR=CROWN[g];return {cx:0,cy:CR.cy+2,rx:CR.rx*0.92,ry:CR.ry*0.86};}
 
+// ── 죽음 자세(pose 'die') ──
+// opt.t 는 죽은 뒤 흐른 시간(초). DIE_T(보스 DIE_BOSS_T) 동안 hurt 자세(× 눈)에서 시작해 바라보는 쪽 반대로
+// 기울고(0.35rad) 발 기준 6px 가라앉으며 알파 1→0. 바닥 그림자도 같은 알파로 옅어지고 오라는 꺼진다.
+// 지나면 아무것도 안 그린다(픽셀 0). 오행마다 결 하나씩(dieTrace) — 부적·동물 형태는 없다.
+// dir: 정령이 바라보는 가로 방향(−1 왼쪽·1 오른쪽). 페이지가 준다 · 없으면 적은 왼쪽, 아군은 오른쪽을 본다고 친다.
+const DIE_T=0.45, DIE_BOSS_T=0.8;
+function dieDir(opt){return opt.dir==null?(opt.enemy?-1:1):(opt.dir<0?-1:1);}
+function dieTrace(ctx,el,g,u,opt,box){const A0=ctx.globalAlpha,C=pal(el,opt.enemy),dir=dieDir(opt);
+  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  if(el===0){const CR=CROWN[g];                              // 목 — 잎 조각 셋이 떨어진다
+    for(let i=0;i<3;i++){const d=i===1?-dir:dir,x0=d*CR.rx*(0.35+i*0.22),y0=CR.cy-CR.ry*0.3+i*5;
+      const x=x0+d*(6+i*3)*u+Math.sin(u*9+i)*2.5,y=y0+(30+i*8)*u*u;
+      leaf(ctx,x,y,x+d*6,y+4-i,2.6,C.light,C.shade);}}
+  else if(el===1){const F=FIRE[g];                           // 화 — 불꽃은 몸 배율(y 0.6)로 줄고 불씨 둘이 뜬다
+    ctx.fillStyle=C.light;ctx.strokeStyle=OL;ctx.lineWidth=1.2;ctx.globalAlpha=A0*Math.max(0,1-u*0.6);
+    for(const d of [-1,1]){const x=d*(F.rx*0.45+4*u),y=F.cy-F.ry-6-28*u;
+      ctx.beginPath();ctx.arc(x,y,2.6-u,0,Math.PI*2);ctx.fill();ctx.stroke();}}
+  else if(el===2){const E=EARTH[g];                          // 토 — 금 두 줄로 갈라진다(몸 안에서만)
+    if(box&&box.rim){box.rim();ctx.clip();}
+    ctx.strokeStyle=OL;ctx.lineWidth=2.2;ctx.globalAlpha=A0*Math.min(1,u*3);
+    ctx.beginPath();ctx.moveTo(-E.rx*0.75,-E.ry*0.95);ctx.lineTo(-E.rx*0.35,-E.ry*0.55);ctx.lineTo(-E.rx*0.5,-E.ry*0.25);ctx.lineTo(-E.rx*0.15,0);
+    ctx.moveTo(E.rx*0.7,-E.ry*0.9);ctx.lineTo(E.rx*0.3,-E.ry*0.6);ctx.lineTo(E.rx*0.45,-E.ry*0.3);ctx.lineTo(E.rx*0.1,0);ctx.stroke();}
+  else if(el===3){                                          // 금 — 날이 빛을 잃는다(하이라이트는 bodyMetal 이 뺐다) · 그림자색이 덮인다
+    if(box&&box.rim){box.rim();ctx.fillStyle=C.shade;ctx.globalAlpha=A0*0.45*u;ctx.fill();}}
+  else{const W=WATER[g];                                    // 수 — 물방울 둘이 몸에서 튀어나온다
+    ctx.fillStyle=C.light;ctx.strokeStyle=OL;ctx.lineWidth=1.4;
+    for(const d of [-1,1]){const x=d*(W.rx*0.6+26*u),y=W.cy-22*u+46*u*u;
+      ctx.beginPath();ctx.arc(x,y,3-u,0,Math.PI*2);ctx.fill();ctx.stroke();}}
+  ctx.restore();}
+
 function drawSpirit(ctx,el,grade,opt){opt=opt||{};
   el=(el|0);if(el<0||el>4)el=0;
   let g=Math.max(1,Math.min(5,(grade|0)||1));
   if(opt.boss)g=5;                                     // 보스는 등급 5 형태 × 1.6배
-  const s=(SCALE[g]||1)*(opt.boss?1.6:1),aura=opt.aura!==false;
+  const s=(SCALE[g]||1)*(opt.boss?1.6:1);
+  const pose=opt.pose||'idle',dying=pose==='die';
+  const du=dying?Math.max(0,+opt.t||0)/(opt.dieDur||(opt.boss?DIE_BOSS_T:DIE_T)):0;
+  if(dying&&du>=1)return {top:-44*s,w:40*s,headTop:-44*s,gone:true};   // 다 사라졌다 — 한 획도 안 긋는다
+  const aura=opt.aura!==false&&!dying;                                  // 죽는 동안 오라는 꺼진다
+  const bopt=dying?Object.assign({},opt,{pose:'hurt',dead:true,t:0}):opt;
   ctx.save();
   if(opt.alpha!=null)ctx.globalAlpha*=opt.alpha;
+  if(dying)ctx.globalAlpha*=(1-du);
   ctx.save();
   ctx.scale(s,s);
   shadow(ctx,30+g*2.2);
   if(aura)drawAura(ctx,el,g,opt.t||0,opt,'back');            // 빛무리·바닥 문양은 몸 뒤
   ctx.save();
-  const pose=opt.pose||'idle';
   if(pose==='attack')ctx.rotate(-0.12);else if(pose==='hurt')ctx.translate(2,0);
-  const box=BODY[el](ctx,g,opt)||{top:-44,w:40};
+  else if(dying){const dir=dieDir(opt);ctx.translate(2,6*du);ctx.rotate(-dir*0.35*du);if(el===1)ctx.scale(1,1-0.4*du);}
+  const box=BODY[el](ctx,g,bopt)||{top:-44,w:40};
   if(aura)auraRim(ctx,el,g,opt,box);                         // 윤곽 오라는 자세 변환 안에서(경로가 몸과 같아야 한다)
+  if(dying){dieTrace(ctx,el,g,du,bopt,box);
+    if(opt.boss){const dir=dieDir(opt);ctx.save();ctx.translate(-dir*8*du,12*du);ctx.rotate(-dir*0.5*du);   // 왕관도 같이 떨어진다
+      bossCrown(ctx,box.headTop!=null?box.headTop:box.top,el);ctx.restore();}}
   ctx.restore();
   if(aura)drawAura(ctx,el,g,opt.t||0,opt,'front');           // 별 입자는 몸 앞
-  if(opt.boss)bossCrown(ctx,box.headTop!=null?box.headTop:box.top,el);
+  if(opt.boss&&!dying)bossCrown(ctx,box.headTop!=null?box.headTop:box.top,el);
   ctx.restore();                                             // 몸 배율 끝
   // 역할 표식은 배율 밖에서 — 자리를 실측 폭(이미 배율이 곱해진 값)에서 잡기 때문이다. 보스에는 안 붙인다.
   if(opt.role!=null&&!opt.boss)drawRole(ctx,opt.role,el,g);
@@ -2247,8 +2288,10 @@ function drawSpirit(ctx,el,grade,opt){opt=opt||{};
 //   (이름표·역할 표식은 몸 폭에 붙어야지 빛무리 폭에 붙으면 안 된다).
 // Node(캔버스 없음)에서는 근사표로 답하고 measured:false 를 달아 준다 — 캐시하지 않는다(브라우저에서 다시 잰다).
 const EXT={};
+//   opt.pose — 'die' 는 'hurt' 와 같게 답한다(죽음 자세는 hurt 몸이 기울며 옅어지는 것이라 실루엣 상자가 같다).
 function spiritExtent(el,grade,opt){opt=opt||{};
-  const boss=!!opt.boss,aura=opt.aura!==false,k=el+'-'+grade+'-'+(boss?1:0)+'-'+(aura?1:0);
+  const boss=!!opt.boss,aura=opt.aura!==false,pose=opt.pose==='die'?'hurt':(opt.pose||'idle');
+  const k=el+'-'+grade+'-'+(boss?1:0)+'-'+(aura?1:0)+(pose==='idle'?'':'-'+pose);
   if(EXT[k])return EXT[k];
   const g=Math.max(1,Math.min(5,(grade|0)||1)),sc=(SCALE[boss?5:g]||1)*(boss?1.6:1);
   let r=null;
@@ -2257,7 +2300,7 @@ function spiritExtent(el,grade,opt){opt=opt||{};
       const N=260,ox=130,oy=230;
       const cv=document.createElement('canvas');cv.width=N;cv.height=N;
       const c=cv.getContext('2d');c.setTransform(1,0,0,1,ox,oy);
-      drawSpirit(c,el,grade,{pose:'idle',boss,aura});
+      drawSpirit(c,el,grade,{pose,boss,aura});
       const d=c.getImageData(0,0,N,N).data;
       let top=-1,minx=N,maxx=-1;
       for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(d[(y*N+x)*4+3]>8){if(top<0)top=y;if(x<minx)minx=x;if(x>maxx)maxx=x;}}
@@ -2266,7 +2309,7 @@ function spiritExtent(el,grade,opt){opt=opt||{};
   if(!r)return {top:-44*sc,w:40*sc,measured:false};
   EXT[k]=r;return r;}
 
-return {VERSION,SPIRIT_PAL,OL,OLW,SCALE,CROWN,pal,drawSpirit,spiritExtent,drawFace,drawAura,auraRim,drawRole,faceAnchor};
+return {VERSION,SPIRIT_PAL,OL,OLW,SCALE,CROWN,DIE_T,DIE_BOSS_T,pal,drawSpirit,spiritExtent,drawFace,drawAura,auraRim,drawRole,faceAnchor};
 });
 
 // 아트: 영웅(치비) 그리기 — 정령과 같은 규칙(순수·난수 금지·인자로 받은 ctx 만).
@@ -2673,7 +2716,7 @@ return {VERSION,HERO_ANCHORS,HERO_FACE,HERO_TAGS,HERO_PAL,OL,OLW,heroAnchors,dra
 //   준비 바·HUD 는 여전히 boardTop(=ch−cs*5−bandH)을 쓰고, 그림·판정은 plateTop 을 쓴다.
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.BATTLE_SCENE=factory();})(typeof window!=='undefined'?window:globalThis,function(){
 'use strict';
-const VERSION='art-7신살';
+const VERSION='art-8후속';
 const HUD_GAP=44;      // 판 아래 본진 띠
 const CAMY=13;         // 카메라 깊이 — 작을수록 원근이 세다(뒷줄 폭 = CAMY/(CAMY+4) ≈ 0.765)
 const BOARDK=0.66;     // 판 높이 = cs*5 × BOARDK — 앞칸 세로/가로 0.85, 뒷줄 높이 0.505×cs
@@ -3136,12 +3179,14 @@ function drawBoard(ctx,L,st){
     g.restore();
     // ⑤ 바깥 테두리
     poly(g,[TL,TR,BR,BL],null,night?'#6E5A3A':'#8A5A2A',2.4);
-    // ⑥ 연환 선
-    const chains=st.chains||[];
+    // ⑥ 연환 선. st.hideLabels(Set<type+':'+cells>)에 든 사슬은 선만 긋고 상시 이름표를 안 찍는다 —
+    //    성립 사건(drawPrepFx chain)이 0.6초 동안 같은 이름표를 띄우는 중이라 둘이 겹치면 글자가 번진다.
+    const chains=st.chains||[],hide=st.hideLabels&&typeof st.hideLabels.has==='function'?st.hideLabels:null;
     for(const chn of chains){
       const col=CHAIN_COL[chn.type]||'#FFC83D';
       g.strokeStyle=col;g.lineWidth=chn.type==='cycle'?4:2.5;g.lineJoin='round';
       g.beginPath();chn.cells.forEach((c,i)=>{const R2=R[c];i?g.lineTo(R2.cx,R2.cy):g.moveTo(R2.cx,R2.cy);});g.stroke();
+      if(hide&&hide.has(chn.type+':'+chn.cells.join(',')))continue;
       const c0=R[chn.cells[0]];
       g.fillStyle=col;g.font="700 9px 'Noto Sans KR'";g.textAlign='left';g.textBaseline='top';
       g.fillText(CHAIN_K[chn.type]||'',c0.pts[0][0]+4,c0.pts[0][1]+3);
@@ -3166,17 +3211,100 @@ function drawBoard(ctx,L,st){
 // (화면 크기가 바뀌어도 입자가 제자리에 있다). 담장 쪽(crack·debris)만 본진 띠를 기준으로 잡는다.
 const TAU=Math.PI*2;
 const FX_CAP=200;
+const DIE_FX_LAG=0.10;   // 처치 폭발이 죽음 자세보다 늦게 터지는 시간(초)
 const FX_LIFE={spark:0.45,burst:0.55,flash:0.08,pop:0.70,arrow:0.24,ring:0.55,
                crack:4.00,debris:0.70,wind:0.45,shiftbanner:0.90};
 // 입자용 오행색은 판·글씨용(EL_COL)보다 진하다 — 금(#CFD6E0)을 그대로 쓰면 돌길 위에서 먼지로 읽힌다.
 const FX_COL =['#2FCB7E','#FF5230','#FFBB2E','#7FC9F0','#2E86FF'];
 const EL_SOFT=['#B6F5D2','#FFC49E','#FFEBB0','#E2F4FF','#AFD8FF'];   // 입자 심지(더 밝다)
 
+// 피해 팝 벌리기 — 같은 발원 칸(논리 거리 POP_R ≈ 18px) 안에 살아 있는 팝이 있으면 새 팝은 그 위에 쌓인다.
+// 자리는 **두 팝의 궤적**으로 정한다: 후보(원점, 그리고 서 있는 팝 하나하나의 바로 위)를 낮은 데부터 훑어, 새 팝이
+// 제 수명 동안(1/60초 간격) 이웃 어느 것과도 글상자가 안 겹치는 첫 자리를 고른다. 상승이 ease-out 이라 뒤에 뜬
+// 팝이 앞 팝을 따라잡는데(0.2~0.4초 시차), '지금 y' 만 보면 원점이 비어 보여도 도중에 부딪힌다 — 그래서 궤적이다.
+// 글상자 모델은 그리기와 같은 식이다: 글자 크기 max(13, round(13·s·kk))(s 는 1.4→1.0 등장 배율·치명 1.3배,
+// kk 는 원근 0.78~1.0), 테두리 max(2.4, 0.26·크기). 뒷줄(kk 0.78)은 바닥 13px 때문에 논리 단위로 상자가 커진다.
+// 단 n 은 x 로 (n%2?1:-1)·ceil(n/2)·POP_DX px 번갈아 벌린다(읽기용 — 겹침 판정은 x 를 안 믿고 y 로만 가른다).
+// 궤적 비교는 **화면 단위**다: 팝마다 생성 때의 화면 기준선 by0(=L.P(x,y)[1] − oy·k)를 저장하고 by0 − rise·kk + sy·kk 로
+// 견준다 — 걷는 적(같은 칸 안에서 y 가 옮겨 감)에 뜬 팝들은 sy 가 같아도 기준선이 다르다(sy 공간만 보면 −5~−8px 겹친다).
+// 상자 비교는 ≤ 에 1px 여유(0.000px 맞닿음 방지). 배치 L 은 setLayout/draw 가 준 것, 없으면 375×588 기본 배치.
+// 한 칸에 다섯이 차면 가장 오래된 팝(t 같으면 생성 순번 seq 가 작은 것)을 **탑 전체 위**로 올리고 알파 페이드 구간
+// (t ≥ life·0.8)에 넣는다. 수명은 30% 깎되 원래의 50% 아래로는 안 내려간다. 쫓겨난 팝 자리는 칸마다 하나다 —
+// 새로 쫓겨나면 먼저 쫓겨난 팝은 그 자리에서 바로 걷는다(같은 프레임에 12개가 와도 탑은 5단 + 1 을 안 넘는다).
+const POP_R=0.25, POP_DX=12, POP_TIERS=5, POP_DT=1/60;
+const POP_ASC=0.78, POP_DSC=0.08, POP_PAD=1, POP_GAP=POP_PAD+1;   // 숫자 잉크: 글자 크기 대비 올림·내림 비율(넉넉히) · 상자 사이 여유 px(비교는 ≤ PAD, 후보 자리는 PAD+1 띄운다)
+function popRise(q){const u=Math.min(1,q.t/q.life);return 30*(1-Math.pow(1-u,2.2));}
+function popRiseU(u){return 30*(1-Math.pow(1-Math.min(1,u),2.2));}
+function popScale(u,crit){return (1+0.4*Math.max(0,1-u/0.28))*(crit?1.3:1);}
+function popSz(u,crit,kk){return Math.max(13,Math.round(13*popScale(u,crit)*kk));}
+// 논리 y → 그 자리의 팝 배율(kk). sceneLayout 의 SCL 과 같은 식(판 안은 화면 크기와 무관)이고 바닥 0.78 이다.
+function popKK(y){return Math.max(0.78,(CAMY+0.5)/(CAMY+Math.max(-CAMY*0.7,Math.min(5,y))));}
+// 팝 q 가 t 초 됐을 때의 글상자(화면 px): 기준선 위 asc · 아래 dsc
+function popBox(q,t){
+  const u=Math.min(1,t/q.life), sz=popSz(u,q.crit,q.kk), lw=Math.max(2.4,sz*0.26);
+  return {asc:POP_ASC*sz+lw/2+0.5, dsc:POP_DSC*sz+lw/2+0.5};
+}
+// 팝 q 가 t 초 됐을 때의 화면 기준선(sy 포함) — 그리기의 by − rise·kk + sy·kk 와 같은 식
+function popScr(q,t){return q.by0+(q.sy-popRiseU(t/q.life))*q.kk;}
+let POP_L0=null;   // 배치가 없을 때의 기본 배치(검사·단독 호출)
 function FxPool(cap){
   const CAP=Math.max(8,cap||FX_CAP);
   const live=[],dead=[];
-  let seq=0,errN=0,errS='';   // 그리다 난 예외는 세어 둔다(검사가 0 인지 본다)
+  let seq=0,seqN=0,errN=0,errS='';   // 그리다 난 예외는 세어 둔다(검사가 0 인지 본다)
   const sh={s:0,d:0,t:0};
+  let LAY=null;                        // 팝 기준선(by0)을 재는 배치 — 페이지가 setLayout 으로 주고 draw 도 기억한다
+  function setLayout(L){if(L&&typeof L.P==='function')LAY=L;}
+  const layout=()=>LAY||POP_L0||(POP_L0=sceneLayout(375,588));
+
+  function kill(q){const i=live.indexOf(q);if(i>=0){live.splice(i,1);if(dead.length<CAP)dead.push(q);}}
+  // 팝 p 를 '지금 화면 기준선 Y' 에 세우면 남은 수명 동안 obs 어느 것과도 안 겹치는가(화면 px · 1px 여유)
+  function popClear(p,Y,obs){
+    const t0=p.t, left=p.life-t0, r0=popRiseU(t0/p.life);
+    for(let tau=0;tau<=left+1e-9;tau+=POP_DT){
+      const tp=t0+tau, yp=Y-(popRiseU(tp/p.life)-r0)*p.kk, bp=popBox(p,tp);
+      for(const q of obs){
+        const tq=q.t+tau;if(tq>=q.life)continue;
+        const yq=popScr(q,tq), bq=popBox(q,tq);
+        if(yp-bp.asc<=yq+bq.dsc+POP_PAD&&yq-bq.asc<=yp+bp.dsc+POP_PAD)return false;
+      }
+    }
+    return true;
+  }
+  const cur=q=>popScr(q,q.t);                          // 지금 화면 기준선
+  const org=q=>q.by0-popRise(q)*q.kk;                   // sy=0 일 때의 지금 화면 기준선
+  // 낮은 자리부터: 원점, 그리고 서 있는 팝 하나하나의 바로 위. 궤적이 비는 첫 자리를 돌려준다(없으면 가장 높은 것 위).
+  function popPick(p,obs){
+    const b0=popBox(p,p.t), cands=[org(p)];
+    for(const q of obs)cands.push(cur(q)-popBox(q,q.t).asc-b0.dsc-POP_GAP);
+    cands.sort((a,b)=>b-a);
+    for(const Y of cands)if(popClear(p,Y,obs))return Y;
+    let Y=cands[cands.length-1];for(let i=0;i<60&&!popClear(p,Y,obs);i++)Y-=2;
+    return Y;
+  }
+  const toSy=(q,Y)=>Math.round((Y-org(q))/q.kk*10)/10;  // 화면 기준선 → sy(논리 단위 · 0.1 반올림, 1px 여유가 덮는다)
+  function popSlot(p){
+    p.sx=0;p.sy=0;p.tier=0;p.evict=false;
+    const near=[];
+    for(let i=0;i<live.length;i++){const q=live[i];if(q.k==='pop'&&Math.hypot(q.x-p.x,q.y-p.y)<=POP_R)near.push(q);}
+    if(!near.length)return;
+    let tower=near.filter(q=>!q.evict), old=null;
+    if(tower.length>=POP_TIERS){                          // 다섯이 찼다 — 가장 오래된 팝을 탑 위로 쫓아내 페이드에 넣는다
+      old=tower[0];for(const q of tower)if(q.t>old.t||(q.t===old.t&&q.seq<old.seq))old=q;
+      for(const q of near)if(q.evict)kill(q);            // 쫓겨난 자리는 칸마다 하나
+      tower=tower.filter(q=>q!==old);
+      old.evict=true;old.life=Math.max(old.life*0.7,old.life0*0.5);old.t=Math.max(old.t,old.life*0.8);
+    }
+    p.sy=toSy(p,popPick(p,tower));const Y=cur(p);
+    let n=0;for(const q of tower)if(cur(q)>Y)n++;         // 내 아래에 선 팝 수 = 단 번호
+    p.tier=n;p.sx=n?(n%2?1:-1)*Math.ceil(n/2)*POP_DX:0;
+    if(old){                                             // 쫓겨난 팝: 탑(새 팝 포함) 전체 위, 남은 수명 동안 안 겹치는 자리
+      const obs=tower.concat([p]);let top=Infinity;
+      for(const q of obs){const v=cur(q)-popBox(q,q.t).asc;if(v<top)top=v;}
+      let oy=top-popBox(old,old.t).dsc-POP_GAP;
+      for(let i=0;i<60&&!popClear(old,oy,obs);i++)oy-=2;
+      old.sy=toSy(old,oy);
+    }
+  }
 
   function spawn(k,x,y,o){
     o=o||{};
@@ -3187,13 +3315,16 @@ function FxPool(cap){
       for(let i=0;i<live.length;i++){const q=live[i];if(q.t>wt){wt=q.t;wi=i;}}
       p=live[wi];live.splice(wi,1);
     }else p=dead.pop()||{};
-    p.k=k;p.x=x;p.y=y;p.t=0;p.life=o.life||FX_LIFE[k]||0.5;
-    p.id=(seq=(seq+1)&65535);
+    p.k=k;p.x=x;p.y=y;p.t=0;p.life=o.life||FX_LIFE[k]||0.5;p.life0=p.life;
+    p.id=(seq=(seq+1)&65535);p.seq=++seqN;          // seq: 결정적 생성 순번(t 동률을 가른다)
     p.seed=o.seed==null?p.id:(o.seed|0);
     p.el=o.el==null?-1:o.el;p.v=o.v==null?0:o.v;
     p.crit=!!o.crit;p.clash=!!o.clash;p.foe=!!o.foe;   // foe: 적이 우리 용병을 때린 피해(붉은 팝)
     p.tx=o.tx==null?x:o.tx;p.ty=o.ty==null?y:o.ty;
     p.ang=o.ang||0;p.spd=o.spd||0;p.oy=o.oy||0;p.r=o.r==null?1:o.r;
+    p.sx=0;p.sy=0;p.tier=0;p.evict=false;p.kk=popKK(y);p.by0=0;
+    if(k==='pop'){const Lq=layout();p.by0=Lq.P(x,y)[1]-p.oy*Lq.SCL(y);   // 생성 때의 화면 기준선(걷는 적의 팝끼리 견준다)
+      popSlot(p);}                            // 같은 칸의 팝은 단을 나눠 선다(live 에 넣기 전에 센다)
     live.push(p);
     return p;
   }
@@ -3223,12 +3354,15 @@ function FxPool(cap){
 
   // ── 그리기 ── 진입점 하나를 save/restore 로 감싼다(알파·폰트·선폭이 새 나가지 않는다)
   function draw(ctx,L){
+    setLayout(L);
     if(!live.length||!L)return;
     const g=ctx;g.save();
     try{
       g.textAlign='center';g.textBaseline='alphabetic';g.lineJoin='round';g.lineCap='round';
-      for(let i=0;i<live.length;i++){
+      // 두 번 훑는다 — 치명·상극 팝은 둘째 바퀴에 그려 늘 맨 위층에 온다(어느 알에도 안 가린다)
+      for(let pass=0;pass<2;pass++)for(let i=0;i<live.length;i++){
         const p=live[i],u=Math.min(1,p.t/p.life);
+        if((p.k==='pop'&&(p.crit||p.clash))!==(pass===1))continue;
         try{one(g,L,p,u);}catch(e){errN++;errS=p.k+': '+String(e).split('\n')[0].slice(0,60);}   // 한 알이 튀어도 나머지 프레임은 그린다
       }
       g.globalAlpha=1;
@@ -3278,13 +3412,12 @@ function FxPool(cap){
         }
         break;}
       case 'pop':{                                          // 피해 숫자 — 튀어 오르며 1.4→1.0
-        const rise=30*(1-Math.pow(1-u,2.2)), s=(1+0.4*Math.max(0,1-u/0.28))*(p.crit?1.3:1);
+        const rise=popRiseU(u);
         const fade=u<0.72?1:1-(u-0.72)/0.28;
-        const sz=Math.max(13,Math.round(13*s*kk));
+        const sz=popSz(u,p.crit,kk);                      // 글상자 모델(popBox)과 같은 식 — 단 나누기가 이 크기를 믿는다
         g.font=`800 ${sz}px 'Jua','Noto Sans KR',sans-serif`;
-        // 같은 순간 여러 대가 맞으면 숫자가 겹친다 — 씨앗으로 좌우를 넓게, 위아래로도 어긋나게 낸다
-        const jx=((p.seed%7)-3)*6.5*kk, jy=((p.seed>>3)%4)*9*kk;
-        const y=by-rise*kk+jy, t=String(p.v), bx2=bx+jx;
+        // 같은 칸에 여러 팝이 뜨면 spawn 이 단(tier)을 나눠 준 오프셋(sx·sy)으로 벌려 선다 — 씨앗 흔들림은 뺐다
+        const y=by-rise*kk+p.sy*kk, t=String(p.v), bx2=bx+p.sx*kk;
         g.lineWidth=Math.max(2.4,sz*0.26);
         // 테두리는 채움보다 늦게 옅어진다 — 다 사라지기 전까지 숫자 모양이 밝은 돌길에 안 묻힌다
         g.globalAlpha=Math.max(0,Math.min(1,fade*1.35));   // 테두리를 채움보다 조금만 진하게(더 키우면 다 꺼진 뒤 윤곽만 남아 바닥에 얼룩이 진다)
@@ -3420,7 +3553,7 @@ function FxPool(cap){
     g.fillRect(px-s/2,py-s/2,s,s);
     g.globalAlpha=1;
   }
-  return {spawn,tick,draw,clear,shake,shakeOffset,CAP,
+  return {spawn,tick,draw,clear,shake,shakeOffset,setLayout,CAP,
           get length(){return live.length;},get list(){return live;},
           get errors(){return errN;},get lastError(){return errS;}};
 }
@@ -3438,6 +3571,9 @@ function ingestFx(pool,B,seen,opt){
   for(let i=0;i<B.fx.length;i++){
     const f=B.fx[i];
     if(!f||(seen&&seen.has(f)))continue;
+    // 처치 폭발은 죽음 자세가 시작되고 DIE_FX_LAG 뒤에 터진다 — 그때까지는 '본 것'에 안 넣어 다음 프레임에 다시 본다.
+    // (시계가 없는 호출 — B.t 가 없다 — 이면 바로 터뜨린다.)
+    if(f.k==='die'&&typeof B.t==='number'&&B.t-(+f.t||0)<DIE_FX_LAG)continue;
     if(seen)seen.add(f);
     n++;
     const sid=((Math.round(f.t*1000)*7+Math.round((f.x||0)*31)*13+Math.round((f.y||0)*7))|0)&65535;
@@ -4172,7 +4308,60 @@ function fxMerge(g,L,ev,e){
   }
   g.globalAlpha=1;
 }
-function fxChain(g,L,ev,e){
+// 연환 이름표 자리. 살아 있는 chain 사건이 하나면 사슬 첫 칸 위에 띄우고(지금까지처럼), 둘 이상이면 서로 겹치니
+// 판 위쪽(plateTop 바로 위) **한 줄**에 왼쪽부터 8px 간격으로 눕힌다.
+//  · 줄은 배율 1 폭으로 먼저 눕힌다(x 는 sc=1 기준) — 등장 팝(1.9→1)이 줄어들어도 줄이 흐르지 않는다.
+//  · 그 폭 합이 cw−16 을 넘으면 배율 q=(cw−16)/합 으로 눌러 한 줄에 맞춘다(둘째 줄 없음 — 접근로 위로 안 올라간다).
+//  · 눌림에는 바닥이 있다(q ≥ CHAIN_QMIN 0.85 — 글자 10px 아래로는 안 내려간다). 바닥에 걸리면 **가장 긴 사슬 순으로**
+//    앞에서 잘라 줄에 드는 만큼만 그린다. 잘린 라벨은 drop:true 로 돌려준다(줄에도 사슬 위에도 안 그린다 — 판 상시
+//    이름표만 남는다. 페이지는 drop 이 아닌 것만 hideLabels 에 넣는다).
+//  · 각 라벨은 제 중심에 대해서만 커진다. 줄 모드의 등장 팝은 이웃·화면 가장자리와 닿지 않는 만큼만(popCap) 부풀린다.
+//  · 글자 폭은 opt.measure(문자열→px, 배율 1 글꼴) 로 잰다. 없으면 ctx.measureText — 그림도 검사도 같은 함수를 쓴다
+//    (헤드리스는 실제 글꼴이 없어 좁게 재므로 검사는 12px/자 스텁을 꽂는다).
+// 돌려주는 상자는 화면 좌표 · 그리는 배율(sc)을 먹인 크기다. w1/tw 는 배율 1 상자 폭·글자 폭이다.
+const CHAIN_FONT="800 12px 'Jua','Noto Sans KR',sans-serif", CHAIN_LH=18, CHAIN_GAP=8, CHAIN_POP=0.9, CHAIN_PAD=7, CHAIN_QMIN=0.85;
+function chainLabels(g,L,fxq,now,opt){
+  const out=[];
+  if(!L||!fxq||!fxq.length)return out;
+  now=+now||0;opt=opt||{};
+  const evs=[];
+  for(let i=0;i<fxq.length;i++){const ev=fxq[i];if(!ev||ev.k!=='chain'||!Array.isArray(ev.cells)||ev.cells.length<2)continue;
+    const e=now-(+ev.t||0);if(e>=0&&e<=CHAIN_LIT)evs.push({ev,e});}
+  if(!evs.length)return out;
+  g.save();g.font=CHAIN_FONT;
+  try{
+    const measure=typeof opt.measure==='function'?opt.measure:(s=>g.measureText(s).width);
+    for(const {ev,e} of evs){const u=e/CHAIN_LIT,pop=1+CHAIN_POP*Math.max(0,1-u/0.25);
+      const nm=CHAIN_K[ev.type]||'연환',tw=measure(nm),w1=tw+CHAIN_PAD*2;
+      out.push({ev,e,nm,tw,w1,pop,q:1,sc:pop,w:w1*pop,h:CHAIN_LH*pop,x:0,y:0,drop:false,key:ev.type+':'+ev.cells.join(',')});}   // w1: 배율 1 상자 폭 · w1·q: 줄 배치 폭
+    if(out.length===1){const o=out[0],p=L.cellRect(Math.max(0,Math.min(24,o.ev.cells[0]|0)));o.x=p.cx;o.y=p.cy-30*p.k;}
+    else{
+      const x0=CHAIN_GAP, room=L.cw-CHAIN_GAP*2;        // 줄은 화면 좌우 8px 여백 안(cw−16)에 눕는다
+      let sum=0;for(const o of out)sum+=o.w1;sum+=CHAIN_GAP*(out.length-1);
+      let q=Math.min(1,room/Math.max(1,sum)), row=out;
+      if(q<CHAIN_QMIN){                                  // 바닥에 걸렸다 — 긴 사슬부터 줄에 드는 만큼만(앞에서 자른다)
+        q=CHAIN_QMIN;
+        const order=out.map((o,i)=>[o,i]).sort((a,b)=>(b[0].ev.cells.length-a[0].ev.cells.length)||(a[1]-b[1]));
+        const keep=new Set();let used=0;
+        for(const [o] of order){const add=(o.w1+(keep.size?CHAIN_GAP:0))*q;if(used+add>room+1e-6)break;keep.add(o);used+=add;}
+        for(const o of out)if(!keep.has(o)){o.drop=true;o.q=q;o.pop=1;o.sc=0;o.w=0;o.h=0;}
+        row=out.filter(o=>!o.drop);
+      }
+      const y=L.plateTop-CHAIN_LH*0.5-4;
+      let x=x0;
+      for(const o of row){o.q=q;o.x=x+o.w1*q/2;o.y=y;x+=(o.w1+CHAIN_GAP)*q;}
+      // 줄 모드의 팝 상한: 이웃끼리 안 닿고, 화면 밖(0 · cw)으로 안 나가는 만큼만 — 여백 8px 은 팝이 써도 된다
+      let cap=1+CHAIN_POP;
+      for(let i=0;i<row.length;i++){const o=row[i];
+        if(i+1<row.length){const n=row[i+1];cap=Math.min(cap,2*(n.x-o.x)/((o.w1+n.w1)*q));}
+        cap=Math.min(cap,2*o.x/(o.w1*q),2*(L.cw-o.x)/(o.w1*q));}
+      cap=Math.max(1,cap);
+      for(const o of row){o.pop=Math.min(o.pop,cap);o.sc=o.q*o.pop;o.w=o.w1*o.sc;o.h=CHAIN_LH*o.sc;}
+    }
+  }finally{g.restore();}
+  return out;
+}
+function fxChain(g,L,ev,e,lab){
   const cells=Array.isArray(ev.cells)?ev.cells:[];
   if(cells.length<2)return;
   const u=e/CHAIN_LIT, a=u<0.18?u/0.18:Math.max(0,1-(u-0.18)/0.82);
@@ -4185,13 +4374,16 @@ function fxChain(g,L,ev,e){
   for(let i=0;i<R.length;i++){                          // 칸마다 맺힘
     g.globalAlpha=a*0.8;prepOrb(g,R[i].cx,R[i].cy,4.5*R[i].k+2,col);
   }
+  if(lab&&lab.drop){g.globalAlpha=1;return;}            // 줄에서 잘린 라벨 — 사슬 빛만 내고 이름표는 판 상시 것에 맡긴다
   const nm=CHAIN_K[ev.type]||'연환';                     // 이름표 팝 — 처음 0.2 초에 튀어나온다
-  const p=R[0], sc=1+0.9*Math.max(0,1-u/0.25);
+  const p=R[0];
+  if(!lab){g.font=CHAIN_FONT;const tw=g.measureText(nm).width;   // 자리 계산 없이 불렸을 때(단독) — 같은 상자 식
+    lab={x:p.cx,y:p.cy-30*p.k,sc:1+CHAIN_POP*Math.max(0,1-u/0.25),tw};}
   g.globalAlpha=a;
-  g.save();g.translate(p.cx,p.cy-30*p.k);g.scale(sc,sc);
-  g.font="800 12px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';
-  const w=g.measureText(nm).width;
-  g.fillStyle='rgba(38,22,10,.72)';poly(g,[[-w/2-7,-9],[w/2+7,-9],[w/2+7,9],[-w/2-7,9]],'rgba(38,22,10,.72)');
+  g.save();g.translate(lab.x,lab.y);g.scale(lab.sc,lab.sc);   // 제 중심에 대해서만 커진다
+  g.font=CHAIN_FONT;g.textAlign='center';g.textBaseline='middle';
+  const w=lab.tw;
+  g.fillStyle='rgba(38,22,10,.72)';poly(g,[[-w/2-CHAIN_PAD,-9],[w/2+CHAIN_PAD,-9],[w/2+CHAIN_PAD,9],[-w/2-CHAIN_PAD,9]],'rgba(38,22,10,.72)');
   g.fillStyle=mix(col,'#FFFFFF',0.35);g.fillText(nm,0,0.5);
   g.restore();
   g.globalAlpha=1;
@@ -4217,21 +4409,22 @@ function fxCharge(g,L,ev,e){
   g.globalAlpha=1;
 }
 // 사건 줄을 소비해 그린다 — 판·정령 위, HUD 아래. 그린 사건 수를 돌려준다.
-function drawPrepFx(ctx,L,fxq,now){
+function drawPrepFx(ctx,L,fxq,now,opt){
   if(!L||!fxq||!fxq.length)return 0;
-  now=+now||0;
+  now=+now||0;opt=opt||{};
   prepClean(fxq,now);
   if(!fxq.length)return 0;
   const g=ctx;let n=0;
   g.save();
   try{
     g.lineJoin='round';g.lineCap='round';
+    const labs=chainLabels(g,L,fxq,now,opt);          // 연환 이름표 자리는 한 번에 잡는다(둘 이상이면 판 위 한 줄) — opt.measure 공유
     for(let i=0;i<fxq.length;i++){
       const ev=fxq[i], e=now-(+ev.t||0);
       if(!(e>=0))continue;
       if(ev.k==='flip'){if(e<=FLIP_WAIT+FLIP_FLY+0.35){fxFlip(g,L,ev,e);n++;}}
       else if(ev.k==='merge'){if(e<=MERGE_PULL+MERGE_BURST+MERGE_POP){fxMerge(g,L,ev,e);n++;}}
-      else if(ev.k==='chain'){if(e<=CHAIN_LIT){fxChain(g,L,ev,e);n++;}}
+      else if(ev.k==='chain'){if(e<=CHAIN_LIT){let lab=null;for(const o of labs)if(o.ev===ev){lab=o;break;}fxChain(g,L,ev,e,lab);n++;}}
       else if(ev.k==='place'){if(e<=PLACE_SQ*2){fxPlace(g,L,ev,e);n++;}}
       else if(ev.k==='charge'){if(e<=CHARGE_T){fxCharge(g,L,ev,e);n++;}}
       g.globalAlpha=1;
@@ -4241,9 +4434,9 @@ function drawPrepFx(ctx,L,fxq,now){
 }
 
 return {VERSION,HUD_GAP,CAMY,BOARDK,FX_CAP,CUT_IN,CUT_HOLD,CUT_OUT,RANGE_T0,RANGE_DUR,SKILL_DUR,
-        PREP_MAX,CHARGE_T,CHARGE_PUSH,
+        PREP_MAX,CHARGE_T,CHARGE_PUSH,CHAIN_LIT,DIE_FX_LAG,
         sceneLayout,gateGeom,drawBackdrop,drawGateDoors,drawBoard,groundShadow,EL_COL,FxPool,ingestFx,drawStatus,drawCutin,drawSkillRange,
-        drawPrepFx,prepPop,prepCam,prepGate,prepClean};
+        drawPrepFx,prepPop,prepCam,prepGate,prepClean,chainLabels};
 });
 
 </script><!-- ART_END -->
@@ -4806,34 +4999,17 @@ function fortuneEffects(d){if(!d||!d.level)return [];const o=[];if(d.power)o.pus
 const fxHtml=d=>{const fx=fortuneEffects(d);return fx.length?`<div class="fx"><b>오늘 전투에 붙는 효과</b><div class="fxr">${fx.map(t=>`<span>${t}</span>`).join('')}</div><small>오늘 치르는 모든 판에 자동으로 붙는다.</small></div>`:'';};
 function relLine(d){if(!SAJU||!d||d.el<0)return '';const [ts,tb]=todayPillar();const M={'같은 기운(비겁)':'내 오행과 같은 기운 · 같은 오행 골패가 잘 나온다','표현(식상)':'내가 낳는 기운 · 융합이 잘 된다','재물(재성)':'내가 다스리는 기운 · 엽전이 붙는다','규율(관성)':'나를 누르는 기운 · 조심, 대신 상극 폭발이 세다','학습(인성)':'나를 돕는 기운 · 영웅이 든든하다'}[d.rel]||'';return `<div class="relline">오늘 일진 <b>${STEM_K[ts]}${BRANCH_K[tb]}</b> · ${EL[d.el].k}의 날 · <b>${d.rel}</b><span>${M}</span></div>`;}
 const fortuneHtml=d=>`<div class="fscore"><b>${d.score}</b><span>점</span><em class="${d.level==='흉'||d.level==='소흉'?'bad':d.level==='대길'?'great':''}">${d.level}</em><i>${d.rel}의 날</i></div>${relLine(d)}${fxHtml(d)}<div class="ftitle">${d.title||''}</div><div class="note">${d.advice||''}</div>${tomorrowTeaser()}`;
-function renderSaju(){
-  if(!$('sajuBox'))return;
-  const [ts,tb]=todayPillar();$('todayGanji').textContent=`오늘 ${gz(ts,tb)}일`;
-  const box=$('sajuBox');
-  if(!SAJU){box.innerHTML=`<div class="note">생년월일을 넣으면 <b>나만의 영웅</b>(희귀)과 특기 2개, 성향 2개가 생기고 오늘의 운세를 뽑을 수 있다.</div>`;}
-  else{const p=SAJU.p;const cell=(lab,v)=>`<div class="pillar"><span>${lab}</span><b>${v?`<i style="color:${EL[STEM_EL[v[0]]].color}">${STEM_K[v[0]]}</i><i style="color:${EL[BRANCH_EL[v[1]]].color}">${BRANCH_K[v[1]]}</i>`:'<i style="color:var(--muted)">??</i>'}</b></div>`;
-    const ts=SAJU.ten2.map(i=>TEN[i]),sk=SAJU.skills.map(k=>SKILL[k]);
-    box.innerHTML=`<div class="pillars">${cell('시',p.hour)}${cell('일',p.day)}${cell('월',p.month)}${cell('년',p.year)}</div>
-      <div class="note" style="margin-bottom:4px">영웅 <b style="color:${elInk(SAJU.me)}">${SAJU.ilju}</b> ${SAJU.raw&&SAJU.raw.g==='f'?'여':'남'} · 영웅 등급 ${ASSAULT.GRADE_K[metaHeroGrade()]} · 나의 오행 <b style="color:${elInk(SAJU.me)}">${EL[SAJU.me].k}</b> +10% · 부족한 <b style="color:${elInk(SAJU.weak)}">${EL[SAJU.weak].k}</b> 골패 확률 ↑</div>
-      <div class="note">특기 <b style="color:var(--gold)">${sk[0].name}</b> ${sk[0].desc(3)} · <b style="color:var(--gold)">${sk[1].name}</b> ${sk[1].desc(3)}</div>
-      <div class="note">성향 <b style="color:var(--good)">${ts[0].k}·${ts[0].name}</b> ${ts[0].desc} · <b style="color:var(--good)">${ts[1].k}·${ts[1].name}</b> ${ts[1].desc}</div>`;}
-  const fb=$('fortuneBody');
-  if(DAILY.level){fb.innerHTML=fortuneHtml(DAILY);}
-  else fb.innerHTML=`<div class="note">${SAJU?'아직 오늘 운세를 뽑지 않았다. 하루 한 번.':'사주 입력 후 뽑을 수 있다.'}</div>`;
-  $('drawBtn').disabled=!SAJU||!!DAILY.level;$('drawBtn').textContent=DAILY.level?'오늘은 뽑았다':'운세 뽑기';
-  $('sajuBtn').textContent=SAJU?'사주 수정':'사주 입력';
-}
 let spinning=false;
 function drawFortuneAnim(){
   if(!SAJU||DAILY.level||spinning||!$('fortuneBody'))return;AU.init();spinning=true;$('drawBtn').disabled=true;
   const fb=$('fortuneBody');const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   let n=0;const iv=setInterval(()=>{fb.innerHTML=`<div class="spin">${EL[n%5].h}${EL[(n+2)%5].h}${EL[(n+4)%5].h}</div>`;AU.tone(500+n*20,0.04,'square',0.02);n++;},80);
-  setTimeout(()=>{clearInterval(iv);const res=drawFortune();spinning=false;renderSaju();renderHome();AU.diceResult(res.level==='흉'?1:res.level==='대길'?6:4);log(`오늘의 운세: ${res.level} · ${res.rel}일`,res.level==='흉'?'bad':'hi');},reduce?0:1300);
+  setTimeout(()=>{clearInterval(iv);const res=drawFortune();spinning=false;renderHome();AU.diceResult(res.level==='흉'?1:res.level==='대길'?6:4);log(`오늘의 운세: ${res.level} · ${res.rel}일`,res.level==='흉'?'bad':'hi');},reduce?0:1300);
 }
 function openSaju(){const m=$('sajuModal');m.hidden=false;if(SAJU){const r=SAJU.raw;$('bDate').value=`${r.y}-${String(r.m).padStart(2,'0')}-${String(r.d).padStart(2,'0')}`;$('bHour').value=r.h;$('bGender').value=r.g||'m';}$('bDate').focus();}
 function saveSaju(){const v=$('bDate').value;if(!v){$('bDate').focus();return;}const firstTime=!SAJU;const [y,m,d]=v.split('-').map(Number);const h=+$('bHour').value;const g=$('bGender').value;
   try{localStorage.setItem('ubz_saju',JSON.stringify({y,m,d,h,g}));}catch(_){}
-  SAJU=computeSaju({y,m,d,h});SAJU.raw={y,m,d,h,g};loadDaily();$('sajuModal').hidden=true;renderSaju();renderDex();renderHome();BUB.until=0;BUB.text='';BUB.day='';heroSay(greetLine(),5);if(firstTime&&!(S&&S.running))openReveal('onboard');log(`사주 등록: 영웅 ${SAJU.ilju} · 특기 ${SAJU.skills.map(k=>SKILL[k].name).join(', ')} · 성향 ${SAJU.ten2.map(i=>TEN[i].k).join(', ')}`,'hi');}
+  SAJU=computeSaju({y,m,d,h});SAJU.raw={y,m,d,h,g};loadDaily();$('sajuModal').hidden=true;renderDex();renderHome();BUB.until=0;BUB.text='';BUB.day='';heroSay(greetLine(),5);if(firstTime&&!(S&&S.running))openReveal('onboard');log(`사주 등록: 영웅 ${SAJU.ilju} · 특기 ${SAJU.skills.map(k=>SKILL[k].name).join(', ')} · 성향 ${SAJU.ten2.map(i=>TEN[i].k).join(', ')}`,'hi');}
 
 // ───── 기록 ─────
 let REC={bestStage:0,bestWave:0,bestScore:0,bestKills:0,bestFusions:0,games:0,mythic:0,totalKills:0,totalClashes:0,totalUlts:0,wins:0,seen:{}};
@@ -4926,7 +5102,7 @@ let HG={cols:4,rows:5,ro:null,again:0};
 // px 글씨는 그대로라 4열이면 칩이 두세 줄로 넘쳐 간지 이름을 덮었다. 그래서 열 수를 폭에서 정하고
 // (4·3·2), 그래도 좁으면 --chip 으로 글씨를 칸에 맞춰 누른다. 재는 값은 늘 배치px(clientWidth)이다 —
 // getBoundingClientRect 는 zoom 이 곱해진 화면px 이라 px 글씨와 견줄 수 없다.
-const heroCols=w=>Math.max(2,Math.min(4,Math.floor(w/60)));
+const heroCols=w=>Math.max(2,Math.min(4,Math.floor(w/52)));   // 칸 52px 이상이면 --chip 6.5px 로 칩 두 개가 한 줄에 선다(큰 글씨 375폭 → 3열)
 function dexPlateHero(again){const box=$('dexPlate');if(!box)return;
   const K=DPK(),AH=window.ART_HEROES;
   HG.again=again?HG.again+1:0;
@@ -5039,7 +5215,7 @@ function renderReveal(){if(!SAJU)return;{const b=$('rvShare');if(b)b.hidden=true
     if(DAILY.level){$('rvShare').hidden=false;$('rvText').textContent='';$('rvBody').innerHTML=`<div class="fortune-body" style="text-align:left">${fortuneHtml(DAILY)}</div>`;$('rvNext').textContent=RV.mode==='onboard'?'다음':'기운을 받았다';}
     else{$('rvText').textContent='산통을 흔들어 오늘의 점수를 받는다.';$('rvBody').innerHTML='<canvas id="rvSantong" width="520" height="360" style="width:260px;height:180px;display:block;margin:0 auto"></canvas>';$('rvNext').textContent='뽑는 중…';$('rvNext').disabled=true;santongAnim($('rvSantong'));
       let n=0;const iv=setInterval(()=>{AU.tone(420+(n%4)*60,0.03,'square',0.018);n++;},110);
-      setTimeout(()=>{clearInterval(iv);drawFortune();SANTONG.score=DAILY.score;SANTONG.level=DAILY.level;renderSaju();renderHome();AU.diceResult(DAILY.score>=88?6:DAILY.score<15?1:4);setTimeout(()=>{$('rvNext').disabled=false;renderReveal();},1300);},1500);}}
+      setTimeout(()=>{clearInterval(iv);drawFortune();SANTONG.score=DAILY.score;SANTONG.level=DAILY.level;renderHome();AU.diceResult(DAILY.score>=88?6:DAILY.score<15?1:4);setTimeout(()=>{$('rvNext').disabled=false;renderReveal();},1300);},1500);}}
   else{draw(2);$('rvTitle').innerHTML='출전 <em>준비</em>';$('rvText').textContent=`출석 ${ATT.streak}일째. 첫 판에 무료 골패 1회와 엽전 ${attendGold()}냥을 받는다. 10판 보스를 잡으면 천하통일이다.`;$('rvBody').innerHTML='';const first=!REC.games;$('rvNext').textContent=first?'안내 판으로 시작':'자유 모드 시작';if(first){$('rvClose').hidden=false;$('rvClose').textContent='바로 자유 모드';}}
 }
 $('rvNext').onclick=()=>{AU.init();if(RV.mode!=='onboard'){$('revealOverlay').hidden=true;RV.step=0;return;}if(RV.step===0){RV.step=1;renderReveal();}else if(RV.step===1){if(!DAILY.level)return;RV.step=2;renderReveal();}else{$('revealOverlay').hidden=true;typeof startAssault==='function'&&startAssault(REC.games?'free':'tutorial');}};
@@ -5439,7 +5615,7 @@ function showShrine(){if(!SAJU){openSaju();return;}const sec=$('scr-shrine');if(
 function shrineExit(){document.querySelector('.tabbar button[data-s="home"]').click();}
 function shrineLoop(alive,fin,ms){let done=false;const end=()=>{if(done)return;done=true;try{fin();}catch(e){console.error(e);}};const loop=()=>{if(done)return;if(!alive()){end();return;}try{drawRoomShrine();}catch(e){console.error(e);}requestAnimationFrame(loop);};requestAnimationFrame(loop);setTimeout(end,ms);}
 function shrineBow(cb){if(BOW_FX)return;BOW_FX={t0:performance.now()};try{AU.tone(180,0.25,'sine',0.04,-60);AU.tone(160,0.25,'sine',0.04,-60,0.75);}catch(_){}let done=false;const fin=()=>{if(done)return;done=true;BOW_FX=null;drawRoomShrine();if(cb)cb();};shrineLoop(()=>!!BOW_FX&&performance.now()-BOW_FX.t0<1600,fin,1700);}
-function shrineShake(){if(SHAKE_FX||!SAJU)return;SHAKE_FX={t0:performance.now()};SANTONG={t0:performance.now(),score:null,level:''};let n=0;const iv=setInterval(()=>{AU.tone(420+(n%4)*60,0.03,'square',0.018);n++;},110);let drawn=false;const pick=()=>{if(drawn)return;drawn=true;clearInterval(iv);drawFortune();SANTONG.score=DAILY.score;SANTONG.level=DAILY.level;try{renderSaju();renderHome();}catch(_){}try{AU.diceResult(DAILY.score>=88?6:DAILY.score<15?1:4);}catch(_){}};setTimeout(pick,1500);let done=false;const fin=()=>{if(done)return;done=true;pick();SHAKE_FX=null;drawRoomShrine();shrineResult();};shrineLoop(()=>!!SHAKE_FX&&performance.now()-SHAKE_FX.t0<2700,fin,2800);}
+function shrineShake(){if(SHAKE_FX||!SAJU)return;SHAKE_FX={t0:performance.now()};SANTONG={t0:performance.now(),score:null,level:''};let n=0;const iv=setInterval(()=>{AU.tone(420+(n%4)*60,0.03,'square',0.018);n++;},110);let drawn=false;const pick=()=>{if(drawn)return;drawn=true;clearInterval(iv);drawFortune();SANTONG.score=DAILY.score;SANTONG.level=DAILY.level;try{renderHome();}catch(_){}try{AU.diceResult(DAILY.score>=88?6:DAILY.score<15?1:4);}catch(_){}};setTimeout(pick,1500);let done=false;const fin=()=>{if(done)return;done=true;pick();SHAKE_FX=null;drawRoomShrine();shrineResult();};shrineLoop(()=>!!SHAKE_FX&&performance.now()-SHAKE_FX.t0<2700,fin,2800);}
 function shrineResult(){if(!DAILY.level)return;const p=$('pane-fortune');if(!p)return;p.innerHTML=`<div class="fortune-body" style="text-align:left">${fortuneHtml(DAILY)}</div><div class="btns" style="margin-top:8px"><button class="ghost" id="fShareBtn">운세 공유</button><button id="fOkBtn">기운을 받았다</button></div>`;roomSheet('오늘의 운세 · 두루마리',[p],()=>{const b=$('fShareBtn');if(b)b.onclick=()=>shareFortune(b);const o=$('fOkBtn');if(o)o.onclick=()=>closeRoomSheet();});}
 function shrineTap(id,hot){const lit=SHRINE_CANDLE!=='off';const R=roomPrep($('roomShrineCv'));const hy=(R?R.H*0.84:520)-150*1.22+6;
   if(id==='candle'){SHRINE_CANDLE=lit?'off':'on';try{localStorage.setItem('ubz_candle',SHRINE_CANDLE);}catch(_){}try{AU.tone(lit?520:780,0.06,'sine',0.04);}catch(_){}drawRoomShrine();return;}
@@ -5516,7 +5692,7 @@ function drawRoomHero(){const cv=$('roomHeroCv');const R=roomPrep(cv);if(!R)retu
       ctx.fillStyle='#F4EFE4';rr(cx0+10,cy0+16,30,9,2);ctx.fill();ctx.strokeStyle='#8A7B62';ctx.lineWidth=0.8;rr(cx0+10,cy0+16,30,9,2);ctx.stroke();qs.forEach((q,i)=>{ctx.fillStyle=QST.done[q.id]?'#3FA66B':'#D9CFBC';ctx.beginPath();ctx.arc(cx0+17+i*8,cy0+20.5,2.2,0,Math.PI*2);ctx.fill();});
       if(QST.all){const qu=QUEST_FX?Math.min(1,(performance.now()-QUEST_FX.t0)/2200):1;const lid=QUEST_FX?Math.min(1,qu/0.4):1;const bx=cx0+70,by=cy0-2;ctx.fillStyle='#8A3A1A';rr(bx-9,by-6,18,9,2);ctx.fill();ctx.strokeStyle='#C9A24A';ctx.lineWidth=1;rr(bx-9,by-6,18,9,2);ctx.stroke();if(lid>0.05){const gg=ctx.createRadialGradient(bx,by-6,1,bx,by-6,16);gg.addColorStop(0,`rgba(255,214,120,${0.8*lid})`);gg.addColorStop(1,'rgba(255,214,120,0)');ctx.fillStyle=gg;ctx.beginPath();ctx.arc(bx,by-6,16,0,Math.PI*2);ctx.fill();}ctx.save();ctx.translate(bx-9,by-6);ctx.rotate(-1.1*lid);ctx.fillStyle='#A84A2A';rr(0,-5,18,5,2);ctx.fill();ctx.restore();}
       {const se=seasonNow();ctx.fillStyle='#F4F1EA';ctx.beginPath();ctx.ellipse(cx0+20,cy0-8,6,8,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#4C7FBF';ctx.beginPath();ctx.ellipse(cx0+20,cy0-8,4,5,0,0,Math.PI*2);ctx.fill();if(se==='spring'){ctx.strokeStyle='#5A3416';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(cx0+20,cy0-14);ctx.quadraticCurveTo(cx0+24,cy0-26,cx0+30,cy0-34);ctx.moveTo(cx0+22,cy0-22);ctx.lineTo(cx0+14,cy0-30);ctx.stroke();ctx.fillStyle='#F7B6C8';for(const [dx,dy] of [[30,-34],[26,-28],[16,-30],[22,-20],[13,-25]]){ctx.beginPath();ctx.arc(cx0+dx,cy0+dy,2.3,0,Math.PI*2);ctx.fill();}}else if(se==='autumn'){ctx.strokeStyle='#5A7A3A';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(cx0+20,cy0-14);ctx.lineTo(cx0+22,cy0-30);ctx.moveTo(cx0+20,cy0-14);ctx.lineTo(cx0+13,cy0-26);ctx.stroke();ctx.fillStyle='#E8B830';for(const [dx,dy] of [[22,-32],[13,-28]]){for(let i=0;i<7;i++){const a=i*Math.PI*2/7;ctx.beginPath();ctx.ellipse(cx0+dx+Math.cos(a)*3.5,cy0+dy+Math.sin(a)*3.5,2,1.2,a,0,Math.PI*2);ctx.fill();}}}}
-      HOT.push({id:'rec',x:cx0-4,y:cy0-20,w:104,h:36});HOT.push({id:'quest',x:cx0-4,y:cy0+16,w:104,h:40});ctx.fillStyle='#F4EFE4';rr(cx0+56,cy0+2,34,9,2);ctx.fill();ctx.strokeStyle='#8A7B62';ctx.lineWidth=0.8;rr(cx0+56,cy0+2,34,9,2);ctx.stroke();ctx.fillStyle='#5A3416';ctx.font="700 6.5px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(`기록 · 최고 ${REC.bestStage||0}판`,cx0+73,cy0+6.5);rtag(HOT,'rec',cx0+30,cy0-30,'위 서랍 · 기록','#8A5A00');rtag(HOT,'quest',cx0+30,cy0+62,`아래 서랍 · 과제 ${qd}/${qs.length}`,'#2F7BE8',qd<qs.length&&qd>0);}
+      HOT.push({id:'rec',x:cx0-4,y:cy0-20,w:104,h:36});HOT.push({id:'quest',x:cx0-4,y:cy0+16,w:104,h:40});ctx.fillStyle='#F4EFE4';rr(cx0+40,cy0+2,46,9,2);ctx.fill();ctx.strokeStyle='#8A7B62';ctx.lineWidth=0.8;rr(cx0+40,cy0+2,46,9,2);ctx.stroke();ctx.fillStyle='#5A3416';ctx.font="700 6px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(`기록 · 최고 ${REC.bestStage||0}판`,cx0+63,cy0+6.5);/* 스티커 x 276~322 — 오른쪽 벽(323) 안쪽 */rtag(HOT,'rec',cx0+30,cy0-30,'위 서랍 · 기록','#8A5A00');rtag(HOT,'quest',cx0+30,cy0+62,`아래 서랍 · 과제 ${qd}/${qs.length}`,'#2F7BE8',qd<qs.length&&qd>0);}
     // 등잔 (왼쪽 바닥)
     const LIT=ROOM_LAMP==='on'||(ROOM_LAMP!=='off'&&nite);{const lx=26,ly=Y(0.66);ctx.fillStyle='#5A3416';ctx.fillRect(lx-2,ly-40,4,40);ctx.fillStyle='#8A5A2A';rr(lx-10,ly-2,20,5,2);ctx.fill();ctx.fillStyle='#8A3A1A';rr(lx-6,ly-48,12,10,3);ctx.fill();ctx.fillStyle=LIT?'#FFE08A':'#F2E6C9';rr(lx-4,ly-46,8,6,2);ctx.fill();if(LIT){ctx.fillStyle='#FFB020';ctx.beginPath();ctx.ellipse(lx,ly-52,2,4,0,0,Math.PI*2);ctx.fill();}HOT.push({id:'lamp',x:lx-16,y:ly-60,w:32,h:64});rtag(HOT,'lamp',lx+14,ly-72,LIT?'등잔 · 켜짐':'등잔 · 꺼짐',LIT?'#FFB020':'#8A7B62');}
     // 계절 소품: 여름 부채(서안) · 겨울 화로(보료 옆)
@@ -6076,7 +6252,7 @@ function drawHeroEvo(e){const p=e.t/e.dur;const P=PALC[e.el];const cx=W/2,cy=H*0
 function faceAnim(cv,ov,el,g,tier,win){const t0=performance.now();cv._anim=t0;const f=()=>{if(cv._anim!==t0||!ov||ov.hidden)return;const t=(performance.now()-t0)/1000;const tt=t%2.6;
   drawOn(cv,()=>{ctx.translate(60,104);const bob=win?(tt<0.9?Math.abs(Math.sin(tt*7))*3:Math.sin(t*2.5)*0.8):Math.sin(t*2)*0.8;ctx.translate(0,-bob);{const hf=heroFit(104,tier);ctx.scale(hf,hf);}BLINK=(t%3.4)<0.12;PHASE=Math.floor(t*4)%4;HURT=!win&&tt<0.5;SWING=win?(tt<0.3?-0.5:tt<0.9?1:0):0;drawHero(el,g,tier);});requestAnimationFrame(f);};requestAnimationFrame(f);}
 // ===== 돌격 모드 UI =====
-let B=null,ASEL=-1,ADRAG=null,ASPD=1,ALAST=0,AFX=[];
+let B=null,ASEL=-1,ADRAG=null,ASPD=1,ALAST=0,AFX=[],AWIN=null;   // AWIN: 승리 잔상 {left,boss} — assaultLoop 참조
 // ACAM: 이번 프레임에 얹은 돌격 카메라 밀기(px · 0 이면 안 민 상태) · CHSEEN: 지난 프레임의 연환 목록
 let ACAM=0,CHSEEN=new Set();
 const ATICK=1/30;let AACC=0; // 전투 시뮬레이션은 30Hz 고정 스텝 (설계서 §14)
@@ -6088,7 +6264,11 @@ const FXP=window.BATTLE_SCENE.FxPool();
 const FXSEEN=new Set();      // 이미 입자로 옮긴 B.fx 항목(같은 항목을 두 번 안 터뜨린다)
 const AANIM=new Map();       // 개체 → {cd,hp,atk,hurt,dx,dy} · 공격 반동·피격 자세를 재는 자리
 const BOSS_SEEN=new Set();   // 등장 연출을 이미 쓴 보스
-function fxReset(){FXP.clear();FXSEEN.clear();AANIM.clear();BOSS_SEEN.clear();HUDB='';ACAM=0;CHSEEN=new Set();if(S&&Array.isArray(S.fxq))S.fxq.length=0;}
+function fxReset(){FXP.clear();FXSEEN.clear();AANIM.clear();BOSS_SEEN.clear();HUDB='';ACAM=0;AWIN=null;chainSeed();if(S&&Array.isArray(S.fxq))S.fxq.length=0;}
+// 판 시작(새 판·이어하기·판 넘어감)의 연환 목록을 CHSEEN 에 채운다 — 기존 사슬은 재공지하지 않는다(새로 생긴 사슬만 0.6초 밝힌다는
+// 원 뜻). 비워 두면 실제 판의 사슬 9~12개가 한 프레임에 전부 공지돼 줄이 q 0.4~0.6 으로 눌렸다.
+function chainSeed(){CHSEEN=new Set();if(!S||!Array.isArray(S.units))return;
+  try{for(const c of ASSAULT.computeChains(S.units,S.mods).chains)CHSEEN.add(c.type+':'+c.cells.join(','));}catch(_){}}
 function fxShake(str,dur){FXP.shake(SHAKE?str:0,dur);}   // 설정이 꺼져 있으면 세기 0 — 모듈이 아무것도 안 남긴다
 // 상극·치명 판정. 코어의 hit fx 에는 누가 때렸는지가 없다(코어는 안 건드린다).
 //  · 수비 = 맞은 자리에서 가장 가까운 적.
@@ -6129,18 +6309,27 @@ function fxHurtUnit(u,dv,sd){
   }
   if(dv>0)FXP.spawn('pop',u.x,u.y,{v:dv,el:u.el,oy:26,seed:sd,foe:true});
 }
+// 죽음: 코어는 죽은 개체를 지우지 않고 그 자리에 둔다(용병 alive=false · 적 hp<=0). 페이지는 처음 죽은 걸 본 시각을
+// a.dead 에 적고 그 뒤 DIE_T(보스 DIE_BOSS_T) 동안 'die' 자세로 그린다 — 자리·오행·등급은 개체가 그대로 갖고 있다.
+// 처치 폭발은 자세 시작 DIE_FX_LAG(0.1초) 뒤에 터진다(적은 ingestFx 가, 용병은 여기서 미룬다). 이탈(escaped)은 죽음이 아니다.
+const dieDur=boss=>{const A=window.ART_SPIRITS;return boss?(A&&A.DIE_BOSS_T||0.8):(A&&A.DIE_T||0.45);};
+const dieLag=()=>{const SC=window.BATTLE_SCENE;return SC&&SC.DIE_FX_LAG!=null?SC.DIE_FX_LAG:0.1;};
+const ADIE={n:0,boss:0,t:0};   // drawAssault 가 이 프레임에 그린 죽음 자세 수(검사용)
 function fxAnim(){
   if(!B)return;
   for(const u of B.units){
     let a=AANIM.get(u);
     if(!u.alive){
-      if(a&&a.hp>0){                                     // 방금 쓰러졌다 — 우리 쪽 죽음도 눈에 보여야 한다
-        const sd=((u.id|0)*13+Math.round(B.t*1000))&65535;
-        FXP.spawn('burst',u.x,u.y,{el:u.el,oy:14,seed:sd});
-        for(let j=0;j<4;j++){const ang=(((sd*7)%360)+j*90+((sd*23+j*41)%40))*Math.PI/180;
-          FXP.spawn('spark',u.x,u.y,{el:u.el,ang,spd:160+((sd*19+j*37)%150),oy:14,seed:sd+j,r:1.15,life:0.5});}
-      }
-      AANIM.delete(u);continue;
+      if(a&&a.hp>0){a.hp=0;a.dead=B.t;a.burst=false;a.dir=(u.cell|0)%2?1:-1;}   // 방금 쓰러졌다 — 자세부터 시작한다
+      if(a&&a.dead!=null){
+        if(!a.burst&&B.t-a.dead>=dieLag()){a.burst=true;                 // 우리 쪽 죽음도 눈에 보여야 한다 — 자세 0.1초 뒤 폭발
+          const sd=((u.id|0)*13+Math.round(a.dead*1000))&65535;
+          FXP.spawn('burst',u.x,u.y,{el:u.el,oy:14,seed:sd});
+          for(let j=0;j<4;j++){const ang=(((sd*7)%360)+j*90+((sd*23+j*41)%40))*Math.PI/180;
+            FXP.spawn('spark',u.x,u.y,{el:u.el,ang,spd:160+((sd*19+j*37)%150),oy:14,seed:sd+j,r:1.15,life:0.5});}}
+        if(B.t-a.dead>dieDur(false)+0.05)AANIM.delete(u);
+      }else AANIM.delete(u);
+      continue;
     }
     if(!a){a={cd:u.cd,hp:u.hp,sh:u.shield||0,atk:-9,hurt:-9,per:0.6,shT:-9,dx:0,dy:1};AANIM.set(u,a);}
     if(u.cd>a.cd+1e-6){                                  // 방금 때렸다 — 그때 찍힌 cd 가 곧 공격 주기다
@@ -6157,8 +6346,10 @@ function fxAnim(){
   for(const e of B.enemies){
     let a=AANIM.get(e);
     if(e.hp<=0){
-      if(a&&a.hp>0&&e.boss)fxShake(7,0.45);              // 보스 처치 — 잔진동(설계서 §6.2)
-      AANIM.delete(e);continue;
+      if(a&&a.hp>0){a.hp=0;
+        if(!e.escaped){a.dead=B.t;a.dir=Math.round(e.x*2)%2?1:-1;if(e.boss)fxShake(7,0.45);}}   // 보스 처치 — 잔진동(설계서 §6.2)
+      if(!(a&&a.dead!=null&&B.t-a.dead<=dieDur(!!e.boss)+0.05))AANIM.delete(e);
+      continue;
     }
     if(!a){a={cd:0,hp:e.hp,sh:0,atk:-9,hurt:-9,per:0.6,shT:-9,dx:0,dy:1};AANIM.set(e,a);}
     if(e.hp<a.hp)a.hurt=B.t;
@@ -6175,7 +6366,9 @@ function hudBattle(){
   const off=(el,v)=>el.classList.toggle('off',v);           // 자리는 그대로 두고 보이기만 끈다
   if(!B||!S||S.phase!=='battle'){if(!pg.classList.contains('off')||!bs.classList.contains('off')){off(pg,true);off(bs,true);HUDB='';}return;}
   const tot=B.enemies.length;let left=0,boss=null;
-  for(const e of B.enemies){if(e.hp>0&&!e.escaped)left++;if(e.boss&&e.hp>0&&e.t0<=B.t&&!boss)boss=e;}
+  // 죽는 중인 보스(AANIM 의 dead 가 살아 있고 몸이 아직 그려지는 동안)는 띠를 0/max 로 남긴다 — 몸보다 먼저 사라지지 않는다
+  const dying=e=>{const a=AANIM.get(e);return !!(a&&a.dead!=null&&B.t-a.dead<dieDur(true));};
+  for(const e of B.enemies){if(e.hp>0&&!e.escaped)left++;if(e.boss&&e.t0<=B.t&&!boss&&(e.hp>0||(!e.escaped&&dying(e))))boss=e;}
   const key=`${tot}|${left}|${boss?boss.el+':'+Math.ceil(boss.hp):''}`;
   if(key===HUDB)return;
   HUDB=key;off(pg,false);
@@ -6486,6 +6679,7 @@ function renderStagePreview(L){
 }
 function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;const dpr=Math.min(2,devicePixelRatio||1);
   const L=assaultLayout(),{cw,ch,boardBot,SCL}=L;   // 그림은 plateTop 쪽 자(cellRect·P·Y)로만 잰다
+  FXP.setLayout(L);                                  // 팝 기준선(by0)은 이 배치로 잰다(같은 프레임의 ingestFx 는 이미 지난 프레임 것을 쓴다)
   if(cv.width!==Math.round(cw*dpr)||cv.height!==Math.round(ch*dpr)){cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr);}
   const A=ASSAULT;
   drawOn(cv,()=>{ctx.scale(dpr,dpr);
@@ -6516,7 +6710,11 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
         if(!CHSEEN.has(key))pushFx({k:'chain',type:c.type,cells:c.cells.slice()});}
       CHSEEN=now;}
     const cands=units?new Set(A.mergeCandidates(units).flat()):null;
-    SCN.drawBoard(ctx,L,{sel:ASEL,cands,chains:CH?CH.chains:[],t:tt,night:sst.night,season:sst.season});
+    // 성립 사건이 이름표를 띄우는 0.6초 동안은 판의 상시 이름표를 접는다(같은 글자 둘이 겹치지 않게).
+    // 줄에서 잘린 라벨(drop — 줄 눌림 바닥 q 0.85 에 걸려 못 들어간 것)은 사건 이름표가 없으니 상시 이름표를 그대로 둔다.
+    const hideL=new Set();
+    if(CH&&Array.isArray(S.fxq))for(const o of SCN.chainLabels(ctx,L,S.fxq,tt))if(!o.drop)hideL.add(o.key);
+    SCN.drawBoard(ctx,L,{sel:ASEL,cands,chains:CH?CH.chains:[],t:tt,night:sst.night,season:sst.season,hideLabels:hideL});
     // 공성 중: 본진 띠에 검붉은 비네트가 맥동하고, 무엇이 목숨을 깎는지 띠에 적어 둔다
     const bandY=boardBot, sieging=B?B.enemies.filter(e=>e.hp>0&&e.sieging&&e.t0<=B.t):[];
     if(sieging.length){const pu=0.55+0.45*Math.sin(performance.now()/1000*4);
@@ -6563,7 +6761,17 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
     // 준비 단계 사건(골패·합성·연환·놓기·돌격) — 판과 정령 위에 얹는다(§6.5)
     SCN.drawPrepFx(ctx,L,S.fxq||(S.fxq=[]),tt);
     // 전투: 개체 위치로 그림
-    if(B){for(const e of B.enemies){if(e.hp<=0||e.t0>B.t)continue;if(e.boss&&e.sieging)continue;const [px,py]=L.P(e.x,e.y),k=SCL(e.y);if(py<-40)continue;const eg=e.boss?5:e.kind===2?2:3;
+    if(B){ADIE.n=0;ADIE.boss=0;ADIE.t=B.t;                 // 이 프레임에 그린 죽음 자세 수(검사용)
+      for(const e of B.enemies){if(e.t0>B.t)continue;const eg=e.boss?5:e.kind===2?2:3;
+        if(e.hp<=0){                                   // 죽음 자세 — fxAnim 이 a.dead 를 찍은 개체만, DIE_T 동안(보스는 문 앞 자리에서)
+          const an=AANIM.get(e),dy=an&&an.dead!=null?B.t-an.dead:-1,dur=dieDur(!!e.boss);
+          if(!(dy>=0&&dy<dur))continue;
+          ADIE.n++;if(e.boss)ADIE.boss++;
+          const sg=!!(e.boss&&e.sieging),[px,py]=sg?L.P(e.x,-0.35):L.P(e.x,e.y),k=sg?1:SCL(e.y);if(py<-40)continue;
+          SCN.groundShadow(ctx,px,py,k,{a:1-dy/dur});
+          ctx.save();ctx.translate(px,py);ctx.scale(k,k);drawCreatureG(e.el,eg,{enemy:true,boss:!!e.boss,pose:'die',t:dy,dir:an.dir});ctx.restore();
+          continue;}
+        if(e.boss&&e.sieging)continue;const [px,py]=L.P(e.x,e.y),k=SCL(e.y);if(py<-40)continue;
         SCN.groundShadow(ctx,px,py,k);
         // 맞은 뒤 0.25초는 피격 자세, 앞 0.12초는 성문 쪽(위)으로 3px 밀린다 — 때린 쪽은 본진 쪽(아래)이다
         const an=AANIM.get(e),hg=an?B.t-an.hurt:9,hu=hg<0.25;
@@ -6573,7 +6781,16 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
           h:e.boss?bossTop(e.el):spiritTop(e.el,eg),t:B.t});
         const by=e.boss?Math.max(14*k,py-(bossTop(e.el)+14)*k):py-(spiritTop(e.el,eg)+6)*k;   // 이름표·체력바는 실측 높이 위(보스 배율은 실측에 이미 들어 있다)
         ctx.fillStyle='#3A2A1C';ctx.fillRect(px-14*k,by,28*k,4*k);ctx.fillStyle=e.boss?'#B8352C':'#3FA66B';ctx.fillRect(px-14*k,by,28*k*Math.max(0,e.hp/e.max),4*k);if(e.boss){ctx.fillStyle='#fff';ctx.font="700 10px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillText(e.boss.name,px,Math.max(10,by-8*k));}}
-      for(const u of B.units){if(!u.alive)continue;const [px,py]=L.P(u.x,u.y),k=SCL(u.y);
+      for(const u of B.units){
+        if(!u.alive){                                  // 죽음 자세(정령만 — 참전 벗은 영웅 그림이라 그대로 사라진다)
+          const an=AANIM.get(u),dy=an&&an.dead!=null?B.t-an.dead:-1,dur=dieDur(false);
+          if(u.friend||!(dy>=0&&dy<dur))continue;
+          ADIE.n++;
+          const [px,py]=L.P(u.x,u.y),k=SCL(u.y),g=Math.max(1,Math.min(5,u.grade|0)),ms=mercScale(u.el,g);
+          SCN.groundShadow(ctx,px,py+MERC_DY*k,k,{a:1-dy/dur});
+          ctx.save();ctx.translate(px,py+MERC_DY*k);ctx.scale(k*ms,k*ms);drawCreatureG(u.el,g,{pose:'die',t:dy,dir:an.dir});ctx.restore();
+          continue;}
+        const [px,py]=L.P(u.x,u.y),k=SCL(u.y);
         // 공격 반동: 근접·참전 벗은 목표 쪽으로 4px 돌진했다 0.2초에 걸쳐 돌아오고, 사수는 0.15초 활을 뒤로 당긴다.
         // 창은 전부 시뮬 시간(B.t)이고 입자도 같은 시계로 산다(assaultLoop 이 FXP.tick 에 ASPD 를 곱한다).
         // 공격 주기보다 긴 창을 쓰면 주기 0.3s 짜리 용병이 영원히 SWING=1 로 굳어 칼을 안 휘두른다 —
@@ -6614,7 +6831,7 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
     for(const f of AFX.slice()){const u=(performance.now()-f.t)/500;if(u>=1){AFX.splice(AFX.indexOf(f),1);continue;}if(f.k==='pop'){const R=L.cellRect(f.cell);ctx.strokeStyle=`rgba(255,200,61,${1-u})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(R.cx,R.cy,(10+u*40)*R.k,0,Math.PI*2);ctx.stroke();}}
   });}
 // ── 신살 스킬 ── 효과 규칙은 코어 ASSAULT.castSkill 에 있다. 여기서는 쿨타임·연출·UI 만 맡는다.
-function castSkill(i){if(!S||!B||S.phase!=='battle')return;const s=S.skills&&S.skills[i];if(!s||s.cd>0||!SKILL[s.k])return;
+function castSkill(i){if(!S||!B||S.phase!=='battle'||AWIN)return;const s=S.skills&&S.skills[i];if(!s||s.cd>0||!SKILL[s.k])return;
   const r=ASSAULT.castSkill(B,S,s.k,metaHeroGrade());if(!r.ok)return;
   s.cd=SKILL[s.k].cd*(S.skillCd||1);S.ults=(S.ults||0)+1;
   S.skillFx={k:s.k,u:0,el:SAJU?SAJU.me:3};   // u 는 시전 뒤 흐른 **시뮬 시간**(assaultLoop 이 ASPD 를 곱해 올린다)
@@ -6656,16 +6873,34 @@ assaultCv.addEventListener('pointerup',ev=>{if(!S||!ADRAG)return;const p=cellAt(
         AU.relic&&AU.relic();buzz(20);log(`합성! ${ASSAULT.EL_K[r.result.el]} ${ASSAULT.ROLE_K[r.result.role]} ${ASSAULT.GRADE_K[r.result.grade]}${r.result.star?' 대길 ★':''}`,'hi');}}else ASEL=from;}
   assaultUI();drawAssault();assaultSave();});
 // ── 루프·저장 ──
+// 승리 잔상(WIN_HOLD). 코어가 B.result='win' 을 찍은 프레임에 곧장 endStage 로 가면 fxReset 이 AANIM·입자를 비워
+// 보스 죽음 자세(0.8초·왕관 낙하·폭발)가 한 번도 안 그려진다. 그래서 B.result 를 처음 본 프레임에는 잔상을 둔다 —
+// 마지막에 죽은 개체가 보스면 DIE_BOSS_T(0.8초), 아니면 0.45초. 잔상 동안은 코어 틱을 안 돌리고(battleTick 없음)
+// 그리기·fxAnim·ingestFx·입자 틱만 돈다. 시계는 전투와 같은 시뮬 시간(dt×ASPD)이고, 죽음 자세·처치 폭발 지연이
+// B.t 를 읽으므로 B.t 를 같은 만큼 올린다(끝난 판의 B.t 는 코어가 다시 안 읽는다 — finishStage 는 kills·clashes·
+// result·lives 만 본다). 패배는 지금처럼 즉시. S.phase 는 'battle' 그대로다: 캔버스 탭은 준비 전용이라 안 먹고 신살은
+// 코어가 B.result 로 거절한다(castSkill 도 가드). assaultSave 는 phase==='prep' 에서만 쓰므로 잔상 중 저장은 안 찍힌다 —
+// 탭을 숨기거나 닫을 때(visibilitychange/pagehide)는 winResolve 로 잔상을 즉시 마무리해 결산·다음 판 준비까지 간 뒤 저장한다.
+const WIN_HOLD_MOB=0.45;
+function winResolve(){if(!AWIN||!B)return;AWIN=null;const res=ASSAULT.finishStage(S,B);B=null;AACC=0;endStage(res);}
 function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;const on=!$('assault').hidden;
   if(S&&B&&S.phase==='battle'&&on){
-    AACC=Math.min(0.25,AACC+(dt>0?dt:0)); // 탭이 잠자다 돌아와도 한 번에 몰아 돌리지 않는다
-    while(AACC>=ATICK&&!B.result){AACC-=ATICK;
-      for(let k=0;k<ASPD;k++){ASSAULT.battleTick(B,ATICK,S.rng,S.mods);for(const s of (S.skills||[]))if(s.cd>0)s.cd=Math.max(0,s.cd-ATICK);if(B.result)break;}}
+    const step=Math.min(0.25,dt>0?dt:0);                  // 탭이 잠자다 돌아와도 한 번에 몰아 돌리지 않는다
+    if(!AWIN){AACC=Math.min(0.25,AACC+step);
+      while(AACC>=ATICK&&!B.result){AACC-=ATICK;
+        for(let k=0;k<ASPD;k++){ASSAULT.battleTick(B,ATICK,S.rng,S.mods);for(const s of (S.skills||[]))if(s.cd>0)s.cd=Math.max(0,s.cd-ATICK);if(B.result)break;}}}
+    else{const hs=Math.min(0.1,step)*ASPD;B.t+=hs;AWIN.left-=hs;}   // 잔상: 코어 틱 없이 시계만 간다(한 프레임 0.1초 상한 — 딸꾹질이 자세를 삼키지 않게)
     fxAnim();                                             // 공격 반동·피격 자세를 한 프레임 갱신
     window.BATTLE_SCENE.ingestFx(FXP,B,FXSEEN,{hitInfo:hitInfoOf,shake:()=>fxShake(6,0.3)});
     if(((ts/250)|0)!==((prev/250)|0))assaultUI();$('hudLives').textContent=`목숨 ${B.lives}`;
     hudBattle();
-    if(B.result){const res=ASSAULT.finishStage(S,B);B=null;AACC=0;endStage(res);}}
+    if(B.result){
+      if(AWIN){if(AWIN.left<=0)winResolve();}
+      else if(B.result==='win'){let boss=false,left=WIN_HOLD_MOB;   // 죽는 중인 개체들의 남은 자세 시간 최댓값(최소 0.45) — 보스가 마지막 처치가 아니어도 자세가 안 잘린다
+        for(const [o,a] of AANIM){if(a.dead==null)continue;const isB=!!(o.boss&&B.enemies.includes(o));
+          const rem=dieDur(isB)-(B.t-a.dead);if(rem>left)left=rem;if(isB&&rem>0)boss=true;}
+        AWIN={left,boss};}
+      else{const res=ASSAULT.finishStage(S,B);B=null;AACC=0;endStage(res);}}}
   else {AACC=0;if(on&&(!B||!S||S.phase!=='battle'))hudBattle();}
   // 입자는 자세·반동 창과 같은 시계(시뮬 시간)로 산다 — 2배속에서 전투만 빨라지고 연출이 뒤처지면
   // 피해 숫자가 다음 타격 뒤에 뜬다. ASPD 를 곱해 둘을 같은 속도로 맞춘다.
@@ -6681,7 +6916,7 @@ function endStage(res){if(!res)return; // finishStage 가 이미 소진했다
   log(`${S.stage}판 클리어 · 엽전 +${res.coins}냥`,'hi');
   if(S.mode==='tutorial'&&S.stage>=3&&res.won){clearSave();$('assault').hidden=true;showHome();toastLower();toast('안내 끝. 자유 모드로 출전하라.');return;}
   if(res.done){finishRun(true);return;}
-  const go=()=>{ASSAULT.nextStage(S);PREVIEW_CACHE=null;ASEL=-1;assaultUI();drawAssault();assaultSave();};
+  const go=()=>{ASSAULT.nextStage(S);chainSeed();PREVIEW_CACHE=null;ASEL=-1;assaultUI();drawAssault();assaultSave();};   // nextStage 가 보정(mods)을 바꿀 수 있어 다시 채운다
   if(res.cards)offerCardsUI(res.cards,go);else go();}
 // 카드 선택 (유물 오버레이 재사용)
 function offerCardsUI(kind,after){const A=ASSAULT;const cards=A.offerCards(kind,S.rng,S.cards,S.cnt);const ov=$('relicOverlay');
@@ -6745,8 +6980,8 @@ function assaultBind(){$('chargeBtn').onclick=()=>{if(!S||S.phase!=='prep')retur
     AU.fanfare&&AU.fanfare();log(`돌격! ${S.stage}판`,'hi');assaultUI();drawAssault();};
   $('spdBtn').onclick=()=>{ASPD=ASPD===1?2:1;AU.buy&&AU.buy();assaultUI();};
   [0,1,2].forEach(i=>{const b=$('sk'+i);if(b)b.onclick=()=>castSkill(i);});
-  $('hudHome').onclick=()=>{if(!S)return;assaultPause();};
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)assaultSave();});window.addEventListener('pagehide',assaultSave);}
+  $('hudHome').onclick=()=>{if(!S||AWIN)return;assaultPause();};   // 승리 잔상(0.8초) 중엔 무시 — castSkill 과 같은 가드
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){winResolve();assaultSave();}});window.addEventListener('pagehide',()=>{winResolve();assaultSave();});}
 assaultBind();
 function doorWipe(cb){let d=$('doorWipe');if(!d){d=document.createElement('div');d.id='doorWipe';d.className='dw';d.innerHTML='<i class="l"></i><i class="r"></i>';document.body.appendChild(d);}if(d.classList.contains('on')){cb();return;}d.classList.remove('on');void d.offsetWidth;d.classList.add('on');try{AU.tone(140,0.12,'triangle',0.05);AU.tone(90,0.2,'sine',0.05,0,0.28);}catch(_){}setTimeout(cb,300);setTimeout(()=>d.classList.remove('on'),760);}
 document.querySelectorAll('.tabbar button').forEach(t=>t.onclick=()=>{const from=document.querySelector('.tabbar button.on');const ov=$('startOverlay')&&!$('startOverlay').hidden;const fromK=curRoom();const wipe=from&&from!==t&&(from.dataset.s==='home'||t.dataset.s==='home')&&ov;const apply=()=>{try{closeRoomSheet(true);closeRoomPop(true);}catch(_){}document.querySelectorAll('.tabbar button').forEach(x=>x.classList.toggle('on',x===t));document.querySelectorAll('.scr').forEach(p=>p.classList.toggle('on',p.id==='scr-'+t.dataset.s));try{roomEnter(t.dataset.s);}catch(_){}const sc=$('scr-'+t.dataset.s);if(sc)sc.scrollTop=0;};if(ov&&(fromK==='hero'||fromK==='shrine')&&t.dataset.s!==fromK&&!ROOM_WALK&&$('roomSheet').hidden&&!document.querySelector('.rpop')){roomWalkOut(fromK,()=>{if(fromK==='shrine'||wipe)doorWipe(apply);else apply();});return;}if(wipe)doorWipe(apply);else apply();});
@@ -6771,7 +7006,7 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{if(!DB)return;boardM
 dailyPreview();
 
 $('bHour').innerHTML=`<option value="-1">모름 (시주 제외)</option>`+BRANCH_K.map((b,i)=>`<option value="${i*2}">${b}시 ${BRANCH_H[i]}</option>`).join('');
-loadSheetJson();loadUserAssets();loadSaju();loadDaily();loadAttend();loadRec();loadFriends();loadSettings();loadIdent();loadAch();renderAch();renderSaju();initBoard();renderDex();renderHome();if(!SAJU&&!REC.games)setTimeout(()=>{$('welcome').hidden=false;},900);
+loadSheetJson();loadUserAssets();loadSaju();loadDaily();loadAttend();loadRec();loadFriends();loadSettings();loadIdent();loadAch();renderAch();initBoard();renderDex();renderHome();if(!SAJU&&!REC.games)setTimeout(()=>{$('welcome').hidden=false;},900);
 recLine();showResume();document.querySelector('.app').classList.add('ingame-hidden');
 setTimeout(()=>{if(!$('startOverlay').hidden&&BUB.day!==todayStr()){BUB.day=todayStr();heroSay(greetLine(),7);}},2200);
 {const g=attendGearCheck();if(g){renderHome();setTimeout(()=>{toast(`출석 ${ATT.streak}일 보상 · 장비 획득: ${g.name}`);},1600);}}
@@ -6779,7 +7014,7 @@ setTimeout(()=>{if(!$('startOverlay').hidden&&BUB.day!==todayStr()){BUB.day=toda
 setTimeout(fortunePrompt,400);
 // 디버그 / 시뮬레이션 훅
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
-window.__ubz={get art(){return {spirits:window.ART_SPIRITS,heroes:window.ART_HEROES,scene:window.BATTLE_SCENE};},startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,flipUI,bossTop,get FX(){return FXP;},fxShake,hudBattle,fxAnim,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
+window.__ubz={get art(){return {spirits:window.ART_SPIRITS,heroes:window.ART_HEROES,scene:window.BATTLE_SCENE};},startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,flipUI,bossTop,get FX(){return FXP;},get AANIM(){return AANIM;},get WIN(){return AWIN;},get ADIE(){return ADIE;},winResolve,get CHSEEN(){return CHSEEN;},chainSeed,fxShake,hudBattle,fxAnim,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
   get SHAKE(){return SHAKE;},setShake:(v)=>{SHAKE=!!v;saveSettings();if(document.getElementById('setShake'))document.getElementById('setShake').classList.toggle('on',SHAKE);},get ASEL(){return ASEL;},get ADRAG(){return ADRAG;},get BOSS_TOP(){return BOSS_TOP;},endStage,finishRun,offerCardsUI,castSkill,assaultLayout,checkAch,renderRec,recLine,get REC(){return REC;},get ACHS(){return ACHS;},get S(){return S;},get B(){return B;},drawRoomShrine,showShrine,shrineTap,AMB,roomWalkOut,get WALK(){return ROOM_WALK;},get SHRINE(){return {BOW_FX,SHAKE_FX,INC_FX,SHRINE_CANDLE};},heroTo:(cv,sc,x,y,el,g)=>drawOn(cv,()=>{ctx.translate(x,y);ctx.scale(sc,sc);BLINK=false;SWING=0;PHASE=0;HURT=false;drawHero(el==null?(SAJU?SAJU.me:3):el,g||'m',1);}),heroEqTo:(cv,o)=>{o=o||{};const eq=o.eq;const old=GR.eq;if(eq)GR.eq={...GR.eq,...eq};try{drawOn(cv,()=>{ctx.translate(o.x==null?60:o.x,o.y==null?110:o.y);const sc=o.sc||1;ctx.scale(sc,sc);BLINK=!!o.blink;SWING=o.pose==='attack'?1:0;PHASE=0;HURT=false;if(o.gear===false)drawHero(o.el==null?0:o.el,o.g||'m',o.tier||0);else drawHeroEq(o.el==null?0:o.el,o.g||'m',o.tier||0);});}finally{GR.eq=old;}},heroStem:(stem)=>{HERO_TEST_STEM=stem;},drawEndScene,perkCheck,roomSheet,closeRoomSheet,get ROOM_HOT(){return ROOM_HOT;},drawRoomHero,drawRoomSocial,drawRoomMore,renderGear,renderBoard,get QST(){return QST;},doorWipe,drawRecChart,renderStore,get GEAR(){return GEAR;},HOT,cheer:(c)=>cheerSuffix(c,todayStr()),GIFTv:()=>GIFT,crSheet:(sc)=>{sc=sc||2.6;const cv2=document.createElement('canvas');cv2.width=1280;cv2.height=720;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,1280,720);for(let el=0;el<5;el++)for(let t=0;t<3;t++){ctx.save();ctx.translate(128+el*256,120+t*240);ctx.scale(sc,sc);BLINK=false;SWING=t===1?1:0;PHASE=0;HURT=false;drawCreature(el,t);ctx.restore();}});return cv2;},scene:(dt)=>{sceneT+=(dt||0);drawScene();return sceneT;},HW,dexGo:(p)=>{DEX_PAGE=(((p|0)%6)+6)%6;renderDex();return DEX_PAGE;},renderDex,hgrid:()=>({CW:HG_CW,CH:HG_CH,NAME:HG_NAME,cols:HG.cols,rows:HG.rows}),dexTick:(d)=>{DEXA.ang+=(d==null?0.5:d);dexFrame();return DEXA.ang;},heroBig:(opts)=>{opts=opts||{};const cv2=document.createElement('canvas');const n=(opts.list||[[0,0,'m']]).length;const cw=opts.cw||300,chh=opts.ch||400,sc=opts.sc||3.2;cv2.width=n*cw;cv2.height=chh;drawOn(cv2,()=>{ctx.fillStyle='#EAF4E6';ctx.fillRect(0,0,cv2.width,cv2.height);(opts.list||[[0,0,'m']]).forEach(([stem,br,g],i)=>{ctx.save();ctx.translate(i*cw+cw/2,chh*0.72);ctx.scale(sc,sc);BLINK=false;SWING=opts.sw||0;PHASE=opts.ph||0;HURT=!!opts.hurt;if(opts.skin)META.skin=opts.skin;window.ART_HEROES.drawHeroChibi(ctx,{stem,gender:g},opts.tier==null?1:opts.tier,{pose:SWING>0.2?'attack':'idle',blink:BLINK,t:PHASE});ctx.restore();});});return cv2;},og:()=>{const c=document.createElement('canvas');c.width=1200;c.height=630;const sk=META.skin;META.skin='basic';drawOn(c,()=>{const g=ctx;const bg=g.createLinearGradient(0,0,1200,630);bg.addColorStop(0,'#DCEBFA');bg.addColorStop(1,'#FBF7EE');g.fillStyle=bg;g.fillRect(0,0,1200,630);[['#3FA66B',150,520],['#E3553B',420,600],['#C9A24A',760,80],['#8FA3B8',1050,560],['#3D7FD9',980,140]].forEach(([col,x,y])=>{const gr=g.createRadialGradient(x,y,0,x,y,260);gr.addColorStop(0,col+'55');gr.addColorStop(1,col+'00');g.fillStyle=gr;g.fillRect(0,0,1200,630);});g.fillStyle='rgba(255,255,255,.65)';g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.fill();g.strokeStyle='#FFD27A';g.lineWidth=8;g.stroke();
     g.save();g.beginPath();g.arc(300,330,235,0,Math.PI*2);g.clip();g.translate(300,500);g.scale(4.7,4.7);BLINK=false;SWING=0;PHASE=0;HURT=false;window.ART_HEROES.drawHeroChibi(ctx,{stem:2,gender:'m'},2,{pose:'idle'});g.restore();
     [0,1,2,3,4].forEach((el,i)=>{g.save();g.translate(640+i*118,470);g.scale(1.9,1.9);BLINK=false;SWING=0;PHASE=0;HURT=false;drawCreature(el,2);g.restore();});
