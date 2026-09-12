@@ -1567,7 +1567,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.5</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.6</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -2272,7 +2272,8 @@ function foeTarget(B,u){
 function alliesNear(B,u,r){const out=[];for(const o of B.all)if(o.side===u.side&&o.alive&&o!==u&&Math.hypot(o.x-u.x,o.y-u.y)<=r)out.push(o);return out;}
 function hurt(B,u,dmg,rng){if(!u.alive)return false;if(u.shield>0){const s=Math.min(u.shield,dmg);u.shield-=s;dmg-=s;}
   u.hp-=dmg;B.fx.push({k:'hit',x:u.x,y:u.y,v:dmg,side:u.side,t:B.t});
-  if(u.hp<=0){u.hp=0;u.alive=false;u.deadAt=B.t;B.fx.push({k:'die',x:u.x,y:u.y,el:u.el,side:u.side,t:B.t});if(u.side===1)B.kills++;return true;}return false;}
+  // die fx 의 boss 표는 화면이 읽는다 — 보스 처치는 소리도 히트스톱도 잡몹과 다르다(v19.6).
+  if(u.hp<=0){u.hp=0;u.alive=false;u.deadAt=B.t;B.fx.push({k:'die',x:u.x,y:u.y,el:u.el,side:u.side,boss:!!u.boss,t:B.t});if(u.side===1)B.kills++;return true;}return false;}
 function clashInit(run){
   const elBonus=(run.mods.elBonus||[0,0,0,0,0]).slice();const mods=Object.assign({},run.mods,{elBonus});
   if(mods.gather){const cnt=[0,0,0,0,0];for(let i=0;i<CELLS;i++){const u=run.units[i];if(u)cnt[u.el]++;}for(let e=0;e<5;e++)if(cnt[e]>=3)elBonus[e]=(elBonus[e]||0)+mods.gather;}
@@ -2339,6 +2340,8 @@ function strike(B,u,e,M,rng,attacks){
   // 호출)는 이 배율을 거치지 않는다. attacks 큐에 담기 전, 즉 이 공격이 실제로 나가는 자리에서만 곱한다.
   if(e.vuln>0)dmg=Math.round(dmg*1.3);
   attacks.push({u,e,dmg,burn:u.burn>0,slow:u.slowBuff>0});
+  u.lastHit=B.t;                       // **타격 프레임 시각** — 화면이 「이번 틱에 때린 개체」를 이걸로 찾는다.
+  // (겨눔이 들어오며 AANIM 의 a.atk 는 겨눔 **시작** 시각이 되어 타격 순간과 안 맞는다.)
   // 투사체(v17 §3): 사수·술사 공격마다 {k:'proj'} — 비행 0.25초는 연출만, 피해는 즉시(apply 단계).
   if(u.role===1||u.role===2)B.fx.push({k:'proj',role:u.role,x0:u.x,y0:u.y,x1:e.x,y1:e.y,el:u.el,side:u.side,t:B.t});
 }
@@ -4103,7 +4106,12 @@ const GAP_A=0.6;       // 옛 틈 흙길 알파 — 틈이 없어졌다(이름�
 const SCL_LO=0.92, SCL_HI=1.00;   // 부감 흉내 — 맨 윗행 0.92(멀다) → 맨 아랫행 1.00(가깝다)
 const SNAP=0.2;        // 판 밖 탭을 붙여 주는 여유(칸 단위)
 // 타격감(v17 §4·§5) — 피격 밀림·치명 흔들림·투사체 시간. **밀림 방향만 가로(−x/+x)로 돈다**.
-const HIT_PUSH_T=0.08, HIT_PUSH_K=0.08;   // 피격: 80ms 동안 뒤로 0.08칸(열 폭 비례) 밀렸다 돌아온다(그리는 위치 오프셋만)
+// 피격 반응(v19.6). 옛 값은 80ms · 0.08칸 **고정**이라, 스치는 한 대와 뼈아픈 한 대가 똑같이 4px 흔들렸다.
+// 이제 **맞은 세기**(power = 이번 피해 / 최대 체력, 0~1)를 타고 밀리는 거리·시간이 늘고, 몸이 잠깐 눌린다.
+// 위치는 여전히 **그리는 오프셋만**이다 — 코어의 논리 좌표는 안 건드린다(밸런스 불변).
+const HIT_PUSH_T=0.14, HIT_PUSH_K=0.075;  // 밑값: 140ms 동안 뒤로 0.075칸 밀렸다 돌아온다
+const HIT_PUSH_P=2.4;                     // 세기 배수 — power 1(한 방에 최대 체력) 이면 (0.7+2.4)배
+const HIT_SQUASH=0.16;                    // 눌림 최대치(가로 +16% · 세로 −16%)
 const HIT_SHAKE=3, HIT_SHAKE_T=0.12;      // 치명·보스 피격: 캔버스 3px · 120ms
 const PROJ_T=0.25, PROJ_RING=0.15;        // 투사체 비행 0.25초(연출만 — 피해는 즉시) · 술사 구슬 도착 링 0.15초
 
@@ -4654,11 +4662,18 @@ function shakeOffset(t,s,d){
 // 피격 밀림 — 맞은 지 age 초 된 몸을 그릴 때 더할 화면 오프셋(px). 뒤로 0.08칸(열 폭) 밀렸다가 80ms 안에 돌아온다.
 // **v18 가로**: 우리 편(side 0)의 「뒤」는 화면 왼쪽(−x · 본진 쪽), 적(side 1)은 오른쪽(+x · 성문 쪽)이다.
 // 위치 값이 아니라 **그리는 오프셋**이다.
-function hitPush(L,side,age){
+// hitPush(L,side,age,power) → {dx,dy,sx,sy}. power 는 이번에 맞은 세기(0~1 · 안 주면 0).
+// 되돌아오는 곡선은 (1−q)^1.6 — 처음에 확 밀렸다가 부드럽게 제자리로 온다(선형이면 뚝 끊긴다).
+function hitPush(L,side,age,power){
   age=+age||0;
-  if(!(age>=0&&age<HIT_PUSH_T))return {dx:0,dy:0};
+  const p=Math.max(0,Math.min(1,+power||0));
+  const T=HIT_PUSH_T*(0.8+p*0.8);                      // 세게 맞을수록 오래 밀린다
+  if(!(age>=0&&age<T))return {dx:0,dy:0,sx:1,sy:1};
   const csx=L&&L.csx>0?L.csx:(L&&L.cs>0?L.cs:60);
-  return {dx:(side===1?1:-1)*HIT_PUSH_K*csx*(1-age/HIT_PUSH_T),dy:0};
+  const q=age/T, f=Math.pow(1-q,1.6);
+  const k=HIT_PUSH_K*(0.7+p*HIT_PUSH_P);
+  const sq=HIT_SQUASH*p*f;                             // 눌림도 같은 곡선으로 편다
+  return {dx:(side===1?1:-1)*k*csx*f,dy:0,sx:1+sq,sy:1-sq};
 }
 // 입자용 오행색은 판·글씨용(EL_COL)보다 진하다 — 금(#CFD6E0)을 그대로 쓰면 돌길 위에서 먼지로 읽힌다.
 const FX_COL =['#2FCB7E','#FF5230','#FFBB2E','#7FC9F0','#2E86FF'];
@@ -8649,7 +8664,7 @@ function mergeHint(u){const A=ASSAULT,lv=unitLv(u),LVP=A.LV_PROMOTE||4,PM=A.PROM
 //   hit(role): 전위 「퍽」(저역 노이즈 60ms + 둔탁한 삼각파) · 사수 「틱」(고역 노이즈 + 짧은 사각파) · 술사 「펑」(저역 팝)
 //   arrow(): 사수 「팅」(현 튕김) · magic(): 술사 「휙」(스윕) · die(): 「푹」 · spin(): 릴 틱 · stop(i): 릴 멈춤 · win(grade): 등급 높을수록 높은 음 ·
 //   merge(): 두 음 · promote(): 네 음 상행 + 반짝임
-const SFX={last:{},MIN_GAP:{hit:0.045,die:0.06,arrow:0.05,magic:0.05,spin:0.05},
+const SFX={last:{},MIN_GAP:{hit:0.045,hitBig:0.10,die:0.06,arrow:0.05,magic:0.05,spin:0.05},
   ctx(){try{AU.init&&AU.init();}catch(_){}return (AU.on&&AU.ctx)?AU.ctx:null;},
   gate(k,gap){const c=this.ctx();if(!c)return null;const now=c.currentTime;if(gap&&this.last[k]!=null&&now-this.last[k]<gap)return null;this.last[k]=now;return c;},
   noiseBuf(c,sec,seed){const n=Math.max(1,Math.round(c.sampleRate*sec));const buf=c.createBuffer(1,n,c.sampleRate);const d=buf.getChannelData(0);
@@ -8659,14 +8674,20 @@ const SFX={last:{},MIN_GAP:{hit:0.045,die:0.06,arrow:0.05,magic:0.05,spin:0.05},
     const g=this.env(c,t,0.005,dur,vol);o.connect(g);o.start(t);o.stop(t+dur+0.03);return 2;},
   burst(c,t,dur,vol,type,freq,q,seed){const n=c.createBufferSource();n.buffer=this.noiseBuf(c,dur,seed);const f=c.createBiquadFilter();f.type=type;f.frequency.value=freq;if(q)f.Q.value=q;
     const g=this.env(c,t,0.003,dur,vol);n.connect(f);f.connect(g);n.start(t);n.stop(t+dur+0.02);return 3;},
-  hit(role){const c=this.gate('hit',this.MIN_GAP.hit);if(!c)return 0;const t=c.currentTime;
-    if(role===1)return this.burst(c,t,0.05,0.07,'highpass',2400,0,7)+this.osc(c,'square',1900,1200,t,0.035,0.03);
-    if(role===2)return this.osc(c,'sine',420,60,t,0.14,0.10)+this.burst(c,t,0.12,0.05,'lowpass',500,0,11);
-    return this.burst(c,t,0.06,0.13,'lowpass',380,0,3)+this.osc(c,'triangle',150,55,t,0.07,0.09);},
+  // v19.6 — 세기로도 갈린다. heavy(센 한 방 = 최대 체력의 20% 이상)는 **다른 문**('hitBig')으로 나가
+  // 잔 타격 줄(MIN_GAP.hit)에 안 먹힌다 — 큰 한 방이 소리에서 사라지면 눈으로만 세게 보이고 귀는 밋밋하다.
+  // 몸통 울림(낮은 삼각파)을 한 겹 더 얹고 조금 길게 끈다.
+  hit(role,heavy){const c=this.gate(heavy?'hitBig':'hit',heavy?this.MIN_GAP.hitBig:this.MIN_GAP.hit);if(!c)return 0;const t=c.currentTime;
+    const boom=heavy?this.osc(c,'triangle',96,42,t,0.15,0.11):0;      // 몸통 울림 — 센 한 방에만
+    if(role===1)return boom+this.burst(c,t,heavy?0.07:0.05,heavy?0.10:0.07,'highpass',2400,0,7)+this.osc(c,'square',1900,1200,t,0.035,heavy?0.05:0.03);
+    if(role===2)return boom+this.osc(c,'sine',420,60,t,0.14,heavy?0.14:0.10)+this.burst(c,t,0.12,heavy?0.07:0.05,'lowpass',500,0,11);
+    return boom+this.burst(c,t,heavy?0.09:0.06,heavy?0.18:0.13,'lowpass',380,0,3)+this.osc(c,'triangle',150,55,t,heavy?0.10:0.07,heavy?0.13:0.09);},
   arrow(){const c=this.gate('arrow',this.MIN_GAP.arrow);if(!c)return 0;const t=c.currentTime;
     return this.osc(c,'triangle',880,440,t,0.09,0.05)+this.burst(c,t,0.07,0.03,'bandpass',3200,2,5);},
   magic(){const c=this.gate('magic',this.MIN_GAP.magic);if(!c)return 0;const t=c.currentTime;return this.osc(c,'sawtooth',300,1400,t,0.16,0.035);},
-  die(){const c=this.gate('die',this.MIN_GAP.die);if(!c)return 0;const t=c.currentTime;
+  // 보스 처치는 더 낮고 길게 — 잡몹 하나 죽는 소리와 같으면 「잡았다」가 안 들린다.
+  die(boss){const c=this.gate(boss?'dieBoss':'die',boss?0:this.MIN_GAP.die);if(!c)return 0;const t=c.currentTime;
+    if(boss)return this.burst(c,t,0.42,0.14,'lowpass',600,0,29)+this.osc(c,'sine',180,44,t,0.5,0.13)+this.osc(c,'triangle',90,36,t+0.05,0.42,0.10);
     return this.burst(c,t,0.16,0.10,'lowpass',900,0,17)+this.osc(c,'sine',260,70,t,0.18,0.08);},
   spin(){const c=this.gate('spin',this.MIN_GAP.spin);if(!c)return 0;const t=c.currentTime;return this.osc(c,'square',700,700,t,0.02,0.02);},
   stop(i){const c=this.gate('stop',0);if(!c)return 0;const t=c.currentTime;return this.osc(c,'triangle',520+(i|0)*30,300,t,0.07,0.07)+this.burst(c,t,0.04,0.04,'lowpass',1200,0,23+(i|0));},
@@ -8686,6 +8707,7 @@ const FXP_RAW=window.BATTLE_SCENE.FxPool();
 // 글자 크기·색은 모듈 팝 규칙(치명 노랑 · 바닥 13px)그대로다 — popSz 는 장면 모듈(S1 소유) 것이라 11px 은 여기서 못 건드린다.
 const POP_MAX=2, POP_LIFE=0.5, POP_NEAR=0.35;
 const HPBARS=[];             // 이번 프레임에 그린 전투 체력바(검사망이 색을 읽는다)
+const FXSTOP=new Set();      // 히트스톱을 이미 건 fx — 같은 사건에 두 번 안 건다
 const MARKQ=[];              // 이번 프레임의 표식(발밑 고리·체력바) — 몸을 다 그린 뒤 몰아 그린다
 const FXP=Object.create(FXP_RAW);
 FXP.spawn=function(k,x,y,o){
@@ -8725,7 +8747,8 @@ function hitInfoOf(f){
     if(o.side===side||!o.alive)continue;
     const d=Math.hypot(o.x-ox,o.y-oy);
     if(d<anyd){anyd=d;any=o;}
-    const a=AANIM.get(o);if(!(a&&a.atk===B.t))continue;   // 이번 틱에 때린 개체만
+    // v19.6: 겨눔이 들어와 a.atk 는 겨눔 **시작** 시각이다 — 코어가 찍는 타격 시각(o.lastHit)으로 찾는다.
+    if(o.lastHit!==f.t)continue;                         // 이번 틱에 실제로 때린 개체만
     if(d<ad){ad=d;att=o;}
   }
   if(!att)att=any;
@@ -8806,7 +8829,7 @@ function fxAnim(){
     }
     a.cd=u.cd;
     const sh=u.shield||0, dv=Math.round((a.hp-u.hp)+(a.sh-sh));   // 방어막이 먼저 깎이므로 둘을 더해야 실제 피해다
-    if(dv>0){a.hurt=B.t;if(sh<a.sh)a.shT=B.t;
+    if(dv>0){a.hurt=B.t;a.hurtV=Math.max(0,Math.min(1,dv/Math.max(1,u.max)));if(sh<a.sh)a.shT=B.t;   // v19.6: 맞은 세기 — 밀림·눌림이 이걸 탄다
       if(u.side===0)fxHurtUnit(u,dv,((u.id|0)*13+Math.round(B.t*1000))&65535);}
     a.hp=u.hp;a.sh=sh;
     if(u.boss&&!BOSS_SEEN.has(u)){BOSS_SEEN.add(u);fxShake(6,0.3);}   // 보스 등장 — 포효 흔들림
@@ -8993,8 +9016,8 @@ function sfxScan(fx){if(!Array.isArray(fx)||!AU.on)return;
   for(const f of fx){if(!f||SFXSEEN.has(f))continue;SFXSEEN.add(f);
     if(f.k==='hit'){let role=0;
       for(const g of fx){if(g.k!=='proj'||g.t!==f.t)continue;const tx=g.x1!=null?g.x1:g.tx,ty=g.y1!=null?g.y1:g.ty;if(tx!=null&&Math.hypot(tx-f.x,ty-f.y)<0.4){role=g.role|0;break;}}
-      SFX.hit(role);}
-    else if(f.k==='die')SFX.die();
+      const d=hitInfoOf(f);SFX.hit(role,!!(d&&d.crit));}   // v19.6: 센 한 방은 다른 소리로
+    else if(f.k==='die')SFX.die(!!f.boss);
     else if(f.k==='proj'){if((f.role|0)===1)SFX.arrow();else SFX.magic();}}}
 function saveDS(o){try{localStorage.setItem('ubz_dailyrun',JSON.stringify(Object.assign({date:todayStr()},o)));}catch(_){}}
 function assaultOpts(mode){const seed=mode==='tutorial'?7:mode==='daily'?hash('daily|'+todayStr()):mode==='weekly'?hash('weekly|'+wkKey()):null;
@@ -9856,9 +9879,10 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
           hu=(B.t-an.hurt)<0.25;}
         // v17 타격감(P2 ruling 2): 피격 밀림은 장면이 위치를 안 바꾼다 — 그릴 때 SCN.hitPush(L,side,age) 오프셋만 더한다
         // (우리 편 +y 아래로 · 적 −y 위로 · 0.08rh 에서 80ms 안에 0). 그림자는 제자리다.
-        const HP=(an&&SCN.hitPush)?SCN.hitPush(L,u.side,B.t-an.hurt):{dx:0,dy:0};
+        const HP=(an&&SCN.hitPush)?SCN.hitPush(L,u.side,B.t-an.hurt,an.hurtV):{dx:0,dy:0,sx:1,sy:1};
         SCN.groundShadow(ctx,px,py,k);                 // 그림자는 제자리 — 돌진해도 발이 땅에서 안 뜬다
-        ctx.save();ctx.translate(px+ox+HP.dx,py+oy+HP.dy);ctx.scale(k,k);BLINK=false;PHASE=0;HURT=hu;
+        // 눌림(HP.sx/HP.sy)은 **발끝을 축으로** 건다 — 몸 가운데를 축으로 하면 발이 땅에서 뜬다.
+        ctx.save();ctx.translate(px+ox+HP.dx,py+oy+HP.dy);ctx.scale(k*(HP.sx||1),k*(HP.sy||1));BLINK=false;PHASE=0;HURT=hu;
         SWING=ap?1:((u.role===0||u.role===3)?Math.abs(Math.sin(B.t*8))*0.6:0);
         // v15 P1 ruling 1 — 적도 같은 키 천장(L.unitH)을 탄다. v15.1 Q5: 폭 상한도 같이(unitScale) — 보스는 ×1.6 몸에 폭 상한만.
         // v17: 적은 좌우 반전 없이 정면(스프라이트를 dir 1 로 굽는다 · spiritSprite).
@@ -9976,9 +10000,19 @@ assaultCv.addEventListener('pointerup',ev=>{if(!S||!ADRAG)return;const p=cellAt(
 // 탭을 숨기거나 닫을 때(visibilitychange/pagehide)는 winResolve 로 잔상을 즉시 마무리해 결산·다음 판 준비까지 간 뒤 저장한다.
 const WIN_HOLD_MOB=0.45;
 function winResolve(){if(!AWIN||!B)return;AWIN=null;const res=ASSAULT.finishWave(S,B);B=null;AACC=0;endStage(res);}
+// ── 히트스톱(v19.6) ────────────────────────────────────────────────────────
+// 센 한 방·처치에 **아주 짧게** 시간이 멎는다. 격투 게임이 쓰는 손인데, 여기서는 「무겁다」를 만드는 거의
+// 유일한 공짜 수단이다 — 코어 규칙이 아니라 **틱을 먹이는 박자**만 늦춘다(시뮬 시간 기준 밸런스 불변:
+// CLASH_MAX 도 B.t 로 재고 봇은 고정 dt 라 영향이 없다).
+// 멈추지 않고 0.12배로 **늦추는** 까닭: 완전히 멈추면 딸꾹질로 읽히고 입자도 같이 얼어 죽은 화면이 된다.
+const HS_MAX=0.085;          // 한 번에 쌓이는 상한(초 · 실제 시간)
+const HS_SLOW=0.12;          // 히트스톱 중 시간 배율
+let HSTOP=0;                 // 남은 히트스톱(초 · 실제 시간)
+function hitStop(sec){HSTOP=Math.min(HS_MAX,Math.max(HSTOP,sec));}
 function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;const on=!$('assault').hidden;
   if(S&&B&&S.phase==='battle'&&on){
-    const step=Math.min(0.25,dt>0?dt:0);                  // 탭이 잠자다 돌아와도 한 번에 몰아 돌리지 않는다
+    let step=Math.min(0.25,dt>0?dt:0);                    // 탭이 잠자다 돌아와도 한 번에 몰아 돌리지 않는다
+    if(HSTOP>0&&!calmFx()){const used=Math.min(HSTOP,step);HSTOP-=used;step=step-used+used*HS_SLOW;}
     if(!AWIN){AACC=Math.min(0.25,AACC+step);
       while(AACC>=ATICK&&!B.result){AACC-=ATICK;
         for(let k=0;k<ASPD;k++){ASSAULT.clashTick(B,ATICK,S.rng,S.mods);for(const s of (S.skills||[]))if(s.cd>0)s.cd=Math.max(0,s.cd-ATICK);if(B.result)break;}}}
@@ -9987,6 +10021,11 @@ function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;cons
     // 우리 쪽 타격·죽음 입자는 페이지가 직접 낸다(붉은 팝 foe:true · 처치 폭발) — 코어가 남긴 같은 사건을
     // 미리 '본 것'으로 찍어 ingestFx 가 같은 자리에 입자를 두 번 뿌리지 않게 한다.
     sfxScan(B.fx);                                        // v17: 타격·처치·투사체 소리 — 코어 fx 를 그대로 듣는다(양쪽 다)
+    // 히트스톱 — **처치**와 **센 한 방**(최대 체력의 20% 이상)에만. 잔 타격마다 걸면 화면이 늘 끈적해진다.
+    for(const f of B.fx){if(FXSTOP.has(f))continue;
+      if(f.k==='die'){FXSTOP.add(f);hitStop(f.boss?0.085:0.05);}
+      else if(f.k==='hit'&&f.v>0){const d=hitInfoOf(f);if(d&&d.crit){FXSTOP.add(f);hitStop(0.038);}}}
+    if(FXSTOP.size>400)FXSTOP.clear();
     for(const f of B.fx)if(f.side===0&&(f.k==='hit'||f.k==='die'))FXSEEN.add(f);
     window.BATTLE_SCENE.ingestFx(FXP,B,FXSEEN,{hitInfo:hitInfoOf,shake:(k,st,du)=>fxShake(k==='crit'?(st!=null?st:3):(st!=null?st:6),k==='crit'?(du!=null?du:0.12):(du!=null?du:0.3)),onDie:fxDieSeen});   // v17 P2: 치명·보스 피격('crit') 은 3px·120ms(S1 규약) — 다른 종류는 옛 6/0.3
     if(((ts/250)|0)!==((prev/250)|0))assaultUI();$('hudLives').textContent=`목숨 ${B.lives}`;
