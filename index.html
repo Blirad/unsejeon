@@ -951,8 +951,12 @@
   .assault .hpbar i.theirs{right:0;transform-origin:right center;background:linear-gradient(#F08A72,#E8553B)}
   .assault .hpbar b{position:absolute;top:0;bottom:0;display:flex;align-items:center;pointer-events:none;
     font-size:11px;line-height:20px;font-weight:800;color:#FFF6E5;text-shadow:0 1px 2px rgba(0,0,0,.85);letter-spacing:.02em;font-variant-numeric:tabular-nums}
-  .assault .hpbar b.n-l{left:8px}
-  .assault .hpbar b.n-r{right:8px}
+  .assault .hpbar b.n-l{left:8px;gap:5px}
+  .assault .hpbar b.n-r{right:8px;gap:5px}
+  /* 「N기」는 체력 숫자보다 작고 옅게 — 눈이 먼저 가는 것은 막대, 그다음이 체력, 그다음이 기수다. */
+  /* 기수는 **em** 이어야 한다 — `.hpbar i` 는 채움 막대 규칙(절대 위치·폭 50%)이라 i 를 쓰면 숫자 위에 겹친다. */
+  .assault .hpbar b em{font-style:normal;font-size:9.5px;font-weight:700;opacity:.72;letter-spacing:0;flex:0 0 auto}
+  .assault .hpbar b s{text-decoration:none;flex:0 0 auto}   /* 체력 숫자 — 검사망이 .hpv 하나만 읽는다 */
   .assault .hpbar::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:rgba(255,246,229,.55)}
   /* ── v18 R3 ruling 3 · 파란 막대 하나 — 그 웨이브 최고 피해 유닛(얼굴 24px · 이름 · 수치). 피해 순위 3줄은 없앴다. ── */
   .assault .topdmg{position:absolute;left:10px;right:10px;top:calc(var(--laneBot,72%) + 36px);z-index:3;
@@ -1574,7 +1578,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.7</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.8</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -8993,11 +8997,15 @@ function hudHp(){const hb=$('hpBar');if(!hb)return;
   if(!on){hb.dataset.k='';return;}
   const h=B.hpSum, o=Math.max(0,h.ours||0), t=Math.max(0,h.theirs||0);
   const fo=h.ours0>0?Math.min(1,o/h.ours0):0, ft=h.theirs0>0?Math.min(1,t/h.theirs0):0;
-  const key=`${Math.round(o)}|${Math.round(t)}`;if(key===hb.dataset.k)return;hb.dataset.k=key;
+  // v19.8 — **남은 기수**를 체력 옆에 적는다. 막대 비율은 「이기고 있나」를 말하지만 「얼마나 남았나」는
+  // 말하지 않는다. 접전이 한 덩어리로 엉키면 눈으로 적을 셀 수가 없어서, 웨이브가 끝나 가는지 아닌지를
+  // 화면에서 읽을 방법이 없었다. 새 요소를 늘리지 않고 막대 양 끝 숫자에 「N기」를 붙인다.
+  const on0=B.units.filter(u=>u.alive).length, on1=B.foes.filter(u=>u.alive).length;
+  const key=`${Math.round(o)}|${Math.round(t)}|${on0}|${on1}`;if(key===hb.dataset.k)return;hb.dataset.k=key;
   hb.querySelector('.ours').style.transform=`scaleX(${fo.toFixed(3)})`;
   hb.querySelector('.theirs').style.transform=`scaleX(${ft.toFixed(3)})`;
-  hb.querySelector('.n-l').textContent=hpNum(o);
-  hb.querySelector('.n-r').textContent=hpNum(t);}
+  hb.querySelector('.n-l').innerHTML=`<s class="hpv">${hpNum(o)}</s><em class="cnt">${on0}기</em>`;
+  hb.querySelector('.n-r').innerHTML=`<em class="cnt">${on1}기</em><s class="hpv">${hpNum(t)}</s>`;}
 // ── v18 R3 ruling 3 · 파란 막대 하나 — 그 웨이브 **최고 피해 유닛**(B.dmgBy 1위). 0.5초마다 다시 잰다.
 // 얼굴 24px 캔버스(정령 몸 · 영웅 머리) · 「오행 역할 · 등급 LvN」 · 막대(제 피해 / 우리 편 총 피해) · 값.
 // 피해 순위 3줄은 없앴다(설계서 §4).
