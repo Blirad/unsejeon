@@ -1559,7 +1559,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v18.1</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.0</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -1757,28 +1757,32 @@ function fillReels(rng,sym,count){const pos=[0,1,2,3,4,5];
   for(let i=0;i<6;i++)if(reels[i]==null)reels[i]=SPIN_SYM[(si+1+Math.floor(rng()*6))%7];
   return reels;}
 
-// ── v18 판(설계서 §1 · 실측 §0): **4열 × 4행 = 16칸**. 열 = 깊이(x · 열 0 = 맨 왼쪽 = 본진 쪽 · 열 3 = 맨 앞),
-// 행 = 세로 자리(y · 행 0 = 맨 위). v17 의 5×5 세로 대치(양쪽 돌진)는 통째로 없앴다 — 우리 판은 왼쪽에 서고
-// 적이 오른쪽 바깥에서 왼쪽으로 전진한다(운빨돌격대 as-3·as-6 구조).
-const N=4,COLS=4,ROWS=4,CELLS=16;const idx=(r,c)=>r*N+c;
+// ── v19 판: **5열 × 5행 = 25칸**. 열 = 깊이(x · 열 0 = 맨 왼쪽 = 본진 쪽 · 열 4 = 맨 앞),
+// 행 = 세로 자리(y · 행 0 = 맨 위). 우리 판은 왼쪽에 서고 적이 오른쪽 바깥에서 왼쪽으로 전진한다(v18 가로 대치 유지).
+// **판이 5×5 인 까닭은 오행이 다섯이기 때문이다.** 한 줄이 다섯 칸이라야 「한 줄에 오행 다섯」이라는
+// 오행연환(五行連環)이 성립한다 — v18 이 4×4 로 줄이면서 직선 연환이 원천적으로 불가능해졌던 것을 되돌린다.
+// 아래 자리·줄은 전부 ROWS·COLS 에서 파생한다(판 크기를 다시 건드려도 한 군데만 고치면 된다).
+const N=5,COLS=5,ROWS=5,CELLS=25;const idx=(r,c)=>r*N+c;
 const colOf=i=>i%N, rowOf=i=>Math.floor(i/N);
-// 기본 자리(v18 §1). 열이 깊이다 — 전위는 **앞열**(3·2), 술사는 가운데(1·2), 사수는 **뒷열**(0·1 — 사거리 3.5라
-// 뒤에서도 전선에 닿는다). 각 열은 가운데 행(1·2)부터 바깥(0·3)으로. 영웅 기본 자리는 앞열 가운데.
-const colCells=c=>[1,2,0,3].map(r=>idx(r,c));
-const HERO_HOME=idx(1,COLS-1);                                   // 7 — 앞열 가운데
-const CELL_PREF=[3,2,1,0].reduce((a,c)=>a.concat(colCells(c)),[]);  // 앞열 → 뒷열, 가운데 행부터
+const RANGE=n=>[...Array(n).keys()];
+// 가운데 행부터 바깥으로 — 5행이면 [2,1,3,0,4]. 부대·적 대형이 가운데부터 차는 순서다.
+const ROWS_OUT=RANGE(ROWS).slice().sort((a,b)=>{const m=(ROWS-1)/2,d=Math.abs(a-m)-Math.abs(b-m);return d||a-b;});
+// 기본 자리. 열이 깊이다 — 전위는 **앞열**(4·3), 술사는 가운데(2·3), 사수는 **뒷열**(0·1).
+const colCells=c=>ROWS_OUT.map(r=>idx(r,c));
+const HERO_HOME=idx((ROWS-1)>>1,COLS-1);                            // 14 — 앞열 가운데
+const CELL_PREF=RANGE(COLS).reverse().reduce((a,c)=>a.concat(colCells(c)),[]);  // 앞열 → 뒷열, 가운데 행부터
 const ARMY_HOME={0:colCells(COLS-1).concat(colCells(COLS-2)).filter(i=>i!==HERO_HOME),
                  1:colCells(0).concat(colCells(1)),
                  2:colCells(1).concat(colCells(2))};
-// 연환 줄(v18 · 4×4): 가로 4줄 · 세로 4줄 · 대각 2줄 — 모두 네 칸짜리다(5×5 시절의 가로·세로 5줄을 대신한다).
+// 연환 줄(v19 · 5×5): 가로 5줄 · 세로 5줄 · 대각 2줄 = **12줄**. 모두 다섯 칸이라 오행 다섯이 한 줄에 들어간다.
 const CHAIN_LINES=(()=>{const L=[];
-  for(let r=0;r<ROWS;r++)L.push([0,1,2,3].map(c=>idx(r,c)));
-  for(let c=0;c<COLS;c++)L.push([0,1,2,3].map(r=>idx(r,c)));
-  L.push([0,1,2,3].map(k=>idx(k,k)));
-  L.push([0,1,2,3].map(k=>idx(k,COLS-1-k)));
+  for(let r=0;r<ROWS;r++)L.push(RANGE(COLS).map(c=>idx(r,c)));
+  for(let c=0;c<COLS;c++)L.push(RANGE(ROWS).map(r=>idx(r,c)));
+  L.push(RANGE(ROWS).map(k=>idx(k,k)));
+  L.push(RANGE(ROWS).map(k=>idx(k,COLS-1-k)));
   return L;})();
-const FRONT_COL=[0,1,2,3].map(r=>idx(r,COLS-1));   // 앞열(진 · 방벽)
-const BACK_COL=[0,1,2,3].map(r=>idx(r,0));         // 뒷열(비 · 화살비 · 사수 치명 보너스)
+const FRONT_COL=RANGE(ROWS).map(r=>idx(r,COLS-1));   // 앞열(진 · 방벽)
+const BACK_COL=RANGE(ROWS).map(r=>idx(r,0));         // 뒷열(비 · 화살비 · 사수 치명 보너스)
 // v17 거리·시간(설계서 §3 · 운빨돌격대 감각): 전위 사거리 .7 · 0.6초에 한 번(rate 1.6) · 속도 3.0, 사수 3.5 · 1.0 · 2.4, 술사 2.5 · 0.6 · 2.4.
 // hp·atk 는 v15 값 그대로. 적도 같은 표를 쓴다(waveSquad → makeUnit).
 // **v18 R7 룰링 1 — 사수 3.5 → 4.5 · 술사 2.5 → 3.8.** 판이 4×4 가로로 바뀌며 깊이가 3.0칸이 됐는데
@@ -1829,17 +1833,15 @@ const elMult=(a,d)=>OVER(a)===d?1.4:1;
 function computeChains(units,mods){const bonus=[];for(let i=0;i<CELLS;i++)bonus.push({atk:0,spd:0,hp:0,aoe:false,allMagic:false});const chains=[];
   const step=(mods&&mods.chainStep)||0.10;
   const nb=i=>{const r=Math.floor(i/N),c=i%N;const o=[];if(r>0)o.push(i-N);if(r<N-1)o.push(i+N);if(c>0)o.push(i-1);if(c<N-1)o.push(i+1);return o;};
-  // 상생 사슬: 각 칸에서 시작해 "다음 칸이 나를 생하는 오행의 다음(=GEN(내 오행))"인 방향으로 가장 긴 단순 경로 탐색
-  // 한 칸에서 뻗는 길은 수십 갈래라도 화면에 그릴 사슬은 하나면 된다 — 상생은 `best`, 오행연환은 `bestCyc`로
-  // 출발 칸마다 "가장 긴 것 하나"만 남긴다. (예전엔 조건을 만족하는 모든 경로를 밀어 넣어 25칸 상생판에서 668개가 나왔다.)
-  let best=[],bestCyc=null;const seen=new Set();
+  // 상생 사슬(부분 점수): 각 칸에서 시작해 GEN(내 오행)으로 이어지는 **인접 경로** 중 가장 긴 것 하나.
+  // 줄(직선)이 아니라 경로라 꺾여도 되고, 3칸·4칸·5칸에 각각 값이 붙는다 — 오행연환(직선 5칸)이
+  // 완성되기 전에도 한 기 한 기가 판단이 되도록 남겨 둔 사다리다.
+  // 출발 칸마다 "가장 긴 것 하나"만 남긴다(모든 경로를 담으면 25칸 상생판에서 668개가 나온다).
+  let best=[];const seen=new Set();
   const dfs=(i,path,vis)=>{if(path.length>best.length)best=path.slice();
-    if(path.length>=5){const els=new Set(path.map(k=>units[k].el));if(els.size===5&&(!bestCyc||path.length>bestCyc.length))bestCyc=path.slice();}
     for(const j of nb(i)){const u=units[j];if(!u||vis.has(j))continue;if(GEN(units[i].el)!==u.el)continue;vis.add(j);path.push(j);dfs(j,path,vis);path.pop();vis.delete(j);}};
-  for(let i=0;i<CELLS;i++){if(!units[i])continue;best=[];bestCyc=null;dfs(i,[i],new Set([i]));
-    if(bestCyc)chains.push({type:'cycle',cells:bestCyc});
+  for(let i=0;i<CELLS;i++){if(!units[i])continue;best=[];dfs(i,[i],new Set([i]));
     if(best.length>=3){const key=best.slice().sort((a,b)=>a-b).join(',');if(!seen.has(key)){seen.add(key);chains.push({type:'sheng',cells:best.slice()});}}}
-  const cycKeys=new Set();for(const c of chains.filter(c=>c.type==='cycle').slice()){const k=c.cells.slice().sort((a,b)=>a-b).join(',');if(cycKeys.has(k)){chains.splice(chains.indexOf(c),1);}else cycKeys.add(k);}
   // 중복 제거: 다른 사슬의 부분집합(또는 동일 칸)인 사슬은 제거하고 가장 긴 사슬만 남긴다.
   // 상생은 더 긴 상생·오행연환에 먹히고(같은 길이면 오행연환이 이긴다), 오행연환은 더 긴 오행연환에만 먹힌다.
   {
@@ -1858,8 +1860,39 @@ function computeChains(units,mods){const bonus=[];for(let i=0;i<CELLS;i++)bonus.
     }
     for(let k=drop.length-1;k>=0;k--)chains.splice(drop[k],1);
   }
-  for(const ch of chains){if(ch.type==='sheng'){const add=step*(ch.cells.length-2);for(const c of ch.cells)bonus[c].atk=Math.max(bonus[c].atk,add);}
-    else if(ch.type==='cycle'){for(const c of ch.cells){bonus[c].atk=Math.max(bonus[c].atk,0.40);if(units[c].role===2)bonus[c].allMagic=true;}}}
+  // ── 오행연환(五行連環 · v19) ───────────────────────────────────────────────
+  // **한 줄 다섯 칸이 다 차고, 그 다섯이 오행 다섯을 하나씩 갖추면** 그 줄이 연환한다.
+  // 줄은 CHAIN_LINES 12줄(가로 5 · 세로 5 · 대각 2)이다. 판이 5×5 인 이유가 이것이다 —
+  // 4×4 에서는 한 줄이 넉 칸이라 이 규칙이 원천적으로 성립하지 않는다.
+  // 순서는 안 따진다(§39). 중복 오행이 하나라도 있으면 연환이 아니다.
+  //
+  // **오행대연환(大連環 · 순행)**: 그 줄의 배열 순서까지 상생 순환(목→화→토→금→수)과 맞으면 한 단계 더 준다.
+  // 어느 오행에서 시작하든(회전) 인정하고, **읽는 방향은 양쪽 다 인정한다** — 같은 진형을 좌우로 뒤집었다고
+  // 값이 달라지면 플레이어에게는 규칙이 아니라 함정이다.
+  //
+  // 겹침: 한 칸이 가로·세로·대각 여러 줄에 들 수 있다. 더해서 주되 **칸마다 두 줄까지**만 센다(CYC_STACK).
+  for(const L of CHAIN_LINES){
+    if(!L.every(c=>units[c]))continue;
+    const els=L.map(c=>units[c].el);
+    if(new Set(els).size!==5)continue;
+    const fwd=els.every((e,k)=>k===0||GEN(els[k-1])===e);
+    const rev=els.every((e,k)=>k===0||GEN(e)===els[k-1]);
+    chains.push({type:fwd||rev?'grand':'cycle',cells:L.slice()});
+  }
+  // 연환이 선 줄에 통째로 먹힌 상생 사슬은 지운다 — 같은 진형을 두 번 세는 것이라, 화면에도 두 줄로 뜬다.
+  {const lines=chains.filter(c=>c.type==='cycle'||c.type==='grand').map(c=>new Set(c.cells));
+   for(let i=chains.length-1;i>=0;i--){const ch=chains[i];if(ch.type!=='sheng')continue;
+     if(lines.some(L=>ch.cells.every(c=>L.has(c))))chains.splice(i,1);}}
+  // 상생 사슬 값은 **중복 제거가 끝난 뒤** 얹는다 — 연환에 먹힌 사슬까지 값을 주면 같은 진형을 두 번 센다.
+  // 사다리에는 천장을 둔다(SHENG_CAP = 다섯 칸 몫). 25칸 판에서는 상생 경로가 열 칸 넘게 이어질 수 있어,
+  // 안 막으면 「직선 다섯 칸」인 오행연환보다 구불구불한 긴 사슬이 더 세지는 뒤집힘이 난다.
+  for(const ch of chains)if(ch.type==='sheng'){const add=Math.min(SHENG_CAP,step*(ch.cells.length-2));
+    for(const c of ch.cells)bonus[c].atk=Math.max(bonus[c].atk,add);}
+  {const used=[];for(let i=0;i<CELLS;i++)used.push(0);
+   for(const ch of chains){if(ch.type!=='cycle'&&ch.type!=='grand')continue;
+     for(const c of ch.cells){if(used[c]>=CYC_STACK)continue;used[c]++;
+       bonus[c].atk+=CYC_ATK;bonus[c].hp+=CYC_HP;
+       if(ch.type==='grand'){bonus[c].atk+=GRAND_ATK;bonus[c].spd+=GRAND_SPD;if(units[c].role===2)bonus[c].allMagic=true;}}}}
   // 동행 연환: 같은 오행 3+ 일렬. v18 줄은 CHAIN_LINES — 가로 4 · 세로 4 · 대각 2(모두 네 칸).
   for(const L of CHAIN_LINES){let run=[];const flush=()=>{if(run.length>=3){chains.push({type:'peer',cells:run.slice()});for(const c of run)bonus[c].spd=0.15;}run=[];};
     for(const c of L){const u=units[c];if(u&&run.length&&units[run[run.length-1]].el===u.el)run.push(c);else{flush();if(u)run=[c];}}flush();}
@@ -1871,12 +1904,21 @@ function computeChains(units,mods){const bonus=[];for(let i=0;i<CELLS;i++)bonus.
   if(back.length>=RAIN_N){chains.push({type:'rain',cells:back});for(const c of back)bonus[c].aoe=true;}
   return {bonus,chains};}
 const RAIN_N=3;   // 「비」 연환에 필요한 뒷줄 사수 칸 수
+// 오행연환 손잡이(v19). 한 줄(5칸)에 오행 다섯이면 연환 · 그 순서가 상생 순환이면 대연환.
+// 한 칸이 받을 수 있는 줄은 최대 CYC_STACK 줄이다(가로+세로까지 · 대각은 그 다음).
+const CYC_STACK=2, CYC_ATK=0.30, CYC_HP=0.15;   // 연환 한 줄: 공격 +30% · 체력 +15%
+const SHENG_CAP=0.30;                            // 상생 사슬 천장 — 다섯 칸(step×3) 몫에서 멈춘다
+const GRAND_ATK=0.20, GRAND_SPD=0.12;           // 대연환 한 줄: 공격 +20%p · 공속 +12% · 술사 광역
 
 // 골패 위 눈은 내 사주 오행 수만큼 가중된다. 참전 벗을 부르면 벗의 오행이 +50% — 벗과 같은 오행 용병이 더 자주 나와
 // 벗 한 기가 아니라 "벗의 오행 부대"가 서게 된다(설계서 §5.2).
-// v18 R4: 가중을 **세제곱**한다(EL_POW). 열쇠(오행·역할·등급) 수를 줄여 포개기가 붙게 하는 손잡이 셋 중 하나다(GRADE_W 주석).
+// v18 R4 는 가중을 **세제곱**했다(EL_POW 3) — 열쇠 수를 줄여 포개기가 붙게 하려는 손잡이였다.
+// **v19 에서 1 로 되돌린다.** 세제곱이면 목 사주가 뽑는 유닛의 98% 가 목이라, 「한 줄에 오행 다섯」인
+// 오행연환이 원천적으로 불가능했다(20웨 형성률 14%). 1 이면 62%/12%/12%/1%/12% 로, 주력은 여전히 목이지만
+// **부족한 오행을 채워 넣는 것**이 판의 과제가 된다(20웨 형성률 51%). 값은 합성이 조금 무뎌지는 것이다 —
+// 평균 승단@20 3.82 → 3.52. 5×5 판의 뜻이 연환에 있으므로 그쪽을 산다.
 // 사주 오행 수 [4,0,2,1,1] 이면 4³:0:2³:1:1 = 목 87% — 「사주의 주된 오행이 곧 내 부대」가 된다. 오행이 고른 사주(균)는 그대로 고르다.
-const EL_POW=3;
+const EL_POW=1;
 const armyWeights=(cnt,boostEl)=>{const w=cnt.map(v=>Math.pow(Math.max(0.1,v),EL_POW));if(boostEl>=0&&boostEl<5)w[boostEl]*=1.5;return w;};
 function strongest(cnt){let s=0;for(let i=1;i<5;i++)if(cnt[i]>cnt[s])s=i;return s;}
 const neededElement=e=>(e+3)%5;
@@ -2081,7 +2123,10 @@ const enemyCellXY=j=>[ENEMY_X0+(j%N)*ENEMY_DX, Math.floor(j/N)+0.5];
 // 등급(GRADE_DEN 20)이나 E_SLOPE 로 더하면 smart 가 먼저 내려앉아 이득이 사라진다 — 두께가 아니라 **수**가 문제다.
 const E_SLOPE=0.0;          // E(w)=1+E_SLOPE·w — 잡몹·보스 체력/공격의 웨이브 배율(등급 배율 위에 곱해진다 · 지금은 0 · C3 도 0.01 만 얹어도 smart −4)
 // v18 룰링 7: 적 수 = min(16, 3 + floor(0.45·w)) — 1웨이브 3기 → 30웨이브 16기(판과 같은 칸 수). 두께는 등급·레벨로.
-const N_SLOPE=0.45;         // n=min(ENEMY_MAX=16, 3+floor(N_SLOPE·w)) — 웨이브 적 기수
+const N_SLOPE=0.60;         // n=min(ENEMY_MAX=25, 3+floor(N_SLOPE·w)) — 웨이브 적 기수
+// **v19: 0.45 → 0.60.** 판이 16칸에서 25칸으로 커지자 우리 화력이 늘어 밴드가 naive 18.0 → 20.4 로 떠올랐다.
+// 칸 수 비(25/16 = 1.56)만큼 올리면(0.70) 이번엔 10웨이브 보스 통과가 83% 로 떨어져 너무 가파르다 —
+// 0.60 에서 naive 18.3 · smart 20.1 · 보스10 100% 로 v18 자리(18.0 · 20.9)에 돌아온다.
 // v18 R4: 24 → 18. 대기열 포개기로 우리 쪽이 세져 naive 가 19~20 까지 떴다(띠 12~18) — 적 두께로 다시 눌렀다(§11 탐침 D20·S1).
 // v18 R5: 18 → **17**. 승급(룰링 2)이 돌아와 우리 쪽이 세졌다 — naive 가 18.2 로 띠(12~18) 위로 떴다.
 // R4 가 적어 둔 대로 naive 를 내리는 손잡이는 이것 하나다(§11.6-7). 17 에서 naive 17.8 · smart 21.4 로 둘 다 띠 안이다.
@@ -2131,15 +2176,15 @@ function waveCount(w){return Math.min(ENEMY_MAX,3+Math.floor(N_SLOPE*w));}
 // 11·22 에 한 칸(10웨이브 보스는 lv 1 · 20웨이브 보스는 lv 2 · 30웨이브 lv 3 ×2.6). 6·8 은 10웨이브 보스가 lv 2 라 naive·smart 모두 10 에 죽고(통과 25~65%),
 // 12 는 naive 가 18.5 로 뜬다(11 은 17.3).
 function waveLv(w){return 1+Math.floor(w/11);}
-// enemyCells(roles): 역할 목록 순서대로 적 대형의 칸을 배정한다. 반환 {cells:[기마다 칸], cnt:[16칸 0/1]}.
-// v18 가로: **열이 깊이**다(열 0 = 우리 쪽 선두) — 전위 → 열 0·1, 사수 → 열 2·3, 술사 → 열 2·3.
-// 각 열은 가운데 행(1·2)부터 바깥(0·3)으로. 제 열이 다 차면 아무 빈 칸으로 넘친다. rng 를 안 쓴다(예고와 같다).
-function enemyCells(roles){const order=[1,2,0,3];const cols={0:[0,1],1:[2,3],2:[2,3]};const cnt=Array(CELLS).fill(0);
+// enemyCells(roles): 역할 목록 순서대로 적 대형의 칸을 배정한다. 반환 {cells:[기마다 칸], cnt:[25칸 0/1]}.
+// v19 가로: **열이 깊이**다(열 0 = 우리 쪽 선두) — 전위 → 열 0·1, 사수·술사 → 열 2 뒤.
+// 각 열은 가운데 행(ROWS_OUT)부터 바깥으로. 제 열이 다 차면 아무 빈 칸으로 넘친다. rng 를 안 쓴다(예고와 같다).
+function enemyCells(roles){const order=ROWS_OUT;const cols={0:[0,1],1:RANGE(COLS).slice(2),2:RANGE(COLS).slice(2)};const cnt=Array(CELLS).fill(0);
   const take=role=>{for(const c of cols[role])for(const r of order){const j=idx(r,c);if(!cnt[j]){cnt[j]=1;return j;}}
     for(let j=0;j<CELLS;j++)if(!cnt[j]){cnt[j]=1;return j;}return -1;};
   return {cells:roles.map(take),cnt};}
 function waveRoles(pv){const roles=[];for(let i=0;i<pv.roles[0];i++)roles.push(0);for(let i=0;i<pv.roles[1];i++)roles.push(1);for(let i=0;i<pv.roles[2];i++)roles.push(2);return roles;}
-// wavePreview: n(기수)에 더해 cells(칸별 기수 16칸, 0 포함, 합 = n)를 돌려준다 — 페이지가 진형 미리보기에 숫자 배지를 얹는다.
+// wavePreview: n(기수)에 더해 cells(칸별 기수 25칸, 0 포함, 합 = n)를 돌려준다 — 페이지가 진형 미리보기에 숫자 배지를 얹는다.
 // 보스 웨이브도 보스는 1기이고 첫 전위 칸(앞줄 가운데)에 선다 — cells 는 보스를 그 칸의 1기로 센다.
 function wavePreview(w,run){const n=waveCount(w);const boss=BOSS_WAVES.includes(w);
   const nV=Math.max(1,Math.round(n*0.4)),nS=Math.round(n*0.2),nA=n-nV-nS;
@@ -2247,11 +2292,17 @@ function castMagic(B,u,mods,rng){
 // 버프를 받은" 상대를 보게 되어, B.all 을 뒤집으면(foes.concat(units)) 20·30웨이브 궤적이 갈렸다.
 // 같은 행에서 내 **앞**(오른쪽)에 선 살아 있는 아군의 x. 없으면 Infinity.
 // 행은 homeY 로 가른다 — 우리 유닛은 전투 중 행을 안 바꾸므로 이게 곧 줄 번호다.
+//
+// **사거리가 나보다 긴 아군은 세지 않는다**(v19). 그 아군의 제자리는 원래 내 뒤이기 때문이다 —
+// 사수(4.5)는 적이 사거리에 들자마자 멈춰 서는데, 그 뒤에 선 전위(0.7)가 「앞 아군 추월 금지」에 걸리면
+// 전위가 영영 접촉선에 못 닿는다(5열이 되어 뒷열·앞열 사이에 한 칸이 더 생기자 실제로 났다).
+// 반대로 사수가 전위를 추월하는 것은 여전히 막는다 — 그래야 원거리가 앞줄로 새지 않는다.
 function frontMateX(B,u){
   let m=Infinity;
   for(const o of B.units){
     if(o===u||!o.alive)continue;
     if(Math.abs(o.homeY-u.homeY)>0.25)continue;
+    if(o.range>u.range+1e-9)continue;          // 긴 사거리는 비켜 준다(제자리가 뒤다)
     if(o.x>u.x&&o.x<m)m=o.x;
   }
   return m;
@@ -2662,7 +2713,8 @@ const RUN_KEYS=['mode','seed','wave','phase','coins','lives','tenLivesPaid','luc
 function serializeRun(run){const o={};for(const k of RUN_KEYS)o[k]=run[k];o.rngN=run.rng.n;return o;}
 // restoreRun: v17 이전 저장(spinN 없음 · tiles/freeFlips/flipN · 유닛 n · perm.lv=META 레벨)은 스핀 필드를 newRun 기본값으로 두고
 // 모든 유닛을 lv 1 로 복원한다(n 삭제 · perm 의 옛 lv 는 mlv 로). 옛 유닛의 hp/atk 는 이미 lv 1 값이라 다시 계산하지 않는다.
-// v18: **25칸 저장은 앞 16칸만 판으로 살리고** 나머지 유닛은 대기열로 민다. 대기열(6)도 넘치면 버리고 run.restoreLost 에 수를 남긴다.
+// v19: 판이 다시 25칸이라 옛 25칸 저장은 **그대로** 판으로 들어온다(v18 의 「앞 16칸만」 은 끝났다).
+// 그래도 칸 수보다 많은 유닛이 실린 저장은 대기열(6)로 밀고, 대기열도 넘치면 버리고 run.restoreLost 에 수를 남긴다.
 // bench·armyIn 이 없는 옛 저장은 bench 빈 배열 · armyIn = 판·대기열의 사주 부대(perm) 수로 본다(옛 판은 여덟 글자가 다 서 있었다).
 function restoreRun(o,opts){const run=newRun(Object.assign({},opts,{seed:o.seed}));const old=o.spinN==null;
   for(const k of RUN_KEYS)if(k in o&&k!=='phase')run[k]=o[k];
@@ -2685,7 +2737,7 @@ function restoreRun(o,opts){const run=newRun(Object.assign({},opts,{seed:o.seed}
 
 return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,tenStars,tenEffect,ITEMS,pickW,
   SPIN_SYM,SPIN_BASE,SPIN_STEP,SPIN_DECAY,KIND_W,ROLE_W,GRADE_W,SPIN_TIER,COIN_AMT,spin,spinCost,elWeights,gradeWeights,fillReels,chooseCard,joinTargets,
-  N,COLS,ROWS,CELLS,idx,colOf,rowOf,CHAIN_LINES,FRONT_COL,BACK_COL,CELL_PREF,ROLE_BASE,unitBase,makeUnit,LV_MAX,LV_PROMOTE,PROMOTE_MAX,LV_K,LV_RATE,LV_RANGE,lvMul,lvRate,lvRange,restat,elMult,computeChains,
+  N,COLS,ROWS,CELLS,idx,colOf,rowOf,CHAIN_LINES,FRONT_COL,BACK_COL,CYC_STACK,CYC_ATK,CYC_HP,GRAND_ATK,GRAND_SPD,SHENG_CAP,RAIN_N,CELL_PREF,ROLE_BASE,unitBase,makeUnit,LV_MAX,LV_PROMOTE,PROMOTE_MAX,LV_K,LV_RATE,LV_RANGE,lvMul,lvRate,lvRange,restat,elMult,computeChains,
   armyWeights,EL_POW,strongest,neededElement,combatPower,stageWarning,addUnit,mergeUnit,canJoin,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
   BENCH_MAX,benchPush,benchToCell,cellToBench,MYTH_RECIPES,MYTH_NEED_GRADE,mythReady,summonMyth,
   defaultMods,BOSS_NAMES,damageOf,clashInit,clashTick,hurt,nearestFoe,alliesNear,
@@ -3957,13 +4009,20 @@ const VERSION='art-13가로';
 const HUD_GAP=44;      // 전장 띠 아래 본진 띠(준비바) 높이
 const CAMY=13;         // 옛 원근 카메라 깊이 — 이름만 남긴다(자리는 안 낸다)
 const BOARDK=0.66;     // 옛 판 높이 비례 — 내보내기 이름만 남긴다
-const COLS=4;          // 우리 판 열(깊이) 수 — 논리 x 0..4
-const ROWS=4;          // 행 수 — 논리 y 0..4(우리도 적도 같은 네 행)
-const CELLS=COLS*ROWS; // = 16
+const COLS=5;          // 우리 판 열(깊이) 수 — 논리 x 0..5
+const ROWS=5;          // 행 수 — 논리 y 0..5(우리도 적도 같은 다섯 행)
+const CELLS=COLS*ROWS; // = 25
 const DEPTH=ROWS;      // 배율(SCL)이 재는 축 = 행. 옛 이름을 그대로 쓴다(값만 4 다)
-const CS_K=0.16;       // 열 pitch / 캔버스 폭(설계서 §0 실측 189/1168 = 0.162)
+// v19 5×5 — 판 **자리**(왼끝 0.10cw · 오른끝 0.74cw)는 실측 그대로 두고 그 안을 다섯으로 나눈다.
+// 열이 넷에서 다섯이 되었으므로 열 폭은 0.16 → 0.64/5 = 0.128 이다(적 진격로 폭은 안 줄어든다).
+// 행도 다섯이라 행 pitch 를 0.125 → 0.105 로 낮추고 띠 상한(BAND_MAX_K)을 0.28 → 0.32 로 연다.
+// **0.105 가 천장인 까닭**: 페이지 준비 캔버스가 가장 납작하다(320 폰 268px). 띠 raw 가 그 캔버스의
+// 자리(하늘 하한을 뺀 191.8px)를 넘으면 준비에서만 눌려, **돌격하는 순간 판이 튄다**. 5·0.105+0.06 = 0.585cw
+// = 187.2px 라 간신히 들어간다. 상한을 0.32 로 연 것은 그 반대쪽 — 0.28 이면 320 폰 전체 화면에서
+// 유닛 키가 20.6px 까지 내려가 오행이 안 읽혔다. 다섯 행은 다섯 행만큼 자리를 쓴다는 것이 v19 의 셈이다.
+const CS_K=0.128;      // 열 pitch / 캔버스 폭 — 판 폭 0.64cw 를 다섯 열로
 const X0_K=0.10;       // 판 왼쪽 여백 / 캔버스 폭(실측 145/1168 = 0.124 → 판 오른끝이 0.74 가 되게 0.10)
-const RH_K=0.125;      // 행 pitch / 캔버스 폭(실측 160/1168 = 0.137)
+const RH_K=0.105;      // 행 pitch / 캔버스 폭 — 다섯 행(띠 H = 5·0.105 + 0.06 = 0.585cw)
 const PAD_K=0.06;      // 띠 여분(맨 아랫행 아래 앞자락 모래) / 캔버스 폭
 // v18 R7 룰링 3: 0.30 → **0.38**. 원작(as-3)은 모래 띠 위에 하늘·먼 산·숲이 화면의 **40%** 쌓이는데
 // 우리는 18%(R3 실측)라 띠가 화면 위쪽에 붙어 보였다. 띠를 아래로 내려 하늘을 35~40% 로 넓힌다.
@@ -3976,7 +4035,7 @@ const SKY_MIN_K=0.12;  // 하늘 하한(안전선) — 아래 BAND_ROOM_K 가 �
 // 실제 폰 화면은 1.775(320×568·360×640)부터다. 이 사이를 갈라야 **준비 ↔ 전투에서 판 크기가 안 튄다**
 // (1.6 으로 잡았더니 390 폰의 전투 캔버스 390×633 만 상한에 걸려 유닛이 35 → 28px 로 줄었다).
 // 상한에 걸리면 **열 폭(csx)은 그대로 두고** rh·H 만 같은 비로 눌린다 — 가로 자[尺]가 안 흔들린다.
-const BAND_MAX_K=0.28;  // 전장 띠 높이 상한 / 화면 높이
+const BAND_MAX_K=0.32;  // 전장 띠 높이 상한 / 화면 높이(v19 5행 — v18 4행 때는 0.28)
 const SCREEN_K=1.7;     // 캔버스가 폭의 1.7배보다 높으면 「그 캔버스가 곧 기기 화면」으로 본다
 const UNIT_H_K=0.72;   // 유닛 키 천장 = 0.72·rh(설계서 §3)
 const UNIT_W_K=0.95;   // 유닛 폭 상한 = 0.95·csx
