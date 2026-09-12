@@ -824,12 +824,13 @@
   .assault .cvwrap{position:relative;flex:1;min-height:0;display:flex}
   .assault .spdcorner{position:absolute;right:6px;top:6px;width:auto;min-height:0;padding:5px 9px;font-size:11.5px;border-radius:10px;z-index:3}
   /* ── v18 R3 ruling 5 · 신화 소환 단추(as-4) — 판 한가운데 노란 알약 ── */
-  .assault .mythbtn{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:4;
-    width:auto;min-height:0;padding:8px 22px;font-size:18px;border-radius:14px;
+  /* v19.3 — 판 한가운데(top 46%)에 있어서 칸 서넛을 덮었다. 판 아래 앞자락(본진 띠 위)으로 내린다. */
+  .assault .mythbtn{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;
+    width:auto;min-height:0;padding:7px 20px;font-size:17px;border-radius:14px;
     background:linear-gradient(180deg,#FFE27A,#FFC01E);color:#4A3000;border:2px solid #8A5E00;
     box-shadow:0 4px 0 #B07E00,0 8px 20px rgba(80,50,0,.35);animation:mythPulse 1.5s ease-in-out infinite}
   .assault .mythbtn small{display:block;font-size:10px;font-weight:700;line-height:1.2}
-  @keyframes mythPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.06)}}
+  @keyframes mythPulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
   @media (prefers-reduced-motion: reduce){.assault .mythbtn{animation:none}}
   /* ── v18 R3 ruling 4 · 대기열 줄(6칸) — 빈 칸은 회색. 탭하면 판 빈 칸으로, 끌어서도 내린다. ── */
   .assault .bench{display:grid;grid-template-columns:repeat(6,minmax(0,44px));gap:6px;width:100%;max-width:294px;justify-content:center;justify-self:center}
@@ -1007,6 +1008,13 @@
     .tile-result.good::after{animation:none;opacity:.5}}
   #assaultCv{flex:1;min-height:0;width:100%;display:block;touch-action:none}
   .prepbar,.battlebar{background:#FBF5E6;border-top:1.5px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom));display:grid;gap:5px}
+  /* v19.3 — 전투에서 캔버스가 화면의 81% 까지 자라 파란 막대 아래로 숲 자락이 15% 남았다(참조는 7%).
+     신살 줄에 최소 높이를 줘서 캔버스(flex:1)가 그만큼 줄게 한다. 둘 다 flex:1 로 두면 남는 자리를
+     반씩 나눠 가져 캔버스가 40% 로 쪼그라든다(한 번 그렇게 해 봤다). 준비바는 이미 더 높아 안 바뀐다. */
+  .assault .battlebar{min-height:14dvh}
+  /* 남은 자리는 신살 단추가 채운다 — 가운데 정렬로 두면 크림색 빈 띠만 넓어진다(손 닿는 크기도 그대로). */
+  .assault .battlebar .skills{align-items:stretch;height:100%}
+  .assault .battlebar .skills .skill{height:100%;align-content:center}   /* 카드가 커지면 내용이 아래로 쏠린다 */
   /* v18 R3 ruling 4 — 준비 하단은 한 열이다: 전투 시작! → 대기열 → 엽전 → 릴 → 뽑기 (십성·벗 줄은 정보 시트로 접었다). */
   .tenrow,.allyrow{display:flex;gap:4px;overflow-x:auto}
   .tenrow button,.allyrow button{min-height:32px;padding:2px 8px;font-size:11px;white-space:nowrap}
@@ -1559,7 +1567,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.2</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.3</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -8494,8 +8502,12 @@ function drawUnitAt(u,R,L,MDY,POP,opt){opt=opt||{};POP=POP||{sx:1,sy:1};
   // 자리는 발끝 바로 아래(cy+1.5k)라 몸을 가리지 않는다.
   if(M&&opt.ring!==false){drawGradeDot(M,opt.alpha);drawHpMark(M,opt.alpha);}}
 // ── 연환 표시(P1 ruling 3) — 성립한 사슬의 칸 바닥을 오행색 알파 .25 로 물들이고 사슬 위에 라벨 하나(「오행연환 ×N」) ──
-const CHAIN_NAME={cycle:'오행연환',sheng:'상생 연환',peer:'동행 연환',wall:'방벽',rain:'화살비'};
-const CHAIN_C={cycle:'#FFC83D',sheng:'#E8B830',peer:'#3FA66B',wall:'#2F7BE8',rain:'#2F7BE8'};
+const CHAIN_NAME={grand:'오행대연환',cycle:'오행연환',sheng:'상생 연환',peer:'동행 연환',wall:'방벽',rain:'화살비'};
+const CHAIN_C={grand:'#FF9A2E',cycle:'#FFC83D',sheng:'#E8B830',peer:'#3FA66B',wall:'#2F7BE8',rain:'#2F7BE8'};
+// v19.3 — 연환은 판의 **목표**다. 그런데 v19.0~2 는 오행연환·대연환이 동행 연환과 똑같이 「×5」 알약 하나로만
+// 떠서 화면에서 구분이 안 됐다(대연환은 CHAIN_C 에 아예 없어 색도 같았다). 이름을 알약에 싣고 줄을 두른다.
+// 알약은 짧게 — 긴 이름을 다섯 줄에 붙이면 서로 겹치고 정령 머리를 덮는다. 온전한 이름은 정보 판(CHAIN_NAME)에 있다.
+const CHAIN_LABEL=(type,n)=>type==='grand'?'대연환':type==='cycle'?'오행':'×'+n;
 const CHAIN_TINT_A=0.25;
 const CHAIN_PILL_H=12, CHAIN_PILL_F=9, CHAIN_PILL_A=0.5;   // v18 R6 — 알약 높이·글자·받침 알파(옛 14/10/0.78)
 function chainMarks(CH,L,units){const out=[];if(!CH||!Array.isArray(CH.chains))return out;
@@ -8509,7 +8521,18 @@ function chainMarks(CH,L,units){const out=[];if(!CH||!Array.isArray(CH.chains))r
     // v16 컨트롤러 룰링: 라벨은 「×N」 알약 하나(이름은 정보 판에서) — 열마다 사슬이 서도 이웃끼리 안 겹치게 칸 왼쪽 위 모서리에 붙인다.
     // v18 R6 — 등급 고리가 사라져 칸 왼쪽 위가 비었다. 자리는 그대로 두되(사슬을 짚는 곳이라 옮길 곳이 없다)
     // 무게만 덜었다: 알약이 CHAIN_PILL_H·CHAIN_PILL_F 로 작아지고 받침이 옅어져(CHAIN_PILL_A) HP 바·등급 점과 안 다툰다.
-    const label=`×${cells.length}`, tw=ctx.measureText(label).width, w=tw+8, h=CHAIN_PILL_H;
+    const label=CHAIN_LABEL(c.type,cells.length), tw=ctx.measureText(label).width, w=tw+8, h=CHAIN_PILL_H;
+    // v19.3 — 오행연환·대연환(줄 사슬)은 **줄 바깥**에 이름을 붙인다: 세로줄은 줄 위, 가로줄은 줄 왼쪽 끝.
+    // 다 왼쪽 위 모서리에 붙이면 다섯 줄이 한자리에 겹쳐 서로를 가린다(칸 사슬 ×N 은 옛 자리 그대로).
+    if(c.type==='cycle'||c.type==='grand'){
+      const vert=(x1-x0)<(y1-y0);
+      const lx=vert?Math.max(w/2+2,Math.min(L.cw-w/2-2,(x0+x1)/2)):Math.max(w/2+2,x0+w/2+1);
+      // 세로줄 이름은 줄 **맨 윗칸 안**에 넣는다 — 판 위(y0−2)에 두면 웨이브 현판이 덮는다.
+      const ly=vert?y0+h+3:(y0+y1)/2+h/2;
+      let yy=ly;while(placed.some(q=>Math.abs(q.x-lx)<(q.w+w)/2&&Math.abs(q.y-yy)<h+1))yy+=h+2;
+      placed.push({x:lx,y:yy,w});
+      out.push({type:c.type,cells:cells.slice(),key:c.type+':'+cells.join(','),tint,label,col:CHAIN_C[c.type]||'#FFC83D',x:lx,y:yy,w,h});
+      continue;}
     const x=Math.max(w/2+2,Math.min(L.cw-w/2-2,x0+w/2+3)), rows=Math.max(1,Math.round((y1-y0)/Math.max(1,L.rh)));
     let y=y0+h+2, xx=x, ok=false;
     for(let k=0;k<rows&&!ok;k++){const yk=y0+k*L.rh+h+2;const hit=placed.some(p=>Math.abs(p.x-xx)<(p.w+w)/2&&Math.abs(p.y-yk)<h);if(!hit){y=yk;ok=true;}}
@@ -8521,8 +8544,18 @@ function drawChainMarks(marks){if(!marks||!marks.length)return;ctx.save();
   const done=new Set();
   for(const m of marks)for(const t of m.tint){if(done.has(t.cell))continue;done.add(t.cell);const q=t.pts;
     ctx.globalAlpha=CHAIN_TINT_A;ctx.fillStyle=t.col;ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);ctx.lineTo(q[1][0],q[1][1]);ctx.lineTo(q[2][0],q[2][1]);ctx.lineTo(q[3][0],q[3][1]);ctx.closePath();ctx.fill();}
+  // 오행연환·대연환은 **줄 하나에 외곽선 하나**를 두른다 — 다섯 칸이 한 줄이라는 게 한눈에 보이되,
+  // 칸마다 두르면(처음에 그렇게 했다) 줄이 여럿 설 때 판이 통째로 테두리에 덮여 다시 어지러워진다.
+  for(const m of marks){if(m.type!=='cycle'&&m.type!=='grand')continue;
+    const g=m.type==='grand';
+    ctx.globalAlpha=1;ctx.lineWidth=g?3:1.8;ctx.strokeStyle=m.col;ctx.setLineDash(g?[]:[7,5]);
+    let X0=1e9,Y0=1e9,X1=-1e9,Y1=-1e9;
+    for(const t of m.tint)for(const q of t.pts){X0=Math.min(X0,q[0]);X1=Math.max(X1,q[0]);Y0=Math.min(Y0,q[1]);Y1=Math.max(Y1,q[1]);}
+    rr(X0+1.5,Y0+1.5,X1-X0-3,Y1-Y0-3,8);ctx.stroke();
+    ctx.setLineDash([]);}
   ctx.globalAlpha=1;ctx.font=`700 ${CHAIN_PILL_F}px 'Noto Sans KR'`;ctx.textAlign='center';ctx.textBaseline='middle';
-  for(const m of marks){ctx.fillStyle=`rgba(38,22,10,${CHAIN_PILL_A})`;rr(m.x-m.w/2,m.y-m.h,m.w,m.h,5);ctx.fill();
+  for(const m of marks){ctx.fillStyle=`rgba(38,22,10,${m.type==='grand'||m.type==='cycle'?0.82:CHAIN_PILL_A})`;
+    rr(m.x-m.w/2,m.y-m.h,m.w,m.h,5);ctx.fill();
     ctx.fillStyle=mixHex(m.col,'#FFFFFF',0.35);ctx.fillText(m.label,m.x,m.y-m.h/2+0.5);}
   ctx.restore();}
 // 끌고 있는 동안 놓일 칸: 같은 오행·역할·등급(코어 canJoin)이면 초록(merge · 포개기), 그 밖의 점유 칸은 호박색 점선(교환), 빈 칸은 표시 없음.
@@ -9630,7 +9663,12 @@ function renderStagePreview(L){
     const g=Math.max(1,Math.min(5,c.grade|0));   // M1: 보스도 코어가 준 등급 그대로 — 툴팁(GRADE_K)과 한 값이다
     const hgt=Math.max(1,spiritTop(c.el,g,!!c.boss));
     // v15.1 Q5 ruling 2 — 미리보기 배율 = 전투 배율. 깊이 배율 k(R.k = SCL(깊이))에 전투가 쓰는 unitScale 을 곱한다.
-    const k=R.k*unitScale({el:c.el,grade:g,role:c.role,boss:!!c.boss},L);
+    let k=R.k*unitScale({el:c.el,grade:g,role:c.role,boss:!!c.boss},L);
+    // v19.3 — **보스는 제 진격로 안에 들어와야 한다.** 보스 폭 상한은 unitW×2.4 라, 적 선두 열(진격로 왼끝)에
+    // 선 보스가 우리 판(bx1) 위로 넘어와 판을 덮었다(5열이 되며 판 오른쪽 열이 그 밑에 깔렸다).
+    // 왼쪽 반폭이 판 오른끝을 안 넘도록 눌러 그린다 — 미리보기에서만이고 전투 배율은 안 건드린다.
+    if(c.boss){const room=Math.max(8,R.cx-L.bx1-2), bw=Math.max(1,unitBodyW(c.el,g,c.role,true));
+      k=Math.min(k,2*room/bw);}
     const fy=R.cy+mercDy(L);                       // 적도 칸 바닥선에 발을 딛는다(우리 편과 한 줄로 마주 본다)
     ctx.save();ctx.translate(R.cx,fy);ctx.scale(k,k);
     drawCreatureCached(c.el,g,{enemy:true,boss:!!c.boss,role:c.role});   // 원색 몸 · 정면(v17 · 반전 없음) — 보스는 왕관
