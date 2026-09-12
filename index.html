@@ -499,7 +499,14 @@
   .mbar button span{font-size:12.5px;line-height:1.1} .mbar button small{margin-top:0}
   .shopc{display:grid;justify-items:center;gap:4px;padding:10px 6px!important}
   .shopc .mi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.15)} .shopc .mi svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  .relics{gap:10px}
+  /* v19.7 — 카드는 **한 줄에 셋**. auto-fit(minmax 120px)이라 390 폭 폰에서 두 칸만 들어가
+     「2 + 1」로 갈리고 오른쪽 아래가 통째로 비었다(원작 as-5 도 셋이 나란하다). 좁은 화면에서는 글씨를 줄인다. */
+  .relics{gap:8px;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .relics .relic{min-height:132px}   /* 0 으로 두면 카드가 통째로 접힌다(.rfront 가 회전 애니메이션으로 들어온다) */
+  #relicCards .relic .rfront{padding:12px 6px 10px}
+  #relicCards .relic .rfront b{font-size:15px;line-height:1.15}
+  #relicCards .relic .rfront>span{font-size:11px;line-height:1.3}
+  @media (max-width:360px){#relicCards .relic .rfront b{font-size:13.5px}#relicCards .relic .rfront>span{font-size:10.5px}}
   .relic{background:#fff;border:1.5px solid var(--line);border-radius:16px;box-shadow:0 3px 0 #E3D9C6;padding:0;position:relative;overflow:hidden;min-height:150px;perspective:600px;transition:transform .35s,opacity .35s,box-shadow .35s}
   .relic .rfront{display:grid;gap:6px;padding:14px 10px 12px;animation:rfr .45s ease-out both;animation-delay:calc(var(--d) + .4s);backface-visibility:hidden}
   .relic .rback{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(160deg,#2F4A7A,#1B2C4E);color:#FFD27A;font-family:var(--display);font-size:40px;border-radius:16px;box-shadow:inset 0 0 0 4px rgba(255,210,122,.35),inset 0 0 0 8px #1B2C4E;animation:rbk .4s ease-in both;animation-delay:var(--d);backface-visibility:hidden}
@@ -1567,7 +1574,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.6</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.7</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -4959,26 +4966,29 @@ function FxPool(cap){
         const hx2=bx+(T[0]-bx)*q, hy=by+(T[1]-by-p.oy*L.SCL(p.ty))*q;
         const tq=Math.max(0,q-0.34);
         const tx2=bx+(T[0]-bx)*tq, ty2=by+(T[1]-by-p.oy*L.SCL(p.ty))*tq;
-        g.globalAlpha=1-u*0.5;g.strokeStyle='rgba(56,36,16,.95)';g.lineWidth=Math.max(1.6,2.6*kk);
+        g.globalAlpha=(1-u*0.5)*0.92;g.strokeStyle=soft;g.lineWidth=Math.max(1.6,2.6*kk);
         g.beginPath();g.moveTo(tx2,ty2);g.lineTo(hx2,hy);g.stroke();
-        g.globalAlpha=(1-u)*0.6;g.strokeStyle=soft;g.lineWidth=Math.max(1.1,1.5*kk);
+        g.globalAlpha=(1-u)*0.34;g.strokeStyle='rgba(56,36,16,.9)';g.lineWidth=Math.max(0.9,1.2*kk);
         g.beginPath();g.moveTo(tx2,ty2);g.lineTo(hx2,hy);g.stroke();
-        g.globalAlpha=1-u*0.4;g.fillStyle='#3A2A16';
+        g.globalAlpha=1-u*0.4;g.fillStyle=col;
         g.beginPath();g.arc(hx2,hy,2.4*kk,0,TAU);g.fill();
         break;}
       case 'proj':{                                         // v17 투사체 — 사수 화살(선분+촉) · 술사 오행 구슬(원+꼬리 · 도착 링)
         const T=L.P(p.tx,p.ty), ty=T[1]-p.oy*L.SCL(p.ty), q=Math.min(1,p.t/PROJ_T);
         const hx2=bx+(T[0]-bx)*q, hy=by+(ty-by)*q;
         const dxn=T[0]-bx, dyn=ty-by, dl=Math.hypot(dxn,dyn)||1, ux=dxn/dl, uy=dyn/dl;
-        if(p.role===1){                                    // 화살 — 0.25초 직선 비행, 꼬리는 지나온 길 0.3
+        if(p.role===1){                                    // 화살 — 0.25초 직선 비행, 꼬리는 지나온 길 0.22
+          // **v19.7 — 꼬리를 오행색으로.** 옛 값은 거의 검정(rgba(56,36,16,.95)) 2.4px 이라, 밝은 모래 위에서
+          // 사수 다섯이 쏘면 판이 검은 긁힌 자국으로 덮였다. 이제 밝은 오행색이 본선이고 어두운 심지는
+          // 가늘게 한 겹만 깐다(대비는 남기되 「긁힘」이 아니라 「빛 줄기」로 읽히게).
           if(q>=1)break;
-          const tq=Math.max(0,q-0.3), tx2=bx+(T[0]-bx)*tq, ty2=by+(ty-by)*tq;
-          g.globalAlpha=1;g.strokeStyle='rgba(56,36,16,.95)';g.lineWidth=Math.max(1.6,2.4*kk);
+          const tq=Math.max(0,q-0.22), tx2=bx+(T[0]-bx)*tq, ty2=by+(ty-by)*tq;
+          g.globalAlpha=0.92;g.strokeStyle=soft;g.lineWidth=Math.max(1.6,2.4*kk);
           g.beginPath();g.moveTo(tx2,ty2);g.lineTo(hx2,hy);g.stroke();
-          g.globalAlpha=0.7;g.strokeStyle=soft;g.lineWidth=Math.max(1,1.2*kk);
+          g.globalAlpha=0.34;g.strokeStyle='rgba(56,36,16,.9)';g.lineWidth=Math.max(0.9,1.1*kk);
           g.beginPath();g.moveTo(tx2,ty2);g.lineTo(hx2,hy);g.stroke();
           const hl=5*kk, hw=2.6*kk;                        // 촉 — 진행 방향으로 뾰족한 삼각형
-          g.globalAlpha=1;g.fillStyle='#3A2A16';g.beginPath();
+          g.globalAlpha=1;g.fillStyle=col;g.beginPath();
           g.moveTo(hx2+ux*hl,hy+uy*hl);g.lineTo(hx2-uy*hw,hy+ux*hw);g.lineTo(hx2+uy*hw,hy-ux*hw);g.closePath();g.fill();
         }else{                                             // 구슬 — 원 + 꼬리 셋, 도착하면 작은 링
           if(q<1){
@@ -8313,12 +8323,26 @@ function spiritSprite(el,grade,pose,enemy,boss,role,n){
   // 마주 보게 하면 누가 적인지 한눈에 읽힌다(원작도 두 부대가 마주 본다).
   cv2=sprite(key,()=>{ctx.translate(0,R*SPR_FOOT);drawCreatureG(el,grade,{pose,enemy:!!enemy,boss:!!boss,role:ro,t:0,rank:false,dir:enemy?-1:1});},R);
   cv2._foot=R*SPR_FOOT;return cv2;}
+// 구운 스프라이트의 **실루엣**(같은 모양을 한 색으로 채운 것) — 보스 테두리에 쓴다. 스프라이트마다 한 번만 굽는다.
+function spriteSil(cv,col){
+  if(cv._sil&&cv._silC===col)return cv._sil;
+  const o=document.createElement('canvas');o.width=cv.width;o.height=cv.height;
+  const g2=o.getContext('2d');g2.drawImage(cv,0,0);
+  g2.globalCompositeOperation='source-in';g2.fillStyle=col;g2.fillRect(0,0,o.width,o.height);
+  cv._sil=o;cv._silC=col;return o;}
 // 역할(opt.role 0~2)은 구운 스프라이트 **안**에 있다 — v15 부터 무기가 역할 그림에 그려져 있어 따로 얹을 게 없다.
 function drawCreatureCached(el,grade,opt){opt=opt||{};
   const g=Math.max(1,Math.min(5,grade|0));
   const cv2=spiritSprite(el,g,opt.pose||'idle',opt.enemy,opt.boss,opt.role,opt.n);
   if(!cv2){drawCreatureG(el,g,opt);return;}
-  const R=cv2._r;ctx.drawImage(cv2,-R,-R-cv2._foot,R*2,R*2);}
+  const R=cv2._r;
+  // **v19.7 — 보스는 테두리를 두른다.** 보스는 등급 5(신화) 팔레트로 그려지는데 그 팔레트가 창백한 반투명이라
+  // (평균 알파 139 · 불투명 43%), 한 열을 통째로 채우는 큰 몸이 배경에 녹아 「보스가 어디 있는지」가 안 보였다.
+  // 실루엣을 여덟 방향으로 깔아 윤곽을 만든다 — 팔레트를 안 건드리고 눈에만 세운다.
+  if(opt.boss){const sil=spriteSil(cv2,'rgba(24,16,10,.55)'), d=2.4;
+    for(let i=0;i<8;i++){const a=Math.PI*2*i/8;
+      ctx.drawImage(sil,-R+Math.cos(a)*d,-R-cv2._foot+Math.sin(a)*d,R*2,R*2);}}
+  ctx.drawImage(cv2,-R,-R-cv2._foot,R*2,R*2);}
 // ───── 영웅 v4: 사람 비율(5.5등신) · 오행별 직업 (궁사 · 무사 · 도승 · 장군 · 술사) · 남녀 의복 차이 ─────
 const HERO_STYLE=[
   {job:'궁사',robe:'#2E8A55',robeD:'#14432A',trim:'#FFD24C',hat:'gat',iris:'#7CFF9A'},
@@ -9849,7 +9873,11 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
     if(B){ADIE.n=0;ADIE.boss=0;ADIE.t=B.t;HPBARS.length=0;MARKQ.length=0;
       const list=B.all.slice().sort((a,b)=>b.y-a.y||a.side-b.side||a.id-b.id);
       for(const u of list){
-        const foe=u.side===1, g=Math.max(1,Math.min(5,u.grade|0)), eg=u.boss?5:g, an=AANIM.get(u);
+        // v19.7 — 보스도 **코어가 준 등급 그대로** 그린다(준비 미리보기와 같은 값 · M1 룰링).
+        // 전에는 전투에서만 보스를 등급 5(신화)로 그렸는데, 신화 팔레트는 창백한 반투명이라(평균 알파 139 ·
+        // 불투명 43% · 색 179,193,199) 큰 몸이 유령처럼 배경에 녹아 보스가 어디 있는지 안 보였다.
+        // 코어 등급(20웨이브 해룡이면 2)이면 깊은 파랑(66,96,138)으로 또렷하다.
+        const foe=u.side===1, g=Math.max(1,Math.min(5,u.grade|0)), eg=g, an=AANIM.get(u);
         const [px,py0]=L.P(u.x,u.y),k=SCL(u.y);          // 배율은 깊이(논리 y)가 낸다 — 화면 아래가 크다
         // **양쪽 다** 칸 중심에서 MDY 만큼 아래(칸 바닥선)에 발을 딛는다 — 준비 단계와 같은 자리라
         // 돌격하는 순간 발이 튀어 오르지 않고(I1), 마주 선 우리·적이 같은 바닥선을 밟는다.
