@@ -1559,7 +1559,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.0</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.1</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -1874,6 +1874,7 @@ function computeChains(units,mods){const bonus=[];for(let i=0;i<CELLS;i++)bonus.
   for(const L of CHAIN_LINES){
     if(!L.every(c=>units[c]))continue;
     const els=L.map(c=>units[c].el);
+    if(els.some(e=>e==null||e<0||e>4))continue;          // 오행이 없는 칸은 연환에 못 낀다(undefined 가 다섯째로 세어지던 버그)
     if(new Set(els).size!==5)continue;
     const fwd=els.every((e,k)=>k===0||GEN(els[k-1])===e);
     const rev=els.every((e,k)=>k===0||GEN(e)===els[k-1]);
@@ -2123,10 +2124,12 @@ const enemyCellXY=j=>[ENEMY_X0+(j%N)*ENEMY_DX, Math.floor(j/N)+0.5];
 // 등급(GRADE_DEN 20)이나 E_SLOPE 로 더하면 smart 가 먼저 내려앉아 이득이 사라진다 — 두께가 아니라 **수**가 문제다.
 const E_SLOPE=0.0;          // E(w)=1+E_SLOPE·w — 잡몹·보스 체력/공격의 웨이브 배율(등급 배율 위에 곱해진다 · 지금은 0 · C3 도 0.01 만 얹어도 smart −4)
 // v18 룰링 7: 적 수 = min(16, 3 + floor(0.45·w)) — 1웨이브 3기 → 30웨이브 16기(판과 같은 칸 수). 두께는 등급·레벨로.
-const N_SLOPE=0.60;         // n=min(ENEMY_MAX=25, 3+floor(N_SLOPE·w)) — 웨이브 적 기수
-// **v19: 0.45 → 0.60.** 판이 16칸에서 25칸으로 커지자 우리 화력이 늘어 밴드가 naive 18.0 → 20.4 로 떠올랐다.
-// 칸 수 비(25/16 = 1.56)만큼 올리면(0.70) 이번엔 10웨이브 보스 통과가 83% 로 떨어져 너무 가파르다 —
-// 0.60 에서 naive 18.3 · smart 20.1 · 보스10 100% 로 v18 자리(18.0 · 20.9)에 돌아온다.
+const N_SLOPE=0.36;         // n=min(ENEMY_MAX=25, 3+floor(N_SLOPE·w)) — 웨이브 적 기수
+// **v19: 0.45 → 0.60**(판이 25칸으로 커져 우리 화력이 늘었다) **→ v19.1: 0.40**.
+// v19.1 에서 적이 빈 행을 그냥 안 지나가게 되자(전부 남아서 싸운다) 난도가 통째로 올랐다 —
+// 그전에는 빈 행의 적이 목숨 하나만 깎고 **싸우지 않고 사라졌다**. naive 18.7 → 15.6 이라 0.40 으로 내렸다:
+// naive 18.1 · smart 18.8 · 보스10 100%. **최종 0.36** — 0.40 이면 120 씨앗 어느 것도 30웨에 못 닿아
+// 곡선의 30웨 칸을 잴 수가 없다(v19.0 은 10/360 이 닿았다). 0.36 에서 8/360 · smart 평균 19.8.
 // v18 R4: 24 → 18. 대기열 포개기로 우리 쪽이 세져 naive 가 19~20 까지 떴다(띠 12~18) — 적 두께로 다시 눌렀다(§11 탐침 D20·S1).
 // v18 R5: 18 → **17**. 승급(룰링 2)이 돌아와 우리 쪽이 세졌다 — naive 가 18.2 로 띠(12~18) 위로 떴다.
 // R4 가 적어 둔 대로 naive 를 내리는 손잡이는 이것 하나다(§11.6-7). 17 에서 naive 17.8 · smart 21.4 로 둘 다 띠 안이다.
@@ -2235,6 +2238,19 @@ function nearestFoe(B,u,maxD){let best=null,bd=maxD==null?99:maxD;
   for(const o of B.all){if(o.side===u.side||!o.alive)continue;const d=Math.hypot(o.x-u.x,o.y-u.y);
     if(d<bd){bd=d;best=o;}else if(d===bd&&best&&o.id<best.id){best=o;}}
   return best;}
+// v19.1 — **적의 표적 고르기는 제 행이 먼저다.** 그냥 「가장 가까운 하나」로 두면 웨이브 전체가
+// 한 기에 쏠려(dogpile) 대형을 갖춘 판이 오히려 집중포화를 맞는다 — 봇에서 smart 가 naive 보다
+// 나빠지는 뒤집힘으로 드러났다. 원작은 열끼리 맞붙는다: 제 행에 상대가 있으면 그쪽, **없을 때만**
+// 비스듬히 옮겨 간다(사용자 지적 「빈 행이라고 그냥 지나가지 말 것」이 이 자리다).
+const ROW_LOCK=0.6;   // 같은 행으로 치는 세로 거리
+function foeTarget(B,u){
+  let best=null,bd=99;
+  for(const o of B.all){if(o.side===u.side||!o.alive)continue;
+    if(Math.abs(o.y-u.y)>ROW_LOCK)continue;
+    const d=Math.hypot(o.x-u.x,o.y-u.y);
+    if(d<bd){bd=d;best=o;}else if(d===bd&&best&&o.id<best.id)best=o;}
+  return best||nearestFoe(B,u,99);
+}
 function alliesNear(B,u,r){const out=[];for(const o of B.all)if(o.side===u.side&&o.alive&&o!==u&&Math.hypot(o.x-u.x,o.y-u.y)<=r)out.push(o);return out;}
 function hurt(B,u,dmg,rng){if(!u.alive)return false;if(u.shield>0){const s=Math.min(u.shield,dmg);u.shield-=s;dmg-=s;}
   u.hp-=dmg;B.fx.push({k:'hit',x:u.x,y:u.y,v:dmg,side:u.side,t:B.t});
@@ -2336,15 +2352,20 @@ function clashTick(B,dt,rng,mods){
         pushes.push({u,targets});
       }
     }
-    const e=nearestFoe(B,u,99);if(!e)continue;
+    const e=u.side===1?foeTarget(B,u):nearestFoe(B,u,99);if(!e)continue;
     const d=Math.hypot(e.x-u.x,e.y-u.y);
     // v18.1: 적은 **왼쪽으로 전진**(−x)하고 우리는 **오른쪽으로 돌격**(+x)한다 — 양쪽이 접촉선에서 만난다.
-    // 세로(y)로는 아무도 안 쫓는다 — 줄(행)은 준비 단계에서 정해지고 전투 중에는 안 바뀐다.
-    // 멈추는 거리: 우리는 제 사거리, 적은 접촉 거리(ENGAGE_GAP) — 적은 사거리 안에 들어도 **오면서 친다**(ENGAGE_GAP 주석).
+    // **v19.1 — 적은 행(y)도 바꾼다.** v18 까지 적은 −x 로만 걸어서, 우리 유닛이 없는 행에 선 적은
+    // 아무와도 안 싸우고 그 행을 그냥 지나 본진으로 갔다. 원작(운빨돌격대)은 그렇지 않다 — 적은
+    // **제 표적 쪽으로** 비스듬히 붙어 한 덩어리가 된다(영상 345초의 세로 한 줄 뭉치가 그 그림이다).
+    // 우리 편은 여전히 행을 안 바꾼다: 행은 준비 단계에서 정한 대형이고, 연환이 그 대형 위에 선다.
+    // 멈추는 거리: 우리는 제 사거리, 적은 접촉 거리(ENGAGE_GAP) — 적은 사거리 안에 들어도 **오면서 친다**.
     const stop=u.side===1?Math.min(u.range,ENGAGE_GAP):u.range;
     if(d>stop){
       const v=Math.min(u.spd*slow*(1+((u.role===0||u.role===3)?M.vanguardSpd||0:0))*dt,Math.max(0,d-stop*0.9));
-      if(u.side===1){if(v>1e-6)moves.push({u,dx:-v,dy:0});}
+      if(u.side===1){                                   // 표적 쪽 단위벡터로 — x 만이 아니라 y 로도 붙는다
+        const n=d>1e-6?d:1, ux=(e.x-u.x)/n, uy=(e.y-u.y)/n;
+        if(v>1e-6)moves.push({u,dx:ux*v,dy:uy*v});}
       else{const lim=Math.min(CHARGE_X,frontMateX(B,u)-RANK_GAP)-u.x;   // 돌격: 앞 아군과 적 출발선까지만
         const step=Math.min(v,Math.max(0,lim));if(step>1e-6)moves.push({u,dx:step,dy:0});}
     }
@@ -9674,11 +9695,15 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
     SCN.drawBoard(ctx,L,{sel:ASEL,cands:null,chains:[],t:tt,night:sst.night,season:sst.season});
     CHMARKS=units?chainMarks(CH,L,units):[];
     if(units){drawChainMarks(CHMARKS);drawMythCells(L,tt);drawDragTarget(L);}
-    // 본진 띠 이름표 — 영웅은 이제 벌판에 서서 직접 싸우므로(§5.3) 본진에 세워 두지 않는다.
+    // 본진 이름표 — **가로 대치에서 본진은 왼쪽이다**(적이 오른쪽에서 −x 로 밀고 들어와 본진 선 LEAK_X 를 넘으면 실점).
+    // v18 까지 이 표가 캔버스 **아래**(옛 세로 대치 자리)에 붙어 있어, 판과 아무 상관 없는 자리에서 「본진」이라 적고 있었다.
+    // 이제 판 왼쪽 자락(담장 앞) 세로 한가운데에 붙인다 — 적이 넘으면 안 되는 그 선 옆이다.
     {ctx.font="700 11px 'Noto Sans KR'";ctx.textAlign='left';ctx.textBaseline='middle';
-     const bt=`본진 · ${SAJU?SAJU.ilju:'무명'}`,bw=ctx.measureText(bt).width;   // 담장 돌무늬 위라 판을 깔아야 읽힌다
-     ctx.fillStyle='rgba(28,16,10,.55)';rr(6,boardBot+14,bw+10,17,6);ctx.fill();
-     ctx.fillStyle='#F2E6C9';ctx.fillText(bt,11,boardBot+22.5);}
+     const bt=`본진 · ${SAJU?SAJU.ilju:'무명'}`,bw=ctx.measureText(bt).width;
+     // 세로로는 띠 **아랫자락**(마지막 행 밑 맨 모래) — 가운데에 두면 왼쪽 열 유닛이 덮는다.
+     const by=Math.round(L.laneBot-11), bx=Math.max(4,Math.round(L.X(A.LEAK_X)));
+     ctx.fillStyle='rgba(28,16,10,.62)';rr(bx,by-9,bw+10,18,6);ctx.fill();
+     ctx.fillStyle='#F2E6C9';ctx.fillText(bt,bx+5,by+0.5);}
     // 준비: 이번 판 적 미리보기(빈 접근로에) → 연환 선·합성 후보·선택 칸
     if(S.phase==='prep')PREVIEW=drawStagePreview(L);
     if(units){const bonus=CH.bonus;
