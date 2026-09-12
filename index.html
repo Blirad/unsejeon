@@ -1559,7 +1559,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v18.0</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v18.1</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -1781,11 +1781,10 @@ const FRONT_COL=[0,1,2,3].map(r=>idx(r,COLS-1));   // 앞열(진 · 방벽)
 const BACK_COL=[0,1,2,3].map(r=>idx(r,0));         // 뒷열(비 · 화살비 · 사수 치명 보너스)
 // v17 거리·시간(설계서 §3 · 운빨돌격대 감각): 전위 사거리 .7 · 0.6초에 한 번(rate 1.6) · 속도 3.0, 사수 3.5 · 1.0 · 2.4, 술사 2.5 · 0.6 · 2.4.
 // hp·atk 는 v15 값 그대로. 적도 같은 표를 쓴다(waveSquad → makeUnit).
-// **v18 R7 룰링 1 — 사수 3.5 → 4.5 · 술사 2.5 → 3.8.** 판이 5×5 세로에서 4×4 가로로 바뀌며 깊이가 3.0칸
-// (뒷열 중심 0.5 ~ 앞열 중심 3.5)이 됐는데 사거리는 v17 값 그대로였다. 적은 앞열 유닛이 ADVANCE(0.4)칸
-// 나간 자리에서 ENGAGE_GAP(0.7)만큼 떨어져 서므로 **적이 멈추는 선은 3.5+0.4+0.7 = 4.6** 이다.
-// 뒷열(열 0) 유닛이 닿는 거리는 0.5+ADVANCE+사거리라 사수가 4.4·술사가 3.4 — 뒷열은 전투에 아예 못 꼈다
-// (R3 보고 의문점 1: 우리 화살 1.4초에 0발 · 적 56발). 4.5/3.8 이면 사수는 5.4, 술사는 4.7 로 전선에 닿는다.
+// **v18 R7 룰링 1 — 사수 3.5 → 4.5 · 술사 2.5 → 3.8.** 판이 4×4 가로로 바뀌며 깊이가 3.0칸이 됐는데
+// 사거리는 v17 값 그대로라, 제 칸에 붙박인 뒷열은 전선에 아예 못 닿았다(R3: 우리 화살 1.4초에 0발 · 적 56발).
+// **v18.1 돌격**이 들어오며 뒷열도 사거리 밖이면 앞으로 걸어 나가므로 이 값이 더는 전선 도달의 조건은 아니다 —
+// 다만 「뒷열이 얼마나 뒤에서 쏘느냐」를 정하는 값으로 그대로 둔다(바꾸면 화력 곡선이 통째로 움직인다).
 // 전위 0.7 은 그대로다(= ENGAGE_GAP · 붙어서 싸우는 그림). 적도 같은 표를 쓰므로 적 사수·술사도 같이 길어진다.
 const ROLE_BASE=[{hp:100,atk:8,rate:1.6,range:0.7,spd:3.0},{hp:45,atk:14,rate:1.0,range:4.5,spd:2.4},{hp:60,atk:5,rate:0.6,range:3.8,spd:2.4}];
 // 등급 배율(v15 재조정). 옛 값은 등급당 ×1.6(신화만 ×2.2 추가)였는데, 스택(§5)이 들어오자 합성(3기 → 1기)이
@@ -2037,10 +2036,16 @@ const BOSS_NAMES=['만목왕','겁화왕','지신','금강왕','해룡'];
 // v18 가로 기하(설계서 §1 · 룰링 6): 우리 판은 x 0.5~3.5 · y 0.5~3.5. 적은 판 오른쪽 바깥 ENEMY_X0(= COLS+0.5)에서
 // 열 간격 ENEMY_DX(0.55 — 우리 칸보다 촘촘하다 · 실측 80px vs 189px)로 4행 대형을 짓고 **왼쪽으로 전진**한다.
 // 적 열 0 이 우리 쪽 선두다. 적이 LEAK_X(열 0 왼쪽 끝 = 본진 선)를 넘으면 그 적은 사라지고 목숨 −1(디펜스 실점).
-// 우리 유닛은 제 칸에 서서 사거리 안이면 치고, 아니면 **앞으로 ADVANCE(0.4)칸까지만** 나간다(붙어서 싸우는 그림).
+// **v18.1 돌격**(원작 영상 실측 · docs/superpowers/refs/lucky-offense/video-battle.png): 우리 유닛도 제 칸에 안 선다 —
+// 사거리 안에 적이 없으면 **접촉선까지 전진**한다. 345초 프레임에서 양쪽은 판 가로 30~48% 에 세로 한 덩어리로
+// 엉켜 있고, 5초 뒤(350초)에는 그 덩어리가 55~60% 로 **밀려** 있다. 옛 ADVANCE(0.4칸 상한)는 이 두 가지를
+// 다 막았다 — 행마다 따로 노는 네 개의 대결이 되고, 이겨도 전진이 없었다(게임 이름이 「돌격」대인 까닭).
+// 대형은 두 가지로만 지킨다: ① 같은 행 앞 아군을 RANK_GAP 안쪽으로 추월하지 않는다(줄이 겹쳐 그려지는 걸 막는다)
+// ② 적 출발선(CHARGE_X)을 넘지 않는다. 행(y)은 여전히 아무도 안 바꾼다.
 const ENEMY_X0=COLS+0.5, ENEMY_DX=0.55;
 const LEAK_X=-0.3;          // 본진 선 — 적 x 가 이보다 작아지면 실점
-const ADVANCE=0.4;          // 우리 유닛이 제 칸에서 앞으로 나갈 수 있는 최대 칸수
+const RANK_GAP=0.55;        // 같은 행에서 앞 아군과 두는 최소 간격(칸) — 적 열 간격과 같은 값이다
+const CHARGE_X=ENEMY_X0;    // 우리 부대가 전진할 수 있는 오른쪽 끝 = 적 출발선(4.5)
 // ENGAGE_GAP: 적이 멈추는 거리. 적은 **제 사거리가 아니라 접촉 거리까지** 밀고 들어온다(as-3 의 뒤엉킨 그림) —
 // 사거리 안에 들면 오면서 친다. 이게 없으면(제 사거리에서 멈추면) 적 사수·술사가 출발선(x 5.6)에 선 채
 // 우리 앞열(x ≤ 3.9)을 쏘고, 우리 뒷열 사수(사거리 3.5 · 최대 x 0.9 → 4.4 까지)는 아무도 못 닿아 판이 120초까지 굳는다.
@@ -2240,6 +2245,17 @@ function castMagic(B,u,mods,rng){
 // 변이는 전부 큐에 담아 두었다가, 결정 단계가 다 끝난 뒤 apply 단계에서 한꺼번에(늘 같은 순서로) 반영한다.
 // I1: 이 분리가 없으면 같은 틱 안에서 나중에 처리되는 쪽이 "이미 밀렸거나 이미 화상이 걸리거나 이미
 // 버프를 받은" 상대를 보게 되어, B.all 을 뒤집으면(foes.concat(units)) 20·30웨이브 궤적이 갈렸다.
+// 같은 행에서 내 **앞**(오른쪽)에 선 살아 있는 아군의 x. 없으면 Infinity.
+// 행은 homeY 로 가른다 — 우리 유닛은 전투 중 행을 안 바꾸므로 이게 곧 줄 번호다.
+function frontMateX(B,u){
+  let m=Infinity;
+  for(const o of B.units){
+    if(o===u||!o.alive)continue;
+    if(Math.abs(o.homeY-u.homeY)>0.25)continue;
+    if(o.x>u.x&&o.x<m)m=o.x;
+  }
+  return m;
+}
 function clashTick(B,dt,rng,mods){
   if(B.result)return;B.t+=dt;if(B.buffT>0)B.buffT-=dt;if(B.barrierT>0)B.barrierT-=dt;const M=B.mods||mods;
   const order=B.all.slice().sort((a,b)=>a.side-b.side||a.id-b.id);
@@ -2271,14 +2287,15 @@ function clashTick(B,dt,rng,mods){
     }
     const e=nearestFoe(B,u,99);if(!e)continue;
     const d=Math.hypot(e.x-u.x,e.y-u.y);
-    // v18 §1(룰링 6): 적은 **왼쪽으로 전진**(−x)하고, 우리 유닛은 제 칸에서 **앞으로**(+x) ADVANCE 칸까지만 나간다.
+    // v18.1: 적은 **왼쪽으로 전진**(−x)하고 우리는 **오른쪽으로 돌격**(+x)한다 — 양쪽이 접촉선에서 만난다.
     // 세로(y)로는 아무도 안 쫓는다 — 줄(행)은 준비 단계에서 정해지고 전투 중에는 안 바뀐다.
     // 멈추는 거리: 우리는 제 사거리, 적은 접촉 거리(ENGAGE_GAP) — 적은 사거리 안에 들어도 **오면서 친다**(ENGAGE_GAP 주석).
     const stop=u.side===1?Math.min(u.range,ENGAGE_GAP):u.range;
     if(d>stop){
       const v=Math.min(u.spd*slow*(1+((u.role===0||u.role===3)?M.vanguardSpd||0:0))*dt,Math.max(0,d-stop*0.9));
       if(u.side===1){if(v>1e-6)moves.push({u,dx:-v,dy:0});}
-      else{const lim=u.homeX==null?v:Math.max(0,u.homeX+ADVANCE-u.x);const step=Math.min(v,lim);if(step>1e-6)moves.push({u,dx:step,dy:0});}
+      else{const lim=Math.min(CHARGE_X,frontMateX(B,u)-RANK_GAP)-u.x;   // 돌격: 앞 아군과 적 출발선까지만
+        const step=Math.min(v,Math.max(0,lim));if(step>1e-6)moves.push({u,dx:step,dy:0});}
     }
     if(d<=u.range&&u.cd<=0){
       u.cd=1/u.rate/(1+(u.bonus.spd||0))/(M.rate||1);
@@ -2319,9 +2336,9 @@ function clashTick(B,dt,rng,mods){
   // B.all 나열 순서와 무관하다.
   for(let a=0;a<order.length;a++){const p=order[a];if(!p.alive||p.side!==1)continue;for(let b=a+1;b<order.length;b++){const q=order[b];if(!q.alive||q.side!==1)continue;
     const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy);if(d<0.45&&d>1e-6){const push=0.5*dt;p.x-=dx/d*push;p.y-=dy/d*push;q.x+=dx/d*push;q.y+=dy/d*push;}}}
-  // 칸 가두기: 우리 유닛은 제 칸 −PUSH_BACK ~ +ADVANCE 안(행은 고정), 적은 본진 선 뒤부터 제 출발선까지.
+  // 가두기: 우리 유닛은 제 칸 뒤 PUSH_BACK ~ 적 출발선(CHARGE_X) 안(행은 고정), 적은 본진 선 뒤부터 제 출발선까지.
   for(const u of B.all){
-    if(u.side===0&&u.homeX!=null){u.x=Math.max(u.homeX-PUSH_BACK,Math.min(u.homeX+ADVANCE,u.x));u.y=u.homeY;}
+    if(u.side===0&&u.homeX!=null){u.x=Math.max(u.homeX-PUSH_BACK,Math.min(CHARGE_X,u.x));u.y=u.homeY;}
     else{u.x=Math.max(LEAK_X-0.5,Math.min(ENEMY_X0+(COLS+1)*ENEMY_DX,u.x));u.y=Math.max(0.1,Math.min(ROWS-0.1,u.y));}}
   // 본진 실점(v18 §1 · 룰링 6): 적 선두가 본진 선(LEAK_X)을 넘으면 그 적은 사라지고 목숨 −1.
   // B.lives 는 startClash 가 run.lives 로 심어 준 값이고 finishWave 가 그대로 run.lives 로 되돌린다.
@@ -2672,7 +2689,7 @@ return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,
   armyWeights,EL_POW,strongest,neededElement,combatPower,stageWarning,addUnit,mergeUnit,canJoin,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
   BENCH_MAX,benchPush,benchToCell,cellToBench,MYTH_RECIPES,MYTH_NEED_GRADE,mythReady,summonMyth,
   defaultMods,BOSS_NAMES,damageOf,clashInit,clashTick,hurt,nearestFoe,alliesNear,
-  ENEMY_X0,ENEMY_DX,LEAK_X,ADVANCE,PUSH_BACK,ENGAGE_GAP,CLASH_MAX,WAVES,BOSS_WAVES,E_SLOPE,N_SLOPE,GRADE_DEN,GRADE_MUL,MYTH_MUL,BOSS_HP_MUL,BOSS_ATK_MUL,BOSS_DMG_RED,ENEMY_MAX,waveCount,waveLv,enemyCells,ourCellXY,enemyCellXY,waveSquad,wavePreview,waveMobHp,waveGradeMul,wallElement,wallElOf,waveRng,wavePurity,
+  ENEMY_X0,ENEMY_DX,LEAK_X,RANK_GAP,CHARGE_X,PUSH_BACK,ENGAGE_GAP,CLASH_MAX,WAVES,BOSS_WAVES,E_SLOPE,N_SLOPE,GRADE_DEN,GRADE_MUL,MYTH_MUL,BOSS_HP_MUL,BOSS_ATK_MUL,BOSS_DMG_RED,ENEMY_MAX,waveCount,waveLv,enemyCells,ourCellXY,enemyCellXY,waveSquad,wavePreview,waveMobHp,waveGradeMul,wallElement,wallElOf,waveRng,wavePurity,
   CARDS,offerCards,applyCards,applyRunCard,takeCard,
   q,SKV,SKILL_KEYS,SKILL_CD,YANG_K,YEOKMA_CAP,GOE_VULN,GOE_STK,DOHWA_STK,HWAGAE_LIVES,HWAGAE_CARRY,HWAGAE_CAP,RAIN_N,castSkill,
   seededRng,armyRoster,armyGrade,armyUnitOf,armyJoin,armySize,ARMY_EVERY,heroUnit,ARMY_ROLE_STEM,ARMY_ROLE_BRANCH,ARMY_HOME,HERO_HOME,newRun,runMods,emptyCell,useItem,placeUnit,sellUnit,equipTen,pickAlly,startClash,finishWave,retryWave,nextWave,scoreOf,wavesCleared,RUN_KEYS,serializeRun,restoreRun};
