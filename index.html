@@ -1578,7 +1578,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.0</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.1</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -8638,20 +8638,21 @@ function chainMarks(CH,L,units){const out=[];if(!CH||!Array.isArray(CH.chains))r
     const px_=xx;placed.push({x:px_,y,w});
     out.push({type:c.type,cells:cells.slice(),key:c.type+':'+cells.join(','),tint,label,col:CHAIN_C[c.type]||'#FFC83D',x:px_,y,w,h});}
   ctx.restore();return out;}
-function drawChainMarks(marks){if(!marks||!marks.length)return;ctx.save();
+// a: 0~1 — 대오 복귀 중에는 함께 떠오른다(안 주면 1). 안에서 알파를 직접 적는 자리마다 곱한다.
+function drawChainMarks(marks,a){if(!marks||!marks.length)return;a=a==null?1:Math.max(0,Math.min(1,a));if(a<=0)return;ctx.save();
   const done=new Set();
   for(const m of marks)for(const t of m.tint){if(done.has(t.cell))continue;done.add(t.cell);const q=t.pts;
-    ctx.globalAlpha=CHAIN_TINT_A;ctx.fillStyle=t.col;ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);ctx.lineTo(q[1][0],q[1][1]);ctx.lineTo(q[2][0],q[2][1]);ctx.lineTo(q[3][0],q[3][1]);ctx.closePath();ctx.fill();}
+    ctx.globalAlpha=CHAIN_TINT_A*a;ctx.fillStyle=t.col;ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);ctx.lineTo(q[1][0],q[1][1]);ctx.lineTo(q[2][0],q[2][1]);ctx.lineTo(q[3][0],q[3][1]);ctx.closePath();ctx.fill();}
   // 오행연환·대연환은 **줄 하나에 외곽선 하나**를 두른다 — 다섯 칸이 한 줄이라는 게 한눈에 보이되,
   // 칸마다 두르면(처음에 그렇게 했다) 줄이 여럿 설 때 판이 통째로 테두리에 덮여 다시 어지러워진다.
   for(const m of marks){if(m.type!=='cycle'&&m.type!=='grand')continue;
     const g=m.type==='grand';
-    ctx.globalAlpha=1;ctx.lineWidth=g?3:1.8;ctx.strokeStyle=m.col;ctx.setLineDash(g?[]:[7,5]);
+    ctx.globalAlpha=a;ctx.lineWidth=g?3:1.8;ctx.strokeStyle=m.col;ctx.setLineDash(g?[]:[7,5]);
     let X0=1e9,Y0=1e9,X1=-1e9,Y1=-1e9;
     for(const t of m.tint)for(const q of t.pts){X0=Math.min(X0,q[0]);X1=Math.max(X1,q[0]);Y0=Math.min(Y0,q[1]);Y1=Math.max(Y1,q[1]);}
     rr(X0+1.5,Y0+1.5,X1-X0-3,Y1-Y0-3,8);ctx.stroke();
     ctx.setLineDash([]);}
-  ctx.globalAlpha=1;ctx.font=`700 ${CHAIN_PILL_F}px 'Noto Sans KR'`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.globalAlpha=a;ctx.font=`700 ${CHAIN_PILL_F}px 'Noto Sans KR'`;ctx.textAlign='center';ctx.textBaseline='middle';
   for(const m of marks){ctx.fillStyle=`rgba(38,22,10,${m.type==='grand'||m.type==='cycle'?0.82:CHAIN_PILL_A})`;
     rr(m.x-m.w/2,m.y-m.h,m.w,m.h,5);ctx.fill();
     ctx.fillStyle=mixHex(m.col,'#FFFFFF',0.35);ctx.fillText(m.label,m.x,m.y-m.h/2+0.5);}
@@ -9096,7 +9097,7 @@ function assaultOpts(mode){const seed=mode==='tutorial'?7:mode==='daily'?hash('d
 function startAssault(mode){try{AU.init&&AU.init();}catch(_){}mode=mode||'free';lastMode=mode;
   S=ASSAULT.newRun(assaultOpts(mode));
   S.skills=((SAJU&&SAJU.skills&&SAJU.skills.length)?SAJU.skills:['dohwa','yeokma']).slice(0,3).map(k=>({k,cd:0}));
-  B=null;ASEL=-1;ADRAG=null;AFX.length=0;fxReset();
+  B=null;ASEL=-1;ADRAG=null;AFX.length=0;fxReset();RETREAT=null;WAVEIN=0;   // 지난 판의 대오 복귀·부대 등장이 새 판으로 안 넘어온다
   if(mode==='daily'){const ds=loadDS();S.ranked=!(ds&&ds.started);if(S.ranked)saveDS({started:true,wave:null});}else S.ranked=mode!=='tutorial';
   hideHome();$('assault').hidden=false;$('endOverlay').hidden=true;$('relicOverlay').hidden=true;$('winOverlay').hidden=true;
   ESEL=-1;SQUAD=null;PREVIEW_CACHE=null;
@@ -9720,8 +9721,13 @@ function drawStagePreview(L){
   const hw=$('hudWarn'), warnText=hw?hw.textContent+'|'+hw.hidden:'';
   const key=`${SQ.key}|${S.wallEl}|${S.purity}|${cw}|${ch}|${warnText}`;
   const cvw=Math.max(1,Math.round(cw*dpr)), cvh=Math.max(1,Math.round(ch*dpr));
+  // v20.1 — 다음 부대는 **오른쪽(성문 쪽)에서 미끄러져** 들어온다. 구운 그림 한 장을 옮겨 그릴 뿐이라
+  // 25기를 프레임마다 다시 그리지 않는다(캐시가 그대로 산다).
+  const paste=cv2=>{const W=waveInQ();
+    if(W.a>=1&&!W.dx){ctx.drawImage(cv2,0,0,cw,ch);return;}
+    ctx.save();ctx.globalAlpha=W.a;ctx.drawImage(cv2,W.dx,0,cw,ch);ctx.restore();};
   if(ESEL<0&&PREVIEW_CACHE&&PREVIEW_CACHE.key===key&&PREVIEW_CACHE.cv.width===cvw&&PREVIEW_CACHE.cv.height===cvh){
-    ctx.drawImage(PREVIEW_CACHE.cv,0,0,cw,ch);
+    paste(PREVIEW_CACHE.cv);
     return PREVIEW_CACHE.result;
   }
   if(ESEL>=0){const r=renderStagePreview(L);PREVIEW_CACHE=null;return r;}
@@ -9729,7 +9735,7 @@ function drawStagePreview(L){
   let result=null;
   drawOn(cv,()=>{ctx.scale(dpr,dpr);result=renderStagePreview(L);});
   PREVIEW_CACHE={key,cv,result};
-  ctx.drawImage(cv,0,0,cw,ch);
+  paste(cv);
   return result;
 }
 // 실제 미리보기 그림(요약 현판 + 적 진형). drawStagePreview 가 오프스크린 캐시에 굽거나,
@@ -9866,7 +9872,10 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
     // 오행색으로 물들이고(알파 .25) 사슬 위에 라벨 하나(chainMarks). 성립 순간의 0.6초 섬광(drawPrepFx chain)은 그대로다.
     SCN.drawBoard(ctx,L,{sel:ASEL,cands:null,chains:[],t:tt,night:sst.night,season:sst.season});
     CHMARKS=units?chainMarks(CH,L,units):[];
-    if(units){drawChainMarks(CHMARKS);drawMythCells(L,tt);drawDragTarget(L);}
+    if(units){const cq=retreatQ();                        // 대오가 다 돌아왔을 때 연환 표가 함께 선다
+      drawChainMarks(CHMARKS,cq);
+      if(cq>=1)drawMythCells(L,tt);
+      drawDragTarget(L);}
     // 본진 이름표 — **가로 대치에서 본진은 왼쪽이다**(적이 오른쪽에서 −x 로 밀고 들어와 본진 선 LEAK_X 를 넘으면 실점).
     // v18 까지 이 표가 캔버스 **아래**(옛 세로 대치 자리)에 붙어 있어, 판과 아무 상관 없는 자리에서 「본진」이라 적고 있었다.
     // 이제 판 왼쪽 자락(담장 앞) 세로 한가운데에 붙인다 — 적이 넘으면 안 되는 그 선 옆이다.
@@ -9888,6 +9897,8 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
         // 착지·합성 직후에는 크게 나왔다 제 크기로 잦아들고, 놓은 칸은 한 번 찌그러졌다 편다.
         const POP=SCN.prepPop(S.fxq,i,tt);
         if(POP.a<=0)continue;
+        // v20.1 — 전투가 끝난 자리에서 제 칸으로 걸어 돌아온다(그리는 자리만 민다)
+        {const rdx=retreatDx(u,L,i);if(rdx){R.cx+=rdx;R.x+=rdx;}}
         drawUnitAt(u,R,L,MDY,POP,{cell:i});}                   // 고리·몸·레벨 배지를 한 칸 안에(v16 표식 두 겹 · v17 배지 = Lv) — 「+N%」 글자는 정보 판으로
       if(S.ally&&!units.includes(S.ally)){const c=A.emptyCell(S);if(c!=null){const R=L.cellRect(c);ctx.save();ctx.globalAlpha=0.6;SCN.groundShadow(ctx,R.cx,R.cy+MDY,R.k);ctx.translate(R.cx,R.cy+MDY);ctx.scale(R.k,R.k);drawMerc(S.ally.el,3,3,false,true,S.ally.ilju);ctx.restore();}}
       // 끌고 다니는 유령은 놓일 칸의 깊이 배율로 — 위쪽 행으로 끌면 조금 작아진다(놓았을 때 크기가 안 튄다)
@@ -10058,7 +10069,7 @@ assaultCv.addEventListener('pointerup',ev=>{if(!S||!ADRAG)return;const p=cellAt(
 // 코어가 B.result 로 거절한다(castSkill 도 가드). assaultSave 는 phase==='prep' 에서만 쓰므로 잔상 중 저장은 안 찍힌다 —
 // 탭을 숨기거나 닫을 때(visibilitychange/pagehide)는 winResolve 로 잔상을 즉시 마무리해 결산·다음 판 준비까지 간 뒤 저장한다.
 const WIN_HOLD_MOB=0.45;
-function winResolve(){if(!AWIN||!B)return;AWIN=null;const res=ASSAULT.finishWave(S,B);B=null;AACC=0;endStage(res);}
+function winResolve(){if(!AWIN||!B)return;AWIN=null;retreatMark(B);const res=ASSAULT.finishWave(S,B);B=null;AACC=0;endStage(res);}
 // ── 히트스톱(v19.6) ────────────────────────────────────────────────────────
 // 센 한 방·처치에 **아주 짧게** 시간이 멎는다. 격투 게임이 쓰는 손인데, 여기서는 「무겁다」를 만드는 거의
 // 유일한 공짜 수단이다 — 코어 규칙이 아니라 **틱을 먹이는 박자**만 늦춘다(시뮬 시간 기준 밸런스 불변:
@@ -10071,6 +10082,51 @@ function finishFlash(boss){if(calmFx())return;FING=boss?0.55:0.32;FINF=FING;}
 function drawFinishFlash(L){if(!(FINF>0)||!L)return;const q=1-FINF/FING;
   ctx.save();ctx.globalAlpha=Math.pow(1-q,1.8)*(FING>0.4?0.62:0.5);
   ctx.fillStyle=FING>0.4?'#FFE9A8':'#FFFFFF';ctx.fillRect(0,0,L.cw,L.ch);ctx.restore();}
+// ── 웨이브가 바뀌는 순간(v20.1) ─────────────────────────────────────────────
+// 전투가 끝나면 화면이 **한 프레임에** 준비 화면으로 바뀌었다: 벌판 한가운데 엉켜 있던 우리 부대가
+// 제 칸으로 순간이동하고, 다음 웨이브 적이 오른쪽에 툭 나타난다. 두 박자를 붙여 이어 준다.
+// 둘 다 **그리는 자리만** 옮기는 연출이다 — 코어 좌표도 맞는 칸도 안 건드린다(끌기는 늘 제 칸을 집는다).
+const RETREAT_T=0.42;        // 대오 복귀에 걸리는 시간(초 · 실제 시간)
+const WAVEIN_T=0.50, WAVEIN_LAG=0.12, WAVEIN_DX=26;   // 다음 부대가 들어오는 시간 · 늦게 시작하는 몫 · 미끄러지는 폭(px)
+let RETREAT=null;            // {t0, m:Map(칸 번호 → 제 칸에서 벗어나 있던 칸수)}
+// **칸 번호로 적는다** — clashInit 이 전투 유닛에 `id:UID++` 로 새 id 를 매기므로 준비 단계 유닛과 id 가 다르다.
+// 칸(u.cell)은 그대로 실려 오고, nextWave 는 **빈 칸에만** 더하므로 살아남은 기의 칸은 안 흔들린다.
+let WAVEIN=0;                // 다음 부대가 들어오기 시작한 시각(0 = 안 함)
+// 전투가 끝나기 직전(코어 B 가 아직 살아 있을 때) 저마다 제 칸에서 얼마나 나와 있었는지를 적어 둔다.
+function retreatMark(B0){
+  RETREAT=null;if(!B0||calmFx())return;
+  const m=new Map();
+  for(const u of B0.units){if(!u||!u.alive||u.homeX==null)continue;
+    const d=u.x-u.homeX;if(Math.abs(d)>0.12&&u.cell!=null)m.set(u.cell|0,d);}
+  if(m.size)RETREAT={t0:performance.now()/1000,m};
+}
+function waveInMark(){WAVEIN=calmFx()?0:performance.now()/1000;}
+// 제 칸으로 돌아오는 중이면 그 유닛을 그릴 화면 x 오프셋(칸수 → px). 끝났으면 0.
+function retreatDx(u,L,cell){
+  if(!RETREAT||!u||ADRAG)return 0;
+  const d=RETREAT.m.get(cell|0);if(d==null)return 0;
+  const q=(performance.now()/1000-RETREAT.t0)/RETREAT_T;
+  if(!(q<1))return 0;
+  const e=1-Math.pow(1-Math.max(0,q),2);              // 떠날 땐 빠르고 붙을 땐 느리게
+  const hx=(cell%ASSAULT.COLS)+0.5;
+  return (L.X(hx+d)-L.X(hx))*(1-e);
+}
+// 대오 복귀가 얼마나 됐나(0~1 · 안 하는 중이면 1). 연환 표시는 이 값으로 함께 떠오른다 —
+// 몸이 아직 걸어오는 중인데 빈 칸 위에 「×3」 알약만 떠 있으면 표가 몸에서 떨어져 나온 것처럼 보인다.
+function retreatQ(){
+  if(!RETREAT)return 1;
+  const q=(performance.now()/1000-RETREAT.t0)/RETREAT_T;
+  if(q>=1){RETREAT=null;return 1;}
+  return Math.max(0,q);
+}
+// 다음 부대 미리보기의 들어오는 몫 — {dx, a}. 안 하는 중이면 {dx:0,a:1}.
+function waveInQ(){
+  if(!WAVEIN)return {dx:0,a:1};
+  const q=(performance.now()/1000-WAVEIN-WAVEIN_LAG)/WAVEIN_T;
+  if(q>=1){WAVEIN=0;return {dx:0,a:1};}
+  const e=q<=0?0:1-Math.pow(1-q,2.2);
+  return {dx:WAVEIN_DX*(1-e),a:Math.max(0,Math.min(1,e))};
+}
 const HS_MAX=0.18;           // 한 번에 쌓이는 상한(초 · 실제 시간) — 마무리 일격이 가장 길다
 const HS_SLOW=0.12;          // 히트스톱 중 시간 배율
 let HSTOP=0;                 // 남은 히트스톱(초 · 실제 시간)
@@ -10106,7 +10162,7 @@ function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;cons
         // 셋을 한꺼번에 건다: ① 더 긴 히트스톱(보스면 더) ② 화면 섬광 한 번 ③ 잔진동.
         // 전부 연출이라 규칙·밸런스와 무관하다(코어는 이미 result 를 찍었다).
         finishFlash(boss);hitStop(boss?0.16:0.11);fxShake(boss?9:6,boss?0.42:0.26);}
-      else{const res=ASSAULT.finishWave(S,B);B=null;AACC=0;endStage(res);}}}
+      else{retreatMark(B);const res=ASSAULT.finishWave(S,B);B=null;AACC=0;endStage(res);}}}
   else {AACC=0;if(on&&(!B||!S||S.phase!=='battle'))hudBattle();}
   // 입자는 자세·반동 창과 같은 시계(시뮬 시간)로 산다 — 2배속에서 전투만 빨라지고 연출이 뒤처지면
   // 피해 숫자가 다음 타격 뒤에 뜬다. ASPD 를 곱해 둘을 같은 속도로 맞춘다.
@@ -10119,20 +10175,20 @@ function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;cons
 function endStage(res){if(!res)return; // finishWave 가 이미 소진했다
   ASEL=-1;ESEL=-1;ADRAG=null;SQUAD=null;PREVIEW_CACHE=null;fxReset();BENCH_SIG='';MYTH_SIG='';BUFF_SIG='';benchUI(true);assaultUI();   // 지난 웨이브의 입자·흔들림이 다음 준비 화면으로 안 넘어온다
   if(!res.won){
-    if(res.revived){toast('부활 부적이 발동했다. 목숨 5로 다시 준비한다.');chainSeed();assaultUI();drawAssault();assaultSave();return;}
+    if(res.revived){toast('부활 부적이 발동했다. 목숨 5로 다시 준비한다.');waveInMark();chainSeed();assaultUI();drawAssault();assaultSave();return;}
     if(res.done){finishRun(false);return;}
     // 목숨이 남았으면 판은 안 끝난다 — 같은 웨이브를 용병 그대로 다시 준비한다(§2)
     ASSAULT.retryWave(S);
     if(res.lost>0){flashLives();toast(`목숨 −${res.lost} · ${S.wave}웨이브 다시`);buzz([20,40,20]);}
     else toast(`화개 결계가 목숨을 지켰다 · ${S.wave}웨이브 다시`,1600);   // v15.1: 화개가 손실을 다 막으면 맞은 연출 없이 알린다
     log(`${S.wave}웨이브 패배 · 목숨 −${res.lost}${res.lost===0?'(화개)':''} (남은 목숨 ${S.lives})`,'hi');
-    chainSeed();assaultUI();drawAssault();assaultSave();return;}
+    waveInMark();chainSeed();assaultUI();drawAssault();assaultSave();return;}
   if(S.ally)S.allyWin=true;
   log(`${S.wave}웨이브 클리어 · 엽전 +${res.coins}냥${res.tenBonus>0?` · 십성 +${res.tenBonus}냥`:''}`,'hi');
   if(res.tenBonus>0)toast(`십성 +${res.tenBonus}냥`,1200);
   if(S.mode==='tutorial'&&S.wave>=3&&res.won){clearSave();$('assault').hidden=true;showHome();toastLower();toast('안내 끝. 자유 모드로 출전하라.');return;}
   if(res.done){finishRun(true);return;}
-  const go=()=>{ASSAULT.nextWave(S);armyJoinFx();chainSeed();SQUAD=null;PREVIEW_CACHE=null;ASEL=-1;ESEL=-1;assaultUI();drawAssault();assaultSave();};   // nextWave 가 보정(mods)을 바꿀 수 있어 다시 채운다
+  const go=()=>{ASSAULT.nextWave(S);armyJoinFx();waveInMark();chainSeed();SQUAD=null;PREVIEW_CACHE=null;ASEL=-1;ESEL=-1;assaultUI();drawAssault();assaultSave();};   // nextWave 가 보정(mods)을 바꿀 수 있어 다시 채운다
   if(res.cards)offerCardsUI(res.cards,go);else go();}
 // 카드 선택 (유물 오버레이 재사용)
 function offerCardsUI(kind,after){const A=ASSAULT;const cards=A.offerCards(kind,S.rng,S.cards,S.cnt);const ov=$('relicOverlay');
@@ -10256,7 +10312,9 @@ setTimeout(()=>{if(!$('startOverlay').hidden&&BUB.day!==todayStr()){BUB.day=toda
 setTimeout(fortunePrompt,400);
 // 디버그 / 시뮬레이션 훅
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
-window.__ubz={goGate,todoItems,startGoldToday,get art(){return {spirits:window.ART_SPIRITS,heroes:window.ART_HEROES,scene:window.BATTLE_SCENE};},startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,wavePeek,wavePreview:(w)=>S?ASSAULT.wavePreview(w==null?S.wave:w,S):null,get SQUAD(){return SQUAD;},get ESEL(){return ESEL;},weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,doSpin,spinUI,spinFlush,spinReels,spinResultCard,spinCardUI,get SPIN(){return SPIN;},SFX,sfxScan,hudHp,onMerged,unitLv,unitCapH,bossTop,get FX(){return FXP;},get AANIM(){return AANIM;},get WIN(){return AWIN;},get ADIE(){return ADIE;},winResolve,get CHSEEN(){return CHSEEN;},chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
+window.__ubz={goGate,todoItems,startGoldToday,get art(){return {spirits:window.ART_SPIRITS,heroes:window.ART_HEROES,scene:window.BATTLE_SCENE};},startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,wavePeek,wavePreview:(w)=>S?ASSAULT.wavePreview(w==null?S.wave:w,S):null,get SQUAD(){return SQUAD;},get ESEL(){return ESEL;},weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,doSpin,spinUI,spinFlush,spinReels,spinResultCard,spinCardUI,get SPIN(){return SPIN;},SFX,sfxScan,hudHp,onMerged,unitLv,unitCapH,bossTop,get FX(){return FXP;},get AANIM(){return AANIM;},get WIN(){return AWIN;},get ADIE(){return ADIE;},winResolve,get CHSEEN(){return CHSEEN;},
+// v20.1 — 웨이브 전환 연출(대오 복귀 · 다음 부대 등장). 검사망이 「진짜로 움직이는지」를 본다.
+retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
 // v18 — 검사망(smoke·viewport·arttest)이 보는 자[尺]: 유닛 키 천장·배율·몸 폭
 mercScale,mercTop,mercBodyW,foeScale,unitHDef,unitWDef,
 // v18 R3 ruling 1 — 표식은 둘뿐: 몸 위 HP 바 · 발밑 등급 점(고리·배지·별 없음)
