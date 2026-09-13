@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="운세전">
 <link id="appIcon" rel="apple-touch-icon" href="">
-<title>운세전 공개판</title>
+<title>운세전</title>
 <!-- 서체(v14 U1): 제목·버튼·명패 Jua · 본문 Gowun Dodum. 링크 한 줄로만 불러온다(글꼴 데이터를 박으면 html 이 8MB 를 넘는다).
      preconnect 두 줄은 첫 글자가 뜨는 시각을 줄인다. display=swap 이라 글꼴이 늦거나 막혀도 폴백으로 먼저 그린다 —
      폴백 차례는 --font-title/--font-body 에 한 벌로 적어 두었다(시스템 한글 → sans-serif). -->
@@ -1578,7 +1578,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.8</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v19.9</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -4688,6 +4688,8 @@ function hitPush(L,side,age,power){
 }
 // 입자용 오행색은 판·글씨용(EL_COL)보다 진하다 — 금(#CFD6E0)을 그대로 쓰면 돌길 위에서 먼지로 읽힌다.
 const FX_COL =['#2FCB7E','#FF5230','#FFBB2E','#7FC9F0','#2E86FF'];
+// 우리 편이 쓰러질 때 쓰는 잿빛 — 오행 색을 빼앗아 '얻은 것'이 아니라 '잃은 것'으로 읽히게 한다.
+const ASH_C='#8C8477', ASH_S='#C6BFB2';
 const EL_SOFT=['#B6F5D2','#FFC49E','#FFEBB0','#E2F4FF','#AFD8FF'];   // 입자 심지(더 밝다)
 
 // 피해 팝 벌리기 — 같은 발원 자리 안에 살아 있는 팝이 있으면 새 팝은 그 위에 쌓인다.
@@ -4815,6 +4817,7 @@ function FxPool(cap){
     p.el=o.el==null?-1:o.el;p.v=o.v==null?0:o.v;
     p.crit=!!o.crit;p.clash=!!o.clash;p.foe=!!o.foe;   // foe: 적이 우리 용병을 때린 피해(붉은 팝)
     p.tx=o.tx==null?x:o.tx;p.ty=o.ty==null?y:o.ty;
+    p.ash=!!o.ash;p.gy=o.gy==null?96:+o.gy;        // ash: 잿빛(아군 전사) · gy: 불똥이 받는 중력
     p.ang=o.ang||0;p.spd=o.spd||0;p.oy=o.oy||0;p.r=o.r==null?1:o.r;p.n=o.n==null?6:Math.max(1,o.n|0);
     p.role=o.role==null?0:o.role|0;               // 투사체(proj): 1 사수 화살 · 2 술사 구슬
     if(k==='proj'&&!o.life&&p.role===2)p.life=p.life0=PROJ_T+PROJ_RING;   // 구슬은 도착 링만큼 더 산다
@@ -4864,7 +4867,8 @@ function FxPool(cap){
     }finally{g.restore();}
   }
   function one(g,L,p,u){
-    const el=p.el>=0&&p.el<5?p.el:1, col=FX_COL[el], soft=EL_SOFT[el];
+    const el=p.el>=0&&p.el<5?p.el:1;
+    const col=p.ash?ASH_C:FX_COL[el], soft=p.ash?ASH_S:EL_SOFT[el], hot=p.ash?'#E2DCD0':'#FFF6DC';
     if(p.k==='crack'||p.k==='debris'){                       // 담장 — **v18 가로: 본진 담장은 화면 왼쪽**이다
       // 담장이 세로로 서 있으므로 금은 판 왼쪽 여백(0 ~ x0)에 서고 **행**(p.x 를 0..4 로 읽는다)으로 흩어진다.
       // 돌가루는 그 금 바로 밑에 떨어진다.
@@ -4882,15 +4886,16 @@ function FxPool(cap){
         // 꼬리는 8px 로 자른다. 안 자르면 빠른 불똥(처치)이 폭발 한가운데에서 뻗은 바퀴살이 된다.
         const a=p.ang, t0=Math.max(0,p.t-0.05);
         const d=p.spd*p.t, d0=p.spd*t0;
-        const x1=bx+Math.cos(a)*d*kk,  y1=by+Math.sin(a)*d*0.62*kk+96*p.t*p.t*kk;
-        let x0=bx+Math.cos(a)*d0*kk, y0=by+Math.sin(a)*d0*0.62*kk+96*t0*t0*kk;
+        const gy=p.gy;
+        const x1=bx+Math.cos(a)*d*kk,  y1=by+Math.sin(a)*d*0.62*kk+gy*p.t*p.t*kk;
+        let x0=bx+Math.cos(a)*d0*kk, y0=by+Math.sin(a)*d0*0.62*kk+gy*t0*t0*kk;
         {const lx=x1-x0,ly=y1-y0,ll=Math.hypot(lx,ly),lim=8*kk;
          if(ll>lim){x0=x1-lx/ll*lim;y0=y1-ly/ll*lim;}}
         const w=Math.max(1,(3.2-2.2*u)*kk*p.r);
         g.globalAlpha=Math.min(1,1.4*(1-u));
         g.strokeStyle='rgba(38,20,8,.55)';g.lineWidth=w+1.8;                  // 어두운 테두리 — 밝은 돌길에서도 산다
         g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();
-        g.strokeStyle=u<0.16?'#FFF6DC':col;g.lineWidth=w;
+        g.strokeStyle=u<0.16?hot:col;g.lineWidth=w;
         g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();
         g.fillStyle=u<0.45?soft:col;                                          // 머리 심지
         g.beginPath();g.arc(x1,y1,w*0.62,0,TAU);g.fill();
@@ -4939,8 +4944,8 @@ function FxPool(cap){
           };
           g.globalAlpha=Math.min(1,(1-bu)*1.9);
           puff(2.2*kk,'rgba(28,14,4,.8)');
-          puff(0,bu<0.28?'#FFF6DC':col);
-          if(bu<0.5){                                       // 한가운데 흰 속
+          puff(0,bu<0.28?hot:col);
+          if(bu<0.5&&!p.ash){                                // 한가운데 흰 속 — 잿빛에는 없다(터지는 게 아니라 스러진다)
             g.globalAlpha=Math.min(1,1-bu*2);g.fillStyle='#FFFFFF';
             g.beginPath();g.ellipse(bx,by,R*0.44,R*0.32,0,0,TAU);g.fill();
           }
@@ -8692,7 +8697,7 @@ function mergeHint(u){const A=ASSAULT,lv=unitLv(u),LVP=A.LV_PROMOTE||4,PM=A.PROM
 //   hit(role): 전위 「퍽」(저역 노이즈 60ms + 둔탁한 삼각파) · 사수 「틱」(고역 노이즈 + 짧은 사각파) · 술사 「펑」(저역 팝)
 //   arrow(): 사수 「팅」(현 튕김) · magic(): 술사 「휙」(스윕) · die(): 「푹」 · spin(): 릴 틱 · stop(i): 릴 멈춤 · win(grade): 등급 높을수록 높은 음 ·
 //   merge(): 두 음 · promote(): 네 음 상행 + 반짝임
-const SFX={last:{},MIN_GAP:{hit:0.045,hitBig:0.10,die:0.06,arrow:0.05,magic:0.05,spin:0.05},
+const SFX={last:{},MIN_GAP:{hit:0.045,hitBig:0.10,die:0.06,lose:0.07,arrow:0.05,magic:0.05,spin:0.05},
   ctx(){try{AU.init&&AU.init();}catch(_){}return (AU.on&&AU.ctx)?AU.ctx:null;},
   gate(k,gap){const c=this.ctx();if(!c)return null;const now=c.currentTime;if(gap&&this.last[k]!=null&&now-this.last[k]<gap)return null;this.last[k]=now;return c;},
   noiseBuf(c,sec,seed){const n=Math.max(1,Math.round(c.sampleRate*sec));const buf=c.createBuffer(1,n,c.sampleRate);const d=buf.getChannelData(0);
@@ -8717,6 +8722,9 @@ const SFX={last:{},MIN_GAP:{hit:0.045,hitBig:0.10,die:0.06,arrow:0.05,magic:0.05
   die(boss){const c=this.gate(boss?'dieBoss':'die',boss?0:this.MIN_GAP.die);if(!c)return 0;const t=c.currentTime;
     if(boss)return this.burst(c,t,0.42,0.14,'lowpass',600,0,29)+this.osc(c,'sine',180,44,t,0.5,0.13)+this.osc(c,'triangle',90,36,t+0.05,0.42,0.10);
     return this.burst(c,t,0.16,0.10,'lowpass',900,0,17)+this.osc(c,'sine',260,70,t,0.18,0.08);},
+  // 우리 쪽이 쓰러지는 소리 — 처치음과 반대로 **가라앉는다**. 밝은 잡음을 빼고 낮은 음을 길게 떨어뜨린다.
+  lose(){const c=this.gate('lose',this.MIN_GAP.lose);if(!c)return 0;const t=c.currentTime;
+    return this.osc(c,'sine',150,54,t,0.30,0.10)+this.osc(c,'triangle',96,40,t+0.03,0.26,0.06)+this.burst(c,t,0.20,0.045,'lowpass',380,0,23);},
   spin(){const c=this.gate('spin',this.MIN_GAP.spin);if(!c)return 0;const t=c.currentTime;return this.osc(c,'square',700,700,t,0.02,0.02);},
   stop(i){const c=this.gate('stop',0);if(!c)return 0;const t=c.currentTime;return this.osc(c,'triangle',520+(i|0)*30,300,t,0.07,0.07)+this.burst(c,t,0.04,0.04,'lowpass',1200,0,23+(i|0));},
   win(grade){const c=this.gate('win',0);if(!c)return 0;const t=c.currentTime;const g=Math.max(1,Math.min(5,grade|0)),base=440*Math.pow(1.26,g-1);let n=0;
@@ -8837,10 +8845,12 @@ function fxAnim(){
         if(u.boss)fxShake(7,0.45);}                                     // 보스 처치 — 잔진동(설계서 §6.2)
       if(a&&a.dead!=null){
         if(u.side===0&&!a.burst&&B.t-a.dead>=dieLag()){a.burst=true;    // 우리 쪽 죽음도 눈에 보여야 한다 — 자세 0.1초 뒤 폭발
+          // v19.9 — 우리 손실은 **잿빛**이다. 오행 색으로 터지면 적을 잡은 것과 똑같이 읽혀
+          // 「몇을 잃었는지」가 화면에 안 남는다. 색을 빼고, 불똥은 위로 안 튀고 아래로 흘러내린다.
           const sd=((u.id|0)*13+Math.round(a.dead*1000))&65535;
-          FXP.spawn('burst',u.x,u.y,{el:u.el,oy:14,seed:sd});
-          for(let j=0;j<4;j++){const ang=(((sd*7)%360)+j*90+((sd*23+j*41)%40))*Math.PI/180;
-            FXP.spawn('spark',u.x,u.y,{el:u.el,ang,spd:160+((sd*19+j*37)%150),oy:14,seed:sd+j,r:1.15,life:0.5});}}
+          FXP.spawn('burst',u.x,u.y,{el:u.el,oy:14,seed:sd,ash:1});
+          for(let j=0;j<4;j++){const ang=(20+j*45+((sd*23+j*41)%34))*Math.PI/180;   // 20°~175° = 모두 아래쪽
+            FXP.spawn('spark',u.x,u.y,{el:u.el,ang,spd:92+((sd*19+j*37)%70),oy:14,seed:sd+j,r:1.05,life:0.62,ash:1,gy:270});}}
         if(u.side===1&&a.needBurst&&B.t-a.dead>=dieLag()){a.needBurst=false;   // 코어 die fx 가 누락된 죽음(보충 길 — 지금 코어는 화상 틱도 die 를 남긴다)
           window.BATTLE_SCENE.dieBurst(FXP,{x:u.x,y:u.y,el:u.el,t:a.dead});}
         if(B.t-a.dead>dieDur(!!u.boss)+0.05)AANIM.delete(u);
@@ -9049,7 +9059,7 @@ function sfxScan(fx){if(!Array.isArray(fx)||!AU.on)return;
     if(f.k==='hit'){let role=0;
       for(const g of fx){if(g.k!=='proj'||g.t!==f.t)continue;const tx=g.x1!=null?g.x1:g.tx,ty=g.y1!=null?g.y1:g.ty;if(tx!=null&&Math.hypot(tx-f.x,ty-f.y)<0.4){role=g.role|0;break;}}
       const d=hitInfoOf(f);SFX.hit(role,!!(d&&d.crit));}   // v19.6: 센 한 방은 다른 소리로
-    else if(f.k==='die')SFX.die(!!f.boss);
+    else if(f.k==='die')(f.side===0?SFX.lose():SFX.die(!!f.boss));
     else if(f.k==='proj'){if((f.role|0)===1)SFX.arrow();else SFX.magic();}}}
 function saveDS(o){try{localStorage.setItem('ubz_dailyrun',JSON.stringify(Object.assign({date:todayStr()},o)));}catch(_){}}
 function assaultOpts(mode){const seed=mode==='tutorial'?7:mode==='daily'?hash('daily|'+todayStr()):mode==='weekly'?hash('weekly|'+wkKey()):null;
@@ -9954,7 +9964,8 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
       // 전장에 붙여 두면 남은 시간을 보려고 눈이 판에서 떠나지 않는다.
       SCN.drawClashBar(ctx,L,{t:B.t,max:A.CLASH_MAX});
       FXP.draw(ctx,L);                                   // 입자는 개체 위에 — 피해 숫자가 몸에 안 가린다
-      if(typeof drawSkillFx==='function')drawSkillFx(L);}
+      if(typeof drawSkillFx==='function')drawSkillFx(L);
+      drawFinishFlash(L);}                              // 마무리 섬광은 맨 위에 — 입자·컷인까지 덮는다
     for(const f of AFX.slice()){const u=(performance.now()-f.t)/500;if(u>=1){AFX.splice(AFX.indexOf(f),1);continue;}if(f.k==='pop'){const R=L.cellRect(f.cell);ctx.strokeStyle=`rgba(255,200,61,${1-u})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(R.cx,R.cy,(10+u*40)*R.k,0,Math.PI*2);ctx.stroke();}}
     drawTenPops(L);        // 십성 팝(§3) — 맨 위에 얹는다(효과가 났다는 말이 몸·숫자에 안 가리게)
   });}
@@ -10041,7 +10052,14 @@ function winResolve(){if(!AWIN||!B)return;AWIN=null;const res=ASSAULT.finishWave
 // 유일한 공짜 수단이다 — 코어 규칙이 아니라 **틱을 먹이는 박자**만 늦춘다(시뮬 시간 기준 밸런스 불변:
 // CLASH_MAX 도 B.t 로 재고 봇은 고정 dt 라 영향이 없다).
 // 멈추지 않고 0.12배로 **늦추는** 까닭: 완전히 멈추면 딸꾹질로 읽히고 입자도 같이 얼어 죽은 화면이 된다.
-const HS_MAX=0.085;          // 한 번에 쌓이는 상한(초 · 실제 시간)
+// 마무리 섬광 — 마지막 한 기가 쓰러지는 순간 화면이 한 번 하얗게 번쩍한다(보스면 더 길고 금빛).
+// 캔버스 위에 얹는 한 겹이라 입자·자세를 안 건드린다. calmFx() 면 안 건다.
+let FINF=0, FING=0;          // 남은 시간 · 전체 길이
+function finishFlash(boss){if(calmFx())return;FING=boss?0.55:0.32;FINF=FING;}
+function drawFinishFlash(L){if(!(FINF>0)||!L)return;const q=1-FINF/FING;
+  ctx.save();ctx.globalAlpha=Math.pow(1-q,1.8)*(FING>0.4?0.62:0.5);
+  ctx.fillStyle=FING>0.4?'#FFE9A8':'#FFFFFF';ctx.fillRect(0,0,L.cw,L.ch);ctx.restore();}
+const HS_MAX=0.18;           // 한 번에 쌓이는 상한(초 · 실제 시간) — 마무리 일격이 가장 길다
 const HS_SLOW=0.12;          // 히트스톱 중 시간 배율
 let HSTOP=0;                 // 남은 히트스톱(초 · 실제 시간)
 function hitStop(sec){HSTOP=Math.min(HS_MAX,Math.max(HSTOP,sec));}
@@ -10071,11 +10089,16 @@ function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;cons
       else if(B.result==='win'){let boss=false,left=WIN_HOLD_MOB;   // 죽는 중인 개체들의 남은 자세 시간 최댓값(최소 0.45) — 보스가 마지막 처치가 아니어도 자세가 안 잘린다
         for(const [o,a] of AANIM){if(a.dead==null)continue;const isB=!!(o.boss&&o.side===1);
           const rem=dieDur(isB)-(B.t-a.dead);if(rem>left)left=rem;if(isB&&rem>0)boss=true;}
-        AWIN={left,boss};}
+        AWIN={left,boss};
+        // **v19.9 — 마무리 일격.** 마지막 한 기가 쓰러지는 순간을 잔상(AWIN)만으로 두면 그냥 조용히 끝난다.
+        // 셋을 한꺼번에 건다: ① 더 긴 히트스톱(보스면 더) ② 화면 섬광 한 번 ③ 잔진동.
+        // 전부 연출이라 규칙·밸런스와 무관하다(코어는 이미 result 를 찍었다).
+        finishFlash(boss);hitStop(boss?0.16:0.11);fxShake(boss?9:6,boss?0.42:0.26);}
       else{const res=ASSAULT.finishWave(S,B);B=null;AACC=0;endStage(res);}}}
   else {AACC=0;if(on&&(!B||!S||S.phase!=='battle'))hudBattle();}
   // 입자는 자세·반동 창과 같은 시계(시뮬 시간)로 산다 — 2배속에서 전투만 빨라지고 연출이 뒤처지면
   // 피해 숫자가 다음 타격 뒤에 뜬다. ASPD 를 곱해 둘을 같은 속도로 맞춘다.
+  if(FINF>0)FINF=Math.max(0,FINF-(dt>0?dt:0));
   FXP.tick((dt>0?dt:0)*((S&&B&&S.phase==='battle')?ASPD:1));
   // 신살 컷인·범위도 같은 시계다 — 벽시계로 돌리면 2배속에서 효과가 다 끝난 뒤에 그림이 남는다
   if(S&&S.skillFx){S.skillFx.u=(S.skillFx.u||0)+(dt>0?dt:0)*((B&&S.phase==='battle')?ASPD:1);
