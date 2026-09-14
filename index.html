@@ -1578,7 +1578,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.9</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.10</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -6701,7 +6701,7 @@ const FORT_SUM={
   '대길':['하늘이 길을 열어 준다. 오늘은 거침없이 나아가라.','기운이 정점에 닿았다. 큰 판을 벌여도 좋다.','귀인이 곁을 지킨다. 뽑는 족족 손에 붙는다.'],
   '길':['순풍이 분다. 차근차근 쌓으면 뜻대로 된다.','작은 운이 겹겹이 온다. 욕심만 부리지 않으면 이긴다.','길이 열려 있다. 망설이지 말고 스핀을 돌려라.'],
   '평':['잔잔한 하루. 운보다 실력이 판을 가른다.','들뜰 것도 움츠릴 것도 없다. 기본을 지켜라.','오행이 고르게 흐른다. 진을 잘 짜면 충분하다.'],
-  '소흉':['바람이 거스른다. 무리한 상극 폭발는 삼가라.','운이 잠시 등을 돌렸다. 생명을 아끼며 버텨라.','작은 실수가 크게 번진다. 합치기를 서두르지 마라.'],
+  '소흉':['바람이 거스른다. 무리한 상극 폭발은 삼가라.','운이 잠시 등을 돌렸다. 생명을 아끼며 버텨라.','작은 실수가 크게 번진다. 합치기를 서두르지 마라.'],
   '흉':['먹구름이 낮게 깔렸다. 오늘은 지키는 날이다.','기운이 바닥이다. 화려함보다 안정을 택하라.','운은 없지만 길은 있다. 기운 카드와 합성으로 메워라.'],
 };
 const FORT_ADV=['상생 순서로 짝을 이어라. 연환이 하루를 연다.','부족한 오행부터 채워라. 오행완성이 답이다.','운 게이지가 100을 채우면 스핀이 확정으로 좋아진다.','보스 전에 상극 폭발 하나는 남겨 둬라.','영웅을 한 등급만 올려도 스킬이 달라진다.','짝패를 아끼지 마라. 엽전이 금세 두둑해진다.'];
@@ -7992,9 +7992,20 @@ let RS_NODES=[];
 function plqFit(el,min){if(!el)return;min=min||10.5;el.style.fontSize='';
   const max=parseFloat(getComputedStyle(el).fontSize)||17;
   for(let fs=max;fs>min&&el.scrollWidth>el.clientWidth;fs-=0.5)el.style.fontSize=(fs-0.5)+'px';}
-function roomSheet(title,nodes,after){const sh=$('roomSheet');const body=$('rsBody');closeRoomSheet(true);closeRoomPop(true);$('rsTitle').textContent=title;nodes.filter(Boolean).forEach(n=>{body.appendChild(n);n.style.display='block';});RS_NODES=nodes.filter(Boolean);sh.hidden=false;plqFit($('rsTitle'));body.scrollTop=0;AU.buy();if(after)setTimeout(after,30);}
+// v20.10 — **시트 제목과 같은 머리글은 접는다.** 명패에 「오늘의 과제」라 적고 바로 밑 카드에도 「오늘의 과제」가
+// 또 있었다(도감·기록·과제·업적 전부 그랬다). 같은 말을 두 번 하는 자리라 첫 화면에서 한 줄이 통째로 버려진다.
+// 닫을 때 `closeRoomSheet` 가 `dataset.rsHid` 를 보고 되돌린다 — 패널은 다른 데서도 쓰므로 원래대로 돌려놔야 한다.
+function rsFoldTitle(node,title){
+  const h=node&&node.querySelector&&node.querySelector('h3');if(!h)return;
+  const t=(h.textContent||'').replace(/\s+/g,' ').trim();
+  if(t&&t===String(title).replace(/\s+/g,' ').trim()){h.dataset.rsHid='1';h.style.display='none';}
+}
+function roomSheet(title,nodes,after){const sh=$('roomSheet');const body=$('rsBody');closeRoomSheet(true);closeRoomPop(true);$('rsTitle').textContent=title;nodes.filter(Boolean).forEach(n=>{body.appendChild(n);n.style.display='block';rsFoldTitle(n,title);});RS_NODES=nodes.filter(Boolean);sh.hidden=false;plqFit($('rsTitle'));body.scrollTop=0;AU.buy();if(after)setTimeout(after,30);}
 // 방을 옮기거나 문을 넘을 때 부르는 「시트 닫기」다 — v14 U4 의 사랑방 시트(#guestSheet)도 같이 닫는다.
-function closeRoomSheet(silent){closeInnerSheet(silent);try{closeGuestSheet(true);}catch(_){}const sh=$('roomSheet');const st=$('roomStash');RS_NODES.forEach(n=>{n.style.display='';if(n.tagName==='DETAILS')n.open=false;st.appendChild(n);});RS_NODES=[];if(!sh.hidden){sh.hidden=true;if(!silent){try{roomEnter(curRoom());}catch(_){}}}}
+function closeRoomSheet(silent){closeInnerSheet(silent);try{closeGuestSheet(true);}catch(_){}const sh=$('roomSheet');const st=$('roomStash');RS_NODES.forEach(n=>{n.style.display='';
+  // 접어 둔 머리글을 되돌린다 — 패널은 다른 데서도 쓴다
+  {const h=n.querySelector&&n.querySelector('h3[data-rs-hid]');if(h){h.style.display='';delete h.dataset.rsHid;}}
+  if(n.tagName==='DETAILS')n.open=false;st.appendChild(n);});RS_NODES=[];if(!sh.hidden){sh.hidden=true;if(!silent){try{roomEnter(curRoom());}catch(_){}}}}
 // ───── 안채 시트 — 탭 넷(영웅·장비·사주 부대·성장) ─────
 // 방 시트(#roomSheet)와 따로 둔 시트 하나다. 탭 넷이 **같은 판(#isBody)** 에 옛 패널을 그대로 끼워 넣는다 —
 // 패널도 그리는 함수도 손대지 않았고, 자리만 바뀌었다(옷차림 `.id-row` · 장비 `.hp[data-p=gear]` ·
