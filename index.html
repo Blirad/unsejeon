@@ -1578,7 +1578,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.2</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.3</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -8357,12 +8357,24 @@ function spiritSprite(el,grade,pose,enemy,boss,role,n){
   cv2=sprite(key,()=>{ctx.translate(0,R*SPR_FOOT);drawCreatureG(el,grade,{pose,enemy:!!enemy,boss:!!boss,role:ro,t:0,rank:false,dir:enemy?-1:1});},R);
   cv2._foot=R*SPR_FOOT;return cv2;}
 // 구운 스프라이트의 **실루엣**(같은 모양을 한 색으로 채운 것) — 보스 테두리에 쓴다. 스프라이트마다 한 번만 굽는다.
-function spriteSil(cv,col){
-  if(cv._sil&&cv._silC===col)return cv._sil;
-  const o=document.createElement('canvas');o.width=cv.width;o.height=cv.height;
+// 실루엣(몸 모양 그대로 한 색으로 채운 판). 색마다 한 장씩 굽고 스프라이트에 달아 둔다 —
+// v20.3 에서 보스가 **테두리색·속색 두 벌**을 쓰게 되어 한 칸 캐시(옛 _sil/_silC)로는 프레임마다 두 번 다시 구웠다.
+const SIL_CUT=96;        // 실루엣을 자르는 알파 문턱 — 이보다 옅은 점(빛무리)은 몸이 아니다
+function spriteSil(cv,col,solid){
+  const key=col+(solid?'|s':'');
+  const m=cv._sils||(cv._sils=new Map());
+  let o=m.get(key);if(o)return o;
+  o=document.createElement('canvas');o.width=cv.width;o.height=cv.height;
   const g2=o.getContext('2d');g2.drawImage(cv,0,0);
+  // **source-in 은 알파를 물려받는다.** 보스 몸은 43% 만 불투명이라 그냥 채우면 실루엣도 43% 다.
+  // solid 면 알파를 **자른다**: SIL_CUT 넘는 점만 꽉 채우고 나머지는 지운다.
+  // 그냥 여러 번 겹쳐 올리면 몸 둘레의 옅은 빛무리까지 같이 짙어져 **검은 구름**이 된다(한 번 그렇게 만들었다).
+  if(solid){const im=g2.getImageData(0,0,o.width,o.height),d2=im.data;
+    for(let i=3;i<d2.length;i+=4)d2[i]=d2[i]>=SIL_CUT?255:0;
+    g2.putImageData(im,0,0);}
   g2.globalCompositeOperation='source-in';g2.fillStyle=col;g2.fillRect(0,0,o.width,o.height);
-  cv._sil=o;cv._silC=col;return o;}
+  m.set(key,o);if(m.size>6)m.delete(m.keys().next().value);
+  return o;}
 // 역할(opt.role 0~2)은 구운 스프라이트 **안**에 있다 — v15 부터 무기가 역할 그림에 그려져 있어 따로 얹을 게 없다.
 function drawCreatureCached(el,grade,opt){opt=opt||{};
   const g=Math.max(1,Math.min(5,grade|0));
@@ -8372,9 +8384,14 @@ function drawCreatureCached(el,grade,opt){opt=opt||{};
   // **v19.7 — 보스는 테두리를 두른다.** 보스는 등급 5(신화) 팔레트로 그려지는데 그 팔레트가 창백한 반투명이라
   // (평균 알파 139 · 불투명 43%), 한 열을 통째로 채우는 큰 몸이 배경에 녹아 「보스가 어디 있는지」가 안 보였다.
   // 실루엣을 여덟 방향으로 깔아 윤곽을 만든다 — 팔레트를 안 건드리고 눈에만 세운다.
-  if(opt.boss){const sil=spriteSil(cv2,'rgba(24,16,10,.55)'), d=2.4;
+  // **v20.3 — 테두리만으로는 모자랐다.** 보스 몸(신화 팔레트)이 반투명이라 접전 한가운데, 몸 예닐곱이
+  // 겹치는 자리에서는 **뒤에 선 아군이 배 속으로 비쳐** 유령 기둥처럼 읽혔다. 윤곽을 두른 뒤
+  // **제 오행을 어둡게 깐 속**을 한 겹 채우고 그 위에 몸을 그린다 — 팔레트는 그대로고 속만 막는다.
+  if(opt.boss){const sil=spriteSil(cv2,'rgba(24,16,10,.42)',true), d=2.4;
     for(let i=0;i<8;i++){const a=Math.PI*2*i/8;
-      ctx.drawImage(sil,-R+Math.cos(a)*d,-R-cv2._foot+Math.sin(a)*d,R*2,R*2);}}
+      ctx.drawImage(sil,-R+Math.cos(a)*d,-R-cv2._foot+Math.sin(a)*d,R*2,R*2);}
+    const back=spriteSil(cv2,mixHex(STACK_EL_COL[Math.max(0,Math.min(4,el|0))]||'#2F7BE8','#1B1208',0.52),true);
+    ctx.drawImage(back,-R,-R-cv2._foot,R*2,R*2);}
   ctx.drawImage(cv2,-R,-R-cv2._foot,R*2,R*2);}
 // ───── 영웅 v4: 사람 비율(5.5등신) · 오행별 직업 (궁사 · 무사 · 도승 · 장군 · 술사) · 남녀 의복 차이 ─────
 const HERO_STYLE=[
@@ -10354,7 +10371,7 @@ setTimeout(fortunePrompt,400);
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
 window.__ubz={goGate,todoItems,startGoldToday,get art(){return {spirits:window.ART_SPIRITS,heroes:window.ART_HEROES,scene:window.BATTLE_SCENE};},startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,wavePeek,wavePreview:(w)=>S?ASSAULT.wavePreview(w==null?S.wave:w,S):null,get SQUAD(){return SQUAD;},get ESEL(){return ESEL;},weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,doSpin,spinUI,spinFlush,spinReels,spinResultCard,spinCardUI,get SPIN(){return SPIN;},SFX,sfxScan,hudHp,onMerged,unitLv,unitCapH,bossTop,get FX(){return FXP;},get AANIM(){return AANIM;},get WIN(){return AWIN;},get ADIE(){return ADIE;},winResolve,get CHSEEN(){return CHSEEN;},
 // v20.1 — 웨이브 전환 연출(대오 복귀 · 다음 부대 등장). 검사망이 「진짜로 움직이는지」를 본다.
-retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},get LEAKF(){return LEAKF;},get FINF(){return FINF;},leakFlash,chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
+retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},get LEAKF(){return LEAKF;},get FINF(){return FINF;},leakFlash,spriteSil,SIL_CUT,chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
 // v18 — 검사망(smoke·viewport·arttest)이 보는 자[尺]: 유닛 키 천장·배율·몸 폭
 mercScale,mercTop,mercBodyW,foeScale,unitHDef,unitWDef,
 // v18 R3 ruling 1 — 표식은 둘뿐: 몸 위 HP 바 · 발밑 등급 점(고리·배지·별 없음)
