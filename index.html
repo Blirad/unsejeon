@@ -1578,7 +1578,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.1</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.2</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -5200,6 +5200,18 @@ function ingestFx(pool,B,seen,opt){
         const a=(-60+((sid*7+j*13)%120))*Math.PI/180;      // v18 가로: 왼쪽 담장에서 전장 쪽(오른쪽 위)으로 튄다
         pool.spawn('debris',Math.max(0,Math.min(ROWS,+f.y||0)),0,{ang:a,spd:40+(j%3)*18,seed:sid+j,r:0.7});
       }
+    }else if(f.k==='leak'){
+      // **v20.2 — 본진이 뚫리는 순간.** 코어는 진작 `{k:'leak'}` 을 남기고 있었는데 화면이 아무것도 안 받았다:
+      // 본진 선을 넘은 적은 그냥 **소리 없이 사라지고** 목숨만 줄었다 — 무엇에 뚫렸는지 화면에 안 남는다.
+      // 뚫린 **행**의 담장에 금이 가고 돌가루가 전장 쪽(오른쪽)으로 튄다(금은 셋까지 — 넷이면 무늬로 읽힌다).
+      const row=Math.max(0.35,Math.min(ROWS-0.35,+f.y||0));
+      let ck=0;for(const q of pool.list)if(q.k==='crack')ck++;
+      if(ck<3)pool.spawn('crack',row,0,{seed:sid,r:1.2});
+      for(let j=0;j<8;j++){
+        const a=(-72+((sid*7+j*13)%144))*Math.PI/180;
+        pool.spawn('debris',Math.max(0,Math.min(ROWS,row+((j%3)-1)*0.5)),0,{ang:a,spd:62+(j%3)*26,seed:sid+j,r:0.9+0.4*(j%2)});
+      }
+      if(onShake)onShake('leak',8,0.36);else pool.shake(8,0.36);
     }
   }
   if(seen&&seen.size>B.fx.length){                          // 지나간 항목은 집합에서도 뺀다(안 자란다)
@@ -8710,7 +8722,7 @@ function mergeHint(u){const A=ASSAULT,lv=unitLv(u),LVP=A.LV_PROMOTE||4,PM=A.PROM
 //   hit(role): 전위 「퍽」(저역 노이즈 60ms + 둔탁한 삼각파) · 사수 「틱」(고역 노이즈 + 짧은 사각파) · 술사 「펑」(저역 팝)
 //   arrow(): 사수 「팅」(현 튕김) · magic(): 술사 「휙」(스윕) · die(): 「푹」 · spin(): 릴 틱 · stop(i): 릴 멈춤 · win(grade): 등급 높을수록 높은 음 ·
 //   merge(): 두 음 · promote(): 네 음 상행 + 반짝임
-const SFX={last:{},MIN_GAP:{hit:0.045,hitBig:0.10,die:0.06,lose:0.07,arrow:0.05,magic:0.05,spin:0.05},
+const SFX={last:{},MIN_GAP:{hit:0.045,hitBig:0.10,die:0.06,lose:0.07,leak:0.12,arrow:0.05,magic:0.05,spin:0.05},
   ctx(){try{AU.init&&AU.init();}catch(_){}return (AU.on&&AU.ctx)?AU.ctx:null;},
   gate(k,gap){const c=this.ctx();if(!c)return null;const now=c.currentTime;if(gap&&this.last[k]!=null&&now-this.last[k]<gap)return null;this.last[k]=now;return c;},
   noiseBuf(c,sec,seed){const n=Math.max(1,Math.round(c.sampleRate*sec));const buf=c.createBuffer(1,n,c.sampleRate);const d=buf.getChannelData(0);
@@ -8738,6 +8750,10 @@ const SFX={last:{},MIN_GAP:{hit:0.045,hitBig:0.10,die:0.06,lose:0.07,arrow:0.05,
   // 우리 쪽이 쓰러지는 소리 — 처치음과 반대로 **가라앉는다**. 밝은 잡음을 빼고 낮은 음을 길게 떨어뜨린다.
   lose(){const c=this.gate('lose',this.MIN_GAP.lose);if(!c)return 0;const t=c.currentTime;
     return this.osc(c,'sine',150,54,t,0.30,0.10)+this.osc(c,'triangle',96,40,t+0.03,0.26,0.06)+this.burst(c,t,0.20,0.045,'lowpass',380,0,23);},
+  // v20.2 — 본진이 뚫리는 소리. 처치·잃음과 또 달라야 한다: 담장이 무너지는 낮고 긴 울림 + 돌 갈리는 잡음 한 겹.
+  leak(){const c=this.gate('leak',this.MIN_GAP.leak);if(!c)return 0;const t=c.currentTime;
+    return this.osc(c,'sine',120,38,t,0.45,0.17)+this.osc(c,'triangle',74,30,t+0.04,0.40,0.10)
+          +this.burst(c,t,0.30,0.12,'lowpass',320,0,37)+this.burst(c,t,0.09,0.07,'highpass',1700,0,13);},
   spin(){const c=this.gate('spin',this.MIN_GAP.spin);if(!c)return 0;const t=c.currentTime;return this.osc(c,'square',700,700,t,0.02,0.02);},
   stop(i){const c=this.gate('stop',0);if(!c)return 0;const t=c.currentTime;return this.osc(c,'triangle',520+(i|0)*30,300,t,0.07,0.07)+this.burst(c,t,0.04,0.04,'lowpass',1200,0,23+(i|0));},
   win(grade){const c=this.gate('win',0);if(!c)return 0;const t=c.currentTime;const g=Math.max(1,Math.min(5,grade|0)),base=440*Math.pow(1.26,g-1);let n=0;
@@ -9073,6 +9089,7 @@ function sfxScan(fx){if(!Array.isArray(fx)||!AU.on)return;
       for(const g of fx){if(g.k!=='proj'||g.t!==f.t)continue;const tx=g.x1!=null?g.x1:g.tx,ty=g.y1!=null?g.y1:g.ty;if(tx!=null&&Math.hypot(tx-f.x,ty-f.y)<0.4){role=g.role|0;break;}}
       const d=hitInfoOf(f);SFX.hit(role,!!(d&&d.crit));}   // v19.6: 센 한 방은 다른 소리로
     else if(f.k==='die')(f.side===0?SFX.lose():SFX.die(!!f.boss));
+    else if(f.k==='leak')SFX.leak();
     else if(f.k==='proj'){if((f.role|0)===1)SFX.arrow();else SFX.magic();}}}
 function saveDS(o){try{localStorage.setItem('ubz_dailyrun',JSON.stringify(Object.assign({date:todayStr()},o)));}catch(_){}}
 function assaultOpts(mode){const seed=mode==='tutorial'?7:mode==='daily'?hash('daily|'+todayStr()):mode==='weekly'?hash('weekly|'+wkKey()):null;
@@ -9988,7 +10005,7 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
       SCN.drawClashBar(ctx,L,{t:B.t,max:A.CLASH_MAX});
       FXP.draw(ctx,L);                                   // 입자는 개체 위에 — 피해 숫자가 몸에 안 가린다
       if(typeof drawSkillFx==='function')drawSkillFx(L);
-      drawFinishFlash(L);}                              // 마무리 섬광은 맨 위에 — 입자·컷인까지 덮는다
+      drawFinishFlash(L);drawLeakFlash(L);}                              // 마무리 섬광은 맨 위에 — 입자·컷인까지 덮는다
     for(const f of AFX.slice()){const u=(performance.now()-f.t)/500;if(u>=1){AFX.splice(AFX.indexOf(f),1);continue;}if(f.k==='pop'){const R=L.cellRect(f.cell);ctx.strokeStyle=`rgba(255,200,61,${1-u})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(R.cx,R.cy,(10+u*40)*R.k,0,Math.PI*2);ctx.stroke();}}
     drawTenPops(L);        // 십성 팝(§3) — 맨 위에 얹는다(효과가 났다는 말이 몸·숫자에 안 가리게)
   });}
@@ -10127,6 +10144,27 @@ function waveInQ(){
   const e=q<=0?0:1-Math.pow(1-q,2.2);
   return {dx:WAVEIN_DX*(1-e),a:Math.max(0,Math.min(1,e))};
 }
+// 본진이 뚫린 순간의 붉은 기운(v20.2) — 화면 전체를 덮는 마무리 섬광과 달리 **왼쪽 자락**에서만 번진다.
+// 목숨이 깎이는 곳이 어디인지(본진 = 화면 왼쪽)를 색으로 말한다.
+const LEAKF_T=0.8;
+let LEAKF=0, LEAKY=2.5;
+function leakFlash(y){if(calmFx())return;LEAKF=LEAKF_T;LEAKY=Math.max(0.2,Math.min(ASSAULT.ROWS-0.2,+y||2.5));}
+function drawLeakFlash(L){if(!(LEAKF>0)||!L)return;const q=1-LEAKF/LEAKF_T;
+  ctx.save();
+  {const a=Math.pow(1-Math.min(1,q/0.7),1.6)*0.62, w=Math.max(48,L.cw*0.34);   // 붉은 기운은 앞 70% 동안만
+   if(a>0.002){const gr=ctx.createLinearGradient(0,0,w,0);
+     gr.addColorStop(0,`rgba(198,40,26,${a})`);gr.addColorStop(0.55,`rgba(198,40,26,${a*0.34})`);gr.addColorStop(1,'rgba(198,40,26,0)');
+     ctx.fillStyle=gr;ctx.fillRect(0,0,w,L.ch);}}
+  // 뚫린 자리에 「목숨 −1」 — 적이 조용히 사라지는 대신 **무엇을 잃었는지**를 그 행에 적는다.
+  {const t='목숨 −1';
+   ctx.font="700 13px 'Noto Sans KR'";ctx.textAlign='left';ctx.textBaseline='middle';
+   const tw=ctx.measureText(t).width, x=Math.max(4,Math.round(L.x0*0.34));
+   const y=Math.round(L.Y(LEAKY)-q*16);
+   ctx.globalAlpha=Math.min(1,(1-q)*2.2);
+   ctx.fillStyle='rgba(92,14,6,.86)';rr(x,y-11,tw+12,22,7);ctx.fill();
+   ctx.strokeStyle='rgba(255,150,130,.7)';ctx.lineWidth=1;rr(x+0.5,y-10.5,tw+11,21,7);ctx.stroke();
+   ctx.fillStyle='#FFD9CF';ctx.fillText(t,x+6,y+0.5);}
+  ctx.restore();}
 const HS_MAX=0.18;           // 한 번에 쌓이는 상한(초 · 실제 시간) — 마무리 일격이 가장 길다
 const HS_SLOW=0.12;          // 히트스톱 중 시간 배율
 let HSTOP=0;                 // 남은 히트스톱(초 · 실제 시간)
@@ -10146,6 +10184,7 @@ function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;cons
     // 히트스톱 — **처치**와 **센 한 방**(최대 체력의 20% 이상)에만. 잔 타격마다 걸면 화면이 늘 끈적해진다.
     for(const f of B.fx){if(FXSTOP.has(f))continue;
       if(f.k==='die'){FXSTOP.add(f);hitStop(f.boss?0.085:0.05);}
+      else if(f.k==='leak'){FXSTOP.add(f);hitStop(0.09);leakFlash(f.y);flashLives();buzz([18,30,18]);}   // 목숨이 깎이는 그 순간에 알린다(웨이브가 끝난 뒤가 아니라)
       else if(f.k==='hit'&&f.v>0){const d=hitInfoOf(f);if(d&&d.crit){FXSTOP.add(f);hitStop(0.038);}}}
     if(FXSTOP.size>400)FXSTOP.clear();
     for(const f of B.fx)if(f.side===0&&(f.k==='hit'||f.k==='die'))FXSEEN.add(f);
@@ -10167,6 +10206,7 @@ function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;cons
   // 입자는 자세·반동 창과 같은 시계(시뮬 시간)로 산다 — 2배속에서 전투만 빨라지고 연출이 뒤처지면
   // 피해 숫자가 다음 타격 뒤에 뜬다. ASPD 를 곱해 둘을 같은 속도로 맞춘다.
   if(FINF>0)FINF=Math.max(0,FINF-(dt>0?dt:0));
+  if(LEAKF>0)LEAKF=Math.max(0,LEAKF-(dt>0?dt:0));
   FXP.tick((dt>0?dt:0)*((S&&B&&S.phase==='battle')?ASPD:1));
   // 신살 컷인·범위도 같은 시계다 — 벽시계로 돌리면 2배속에서 효과가 다 끝난 뒤에 그림이 남는다
   if(S&&S.skillFx){S.skillFx.u=(S.skillFx.u||0)+(dt>0?dt:0)*((B&&S.phase==='battle')?ASPD:1);
@@ -10314,7 +10354,7 @@ setTimeout(fortunePrompt,400);
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
 window.__ubz={goGate,todoItems,startGoldToday,get art(){return {spirits:window.ART_SPIRITS,heroes:window.ART_HEROES,scene:window.BATTLE_SCENE};},startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,wavePeek,wavePreview:(w)=>S?ASSAULT.wavePreview(w==null?S.wave:w,S):null,get SQUAD(){return SQUAD;},get ESEL(){return ESEL;},weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,doSpin,spinUI,spinFlush,spinReels,spinResultCard,spinCardUI,get SPIN(){return SPIN;},SFX,sfxScan,hudHp,onMerged,unitLv,unitCapH,bossTop,get FX(){return FXP;},get AANIM(){return AANIM;},get WIN(){return AWIN;},get ADIE(){return ADIE;},winResolve,get CHSEEN(){return CHSEEN;},
 // v20.1 — 웨이브 전환 연출(대오 복귀 · 다음 부대 등장). 검사망이 「진짜로 움직이는지」를 본다.
-retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
+retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},get LEAKF(){return LEAKF;},get FINF(){return FINF;},leakFlash,chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
 // v18 — 검사망(smoke·viewport·arttest)이 보는 자[尺]: 유닛 키 천장·배율·몸 폭
 mercScale,mercTop,mercBodyW,foeScale,unitHDef,unitWDef,
 // v18 R3 ruling 1 — 표식은 둘뿐: 몸 위 HP 바 · 발밑 등급 점(고리·배지·별 없음)
