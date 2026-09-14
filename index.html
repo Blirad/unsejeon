@@ -659,7 +659,9 @@
   #endCv{width:100%;height:auto;display:block;border-radius:14px;margin:6px 0 4px;border:1.5px solid var(--line)}
 
   #boardList{list-style:none;margin:8px 0 0;padding:12px 10px 8px;background:linear-gradient(180deg,#6E4220,#4A2A10);border:2px solid #C9A24A;border-radius:8px;box-shadow:inset 0 0 0 2px #2E1A08,0 3px 0 #2E1A08;position:relative}
-  #boardList::before{content:'榜';position:absolute;right:12px;top:-13px;background:#B8352C;color:#FFF3C4;font-family:var(--display);font-size:13px;padding:2px 9px;border-radius:4px;box-shadow:0 2px 0 #7A1E12;transform:rotate(-4deg)}
+  /* v20.11 — 「榜」 도장(#boardList::before)을 뺐다. 목록 윗변에 걸터앉아 **아래쪽이 늘 잘려** 있었고,
+     안으로 넣으면 1등 줄의 웨이브 수를 덮고, 위 여백으로 올리면 흰 카드 뒤로 숨었다(쌓임 맥락).
+     머리글에 「순위」가 서게 됐으니(v20.11) 이 장식은 값보다 손이 더 든다 — 지운다. */
   #boardList li{display:grid;grid-template-columns:26px 1fr auto;gap:2px 8px;align-items:center;background:linear-gradient(90deg,#FBF5E6,#F3EAD3 60%,#FBF5E6);border:1px solid #D9C79A;border-radius:3px;padding:6px 8px;margin-bottom:5px;font-size:12px;color:#2A2118;position:relative}
   #boardList li::before{content:'';position:absolute;left:50%;top:-4px;width:6px;height:6px;border-radius:50%;background:#B8352C;transform:translateX(-50%);box-shadow:0 1px 0 #7A1E12}
   #boardList li .rk{width:22px;height:22px;border-radius:50%;background:#3E2A18;color:#E8C97A;display:grid;place-items:center;font-weight:700;font-size:11px}
@@ -1521,7 +1523,9 @@ window.SPRIMG=SPRIMG;
             </div>
             <div class="board" id="pane-rec"><h3>내 기록</h3><div class="stats" id="recGrid"></div><canvas id="recChart" width="640" height="150" style="width:100%;height:auto;display:block;margin-top:8px;border-radius:10px;background:#FBF7EE"></canvas><div class="note" id="recNote" style="margin-top:6px"></div></div>
             <div class="hpane board" id="pane-board">
-              <h3><span class="tabs"><button class="tab on" data-b="free">전체</button><button class="tab" data-b="weekly">이번 주</button><button class="tab" data-b="daily">오늘의 판</button></span><span id="boardHint">TOP 10 · 연결 중…</span></h3>
+              <!-- v20.11 — 오프라인이면 탭 셋이 숨어 머리글이 **빈 띠**가 됐다(주황 표시만 남고 글자가 없었다).
+                   탭이 숨을 때만 제목을 세운다(boardOffline / boardOnline 이 같이 토글한다). -->
+              <h3><b id="boardTitle" hidden>순위</b><span class="tabs"><button class="tab on" data-b="free">전체</button><button class="tab" data-b="weekly">이번 주</button><button class="tab" data-b="daily">오늘의 판</button></span><span id="boardHint">TOP 10 · 연결 중…</span></h3>
               <ol id="boardList"></ol><div class="note" id="boardFriends" style="margin-top:6px"></div>
               <div class="note" id="boardPop" style="margin-top:6px"></div>
             </div>
@@ -1578,7 +1582,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.10</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.11</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -8284,12 +8288,14 @@ async function initBoard(){
 function boardOffline(){
   $('boardHint').textContent='오프라인';
   const tabs=document.querySelector('.tabs');if(tabs)tabs.hidden=true;
+  {const tt=$('boardTitle');if(tt)tt.hidden=false;}   // 탭이 숨으면 제목이 선다 — 안 그러면 머리글이 빈 띠다
   $('boardList').innerHTML='<li class="note">순위 방은 claude.ai 판에서 열린다. 여기서는 내 기록만 남는다.</li>'
     +`<li class="note">내 기록 · 최고 ${REC.bestWave||0}웨이브 · 점수 ${(REC.bestScore||0).toLocaleString()}${REC.games?` (${REC.games}회 출전)`:''}</li>`;
   $('boardFriends').textContent='';$('boardPop').textContent='';
 }
 function subscribeBoard(){
   if(!DB)return;if(boardUnsub){boardUnsub();boardUnsub=null;}
+  {const tt=$('boardTitle');if(tt)tt.hidden=true;const tb=document.querySelector('.tabs');if(tb)tb.hidden=false;}   // 온라인이면 탭이 제목 자리를 쓴다
   $('boardHint').textContent='TOP 10 · 연결 중…';$('boardList').innerHTML='';
   try{boardUnsub=DB.collection(scorePath(boardMode)).orderBy('wave','desc').limit(10).onSnapshot(snap=>{$('boardHint').textContent=(boardMode==='daily'?todayStr()+' · ':boardMode==='weekly'?weekKey()+' · ':'')+'TOP 10 · 실시간';renderBoard(snap.docs.map(d=>({id:d.id,...d.data()})));},
     ()=>{boardOffline();$('boardHint').textContent='순위표를 불러올 수 없다';});}
@@ -10423,7 +10429,7 @@ setTimeout(fortunePrompt,400);
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
 window.__ubz={goGate,todoItems,startGoldToday,get art(){return {spirits:window.ART_SPIRITS,heroes:window.ART_HEROES,scene:window.BATTLE_SCENE};},startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,wavePeek,wavePreview:(w)=>S?ASSAULT.wavePreview(w==null?S.wave:w,S):null,get SQUAD(){return SQUAD;},get ESEL(){return ESEL;},weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,doSpin,spinUI,spinFlush,spinReels,spinResultCard,spinCardUI,get SPIN(){return SPIN;},SFX,sfxScan,hudHp,onMerged,unitLv,unitCapH,bossTop,get FX(){return FXP;},get AANIM(){return AANIM;},get WIN(){return AWIN;},get ADIE(){return ADIE;},winResolve,get CHSEEN(){return CHSEEN;},
 // v20.1 — 웨이브 전환 연출(대오 복귀 · 다음 부대 등장). 검사망이 「진짜로 움직이는지」를 본다.
-retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},get LEAKF(){return LEAKF;},get FINF(){return FINF;},leakFlash,spriteSil,SIL_CUT,roomExitByDoor,chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
+boardOffline,retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},get LEAKF(){return LEAKF;},get FINF(){return FINF;},leakFlash,spriteSil,SIL_CUT,roomExitByDoor,chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
 // v18 — 검사망(smoke·viewport·arttest)이 보는 자[尺]: 유닛 키 천장·배율·몸 폭
 mercScale,mercTop,mercBodyW,foeScale,unitHDef,unitWDef,
 // v18 R3 ruling 1 — 표식은 둘뿐: 몸 위 HP 바 · 발밑 등급 점(고리·배지·별 없음)
