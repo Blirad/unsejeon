@@ -1578,7 +1578,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.4</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.5</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -1939,7 +1939,15 @@ const GRAND_ATK=0.20, GRAND_SPD=0.12;           // 대연환 한 줄: 공격 +20
 // 평균 승단@20 3.82 → 3.52. 5×5 판의 뜻이 연환에 있으므로 그쪽을 산다.
 // 사주 오행 수 [4,0,2,1,1] 이면 4³:0:2³:1:1 = 목 87% — 「사주의 주된 오행이 곧 내 부대」가 된다. 오행이 고른 사주(균)는 그대로 고르다.
 const EL_POW=1;
-const armyWeights=(cnt,boostEl)=>{const w=cnt.map(v=>Math.pow(Math.max(0.1,v),EL_POW));if(boostEl>=0&&boostEl<5)w[boostEl]*=1.5;return w;};
+// **v20.5 — 없는 오행의 바닥값**. 옛 값은 0.1 이었다. 사주에 아예 없는 오행(개수 0)이 0.1 로 깔리면
+// 목 사주 [4,0,2,1,1] 에서 화가 **1.2%** 로 나온다 — 한 줄에 오행 다섯을 채우는 연환이 사실상 불가능하다.
+// 실측(씨앗 60 · smart): 20웨 한 줄이라도 서는 판이 목 **9%** · 금 **17%** — 균 사주(97%)만 연환을 봤다.
+// 5×5 판의 뜻이 연환에 있는데 **치우친 사주일수록 그 뜻을 못 보는** 셈이었다.
+// 0.6 으로 올리면 목 사주 배분이 47/7/23/12/12% 가 된다 — 주력은 여전히 목이고(47% vs 7%)
+// 「없는 오행을 채워 넣는 것」이 판의 과제로 남는다. 형성률 20웨 목 64% · 금 60%, 30웨 목 86% · 금 100%.
+// 밴드는 거의 안 움직인다(smart 21.72 → 21.57 · naive 19.00 → 19.00 · 균 사주는 바닥이 안 걸려 그대로).
+const EL_FLOOR=0.6;
+const armyWeights=(cnt,boostEl)=>{const w=cnt.map(v=>Math.pow(Math.max(EL_FLOOR,v),EL_POW));if(boostEl>=0&&boostEl<5)w[boostEl]*=1.5;return w;};
 function strongest(cnt){let s=0;for(let i=1;i<5;i++)if(cnt[i]>cnt[s])s=i;return s;}
 const neededElement=e=>(e+3)%5;
 // combatPower: 칸 단위 합. 레벨은 이미 atk·hp 에 들어 있다(v17 · restat). 페이지는 이 값을 그대로 쓴다.
@@ -2818,7 +2826,7 @@ function restoreRun(o,opts){const run=newRun(Object.assign({},opts,{seed:o.seed}
 return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,tenStars,tenEffect,ITEMS,pickW,
   SPIN_SYM,SPIN_BASE,SPIN_STEP,SPIN_DECAY,KIND_W,ROLE_W,GRADE_W,SPIN_TIER,COIN_AMT,spin,spinCost,elWeights,gradeWeights,fillReels,chooseCard,joinTargets,
   N,COLS,ROWS,CELLS,idx,colOf,rowOf,CHAIN_LINES,FRONT_COL,BACK_COL,ROWS_OUT,CYC_STACK,CYC_ATK,CYC_HP,GRAND_ATK,GRAND_SPD,SHENG_CAP,RAIN_N,CELL_PREF,ROLE_BASE,unitBase,makeUnit,LV_MAX,LV_PROMOTE,PROMOTE_MAX,LV_K,LV_RATE,LV_RANGE,lvMul,lvRate,lvRange,restat,elMult,computeChains,
-  armyWeights,EL_POW,strongest,neededElement,combatPower,stageWarning,addUnit,mergeUnit,canJoin,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
+  armyWeights,EL_POW,EL_FLOOR,strongest,neededElement,combatPower,stageWarning,addUnit,mergeUnit,canJoin,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
   BENCH_MAX,benchPush,benchToCell,cellToBench,MYTH_RECIPES,MYTH_NEED_GRADE,mythReady,summonMyth,
   defaultMods,BOSS_NAMES,damageOf,clashInit,clashTick,hurt,nearestFoe,alliesNear,
   ENEMY_X0,ENEMY_DX,LEAK_X,RANK_GAP,CHARGE_X,PUSH_BACK,ENGAGE_GAP,WINDUP,HIT_TOL,CLASH_MAX,WAVES,BOSS_WAVES,E_SLOPE,N_SLOPE,GRADE_DEN,GRADE_MUL,MYTH_MUL,BOSS_HP_MUL,BOSS_ATK_MUL,BOSS_DMG_RED,ENEMY_MAX,waveCount,waveLv,enemyCells,ourCellXY,enemyCellXY,waveSquad,wavePreview,waveMobHp,waveGradeMul,wallElement,wallElOf,waveRng,wavePurity,
