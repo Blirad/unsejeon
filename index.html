@@ -1511,7 +1511,7 @@ window.SPRIMG=SPRIMG;
             </div></div>
           </section>
           <section class="scr" id="scr-social">
-            <div class="room-hd" id="rhSocial"><canvas id="rhSocialCv" width="702" height="320"></canvas><div class="rh-t"><b>사랑채 · 사랑방</b><span>손님이 앉고 기운을 나누는 곳</span></div><button class="rh-back" data-home>마당으로 ›</button></div>
+            <div class="room-hd" id="rhSocial"><canvas id="rhSocialCv" width="702" height="320"></canvas><div class="rh-t"><b>사랑방 · 손님</b><span>손님이 앉고 기운을 나누는 곳</span></div><button class="rh-back" data-home>마당으로 ›</button></div>
             <div class="code-card"><div class="cc-l"><span>내 사주 코드</span><b id="myCode">-</b><small>친구가 넣으면 오늘 하루 내 오행이 친구를 돕는다</small></div><div class="cc-b"><button class="sm" id="copyCode">복사</button><button class="ghost sm" id="copyInvite">초대 문구</button></div></div>
             <div class="board" id="friendBox"><h3>오늘의 손님 <span id="frCount">0/3</span></h3><div class="guest-seats" id="guestSeats"></div>
               <div class="submit"><input id="friendIn" maxlength="12" placeholder="친구 코드 (예: 경진-ab12)" autocapitalize="off" autocomplete="off"><button class="ghost sm" id="friendPaste">붙여넣기</button><button class="sm" id="friendAdd">받기</button></div>
@@ -1578,7 +1578,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.7</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.8</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -6481,7 +6481,7 @@ const wkKey=()=>{const d=new Date();const day=(d.getDay()+6)%7;d.setDate(d.getDa
 // 이득(특기 대기)을 -15%로 순하게 줄이고 대가(보스 체력)를 +120%로 올렸다. smart 평균은 보스로 안 움직인다 —
 // smart 의 벽은 보스가 없는 아홉째 판이라, 철벽의 무게는 열째 판 돌파율에서만 보인다 — 둘 다 옛 10판(스테이지)
 // 시절의 측정이고, 지금 웨이브 수로는 ×3 자리다(기준선 63% → 56%, 씨앗 80).
-const WEEKLY_MODS=[{id:'swift',s:'빠른 적 · 엽전 +40%',t:'적 속도 +20% · 클리어 엽전 +40%',spd:1.2,gold:1.4},{id:'rich',s:'부자 시작 · 스핀 비쌈',t:'시작 엽전 300냥 · 스핀 비용 +40%',gold0:300,cost:1.4},{id:'harvest',s:'목숨 +10 · 엽전 두 배 · 적 빠름 · 골패 비쌈',t:'목숨 +10 · 클리어 엽전 두 배 · 적 속도 +15% · 스핀 비용 +30%',lives:10,gold:2,spd:1.15,cost:1.3},{id:'iron',s:'보스 아주 강함 · 특기 조금 빠름',t:'보스 체력 +120% · 특기 대기 -15%',boss:2.2,skill:0.85},{id:'tide',s:'적 튼튼 · 운 40 시작',t:'적 체력 +25%(9웨이브부터 절반) · 시작 운 게이지 40',hp:1.25,luck:40}];
+const WEEKLY_MODS=[{id:'swift',s:'빠른 적 · 엽전 +40%',t:'적 속도 +20% · 클리어 엽전 +40%',spd:1.2,gold:1.4},{id:'rich',s:'부자 시작 · 스핀 비쌈',t:'시작 엽전 300냥 · 스핀 비용 +40%',gold0:300,cost:1.4},{id:'harvest',s:'목숨 +10 · 엽전 두 배 · 적 빠름 · 뽑기 비쌈',t:'목숨 +10 · 클리어 엽전 두 배 · 적 속도 +15% · 스핀 비용 +30%',lives:10,gold:2,spd:1.15,cost:1.3},{id:'iron',s:'보스 아주 강함 · 특기 조금 빠름',t:'보스 체력 +120% · 특기 대기 -15%',boss:2.2,skill:0.85},{id:'tide',s:'적 튼튼 · 운 40 시작',t:'적 체력 +25%(9웨이브부터 절반) · 시작 운 게이지 40',hp:1.25,luck:40}];
 const weeklyMod=()=>WEEKLY_MODS[hash(wkKey()+'|wk')%WEEKLY_MODS.length];
 const wk=k=>(S&&S.wk&&S.wk[k])||1;
 const metaHeroGrade=()=>META.lv>=30?5:META.lv>=10?4:3;
@@ -6989,7 +6989,7 @@ function greetLine(){const hr=new Date().getHours();const L=[];const nm=SAJU?SAJ
   if(!DAILY.level)L.push('사당에 아직 안 갔군. 운세부터 뽑게.');else if(DAILY.score>=88)L.push(`오늘 운세 ${DAILY.score}점. 이런 날은 없다. 나가자.`);else if(DAILY.score<15)L.push(`운세 ${DAILY.score}점이라. 조심조심 가자.`);else L.push(`운세 ${DAILY.score}점 ${DAILY.level}. 무난하다.`);
   const qn=questList().filter(q=>QST.done[q.id]).length;if(qn<3)L.push(`오늘 과제가 ${3-qn}개 남았다.`);else L.push('오늘 과제는 다 끝냈다. 대단하군.');
   if(ATT.streak>=3)L.push(`${ATT.streak}일 연속 출석. 성실하군.`);
-  if(FR.list.length)L.push(`친구 ${FR.list.length}명이 기운을 보냈다. 든든하다.`);else L.push('사랑채가 비었다. 친구 코드를 받아 오게.');
+  if(FR.list.length)L.push(`친구 ${FR.list.length}명이 기운을 보냈다. 든든하다.`);else L.push('사랑방이 비었다. 친구 코드를 받아 오게.');
   if(META.lv>=10)L.push(`내가 벌써 Lv.${META.lv}라니. 자네 덕이다.`);
   try{loadGift();if(GIFT.list.length)L.push(`친구 응원이 ${GIFT.list.length}개 왔다. 오늘 판은 든든하겠군.`);else if(FR.list.length)L.push('응원 코드도 한 번 보내 보게. 서로 좋은 일이다.');}catch(_){}
   {const np=nextPerk();if(np&&np.lv-META.lv<=2)L.push(`특전까지 ${np.lv-META.lv}레벨 남았다. 한 판 더 가자.`);}
@@ -7369,13 +7369,13 @@ function drawScene(){const cv2=$('homeScene');if(!cv2||!cv2.offsetWidth)return;c
     const tag=(bb,txt,col,fy,big,at,badge)=>{let cx=at?at[0]:bb[0]+bb[2]/2;let cy=(at?at[1]:bb[1]+bb[3]*(fy==null?0.3:fy))+Math.sin(t*3)*2;cy=Math.max(46,Math.min(h-32,cy));if(big){ctx.save();ctx.translate(cx,cy);const q=1+0.05*Math.sin(t*4);ctx.scale(q,q);ctx.translate(-cx,-cy);}const B=drawPlaque(ctx,cx,cy,txt,{big,dot:col!=null?col:null,clampW:w,badge});if(big)ctx.restore();bb.tag=[B.x-4,B.y-3,B.w+8,B.h+6];};
     if(BGY){ // 명패가 서로 겹치면 아래로 민다 — 작은 화면에서는 그림 위쪽이 잘려 자리가 좁다
       const put=[];
-      for(const [bb,txt,big] of [[sb,yardShrineTxt(),false],[rb,'안채 · 내 방',false],[HOT.guest,'사랑채 · 친구',false]]){
+      for(const [bb,txt,big] of [[sb,yardShrineTxt(),false],[rb,'안채 · 내 방',false],[HOT.guest,'사랑방 · 친구',false]]){
         if(!bb||!bb.at)continue;ctx.font=big?"700 13.5px 'Noto Sans KR'":"700 11px 'Noto Sans KR'";
         const hw=(ctx.measureText(txt).width+(big?26:18))/2+6;let cx=Math.max(hw,Math.min(w-hw,bb.at[0])),cy=Math.max(46,Math.min(h-22,bb.at[1]));
         for(let n=0;n<8;n++){const hit=put.find(p=>Math.abs(p.cx-cx)<p.hw+hw&&Math.abs(p.cy-cy)<44);if(!hit)break;cy=hit.cy+44;}
         cy=Math.max(46,Math.min(h-22,cy));put.push({cx,cy,hw});bb.at=[cx,cy];}}
     tag(rb,'안채 · 내 방',EL[ROOM_EL.hero].color,0,false,BGY?rb.at:P(6,1.2,3.0));if(!DAILY.level&&SAJU){const cx0=sb[0]+sb[2]/2,cy0=sb[1]+sb[3]*0.55;ctx.save();ctx.globalAlpha=0.35+0.15*Math.sin(t*2.5);const gr=ctx.createLinearGradient(cx0,cy0-tz*4,cx0,cy0);gr.addColorStop(0,'rgba(255,210,122,0)');gr.addColorStop(1,'rgba(255,210,122,.9)');ctx.fillStyle=gr;ctx.beginPath();ctx.moveTo(cx0-tw*0.5,cy0-tz*4);ctx.lineTo(cx0+tw*0.5,cy0-tz*4);ctx.lineTo(cx0+tw*1.3,cy0);ctx.lineTo(cx0-tw*1.3,cy0);ctx.closePath();ctx.fill();ctx.restore();}
-    tag(sb,yardShrineTxt(),EL[ROOM_EL.shrine].color,0,false,BGY?sb.at:P(9.45,-1.6,4.1),!DAILY.level);tag(HOT.guest,'사랑채 · 친구',EL[ROOM_EL.social].color,0,false,BGY?HOT.guest.at:P(XL+0.2,3.4,2.05));
+    tag(sb,yardShrineTxt(),EL[ROOM_EL.shrine].color,0,false,BGY?sb.at:P(9.45,-1.6,4.1),!DAILY.level);tag(HOT.guest,'사랑방 · 친구',EL[ROOM_EL.social].color,0,false,BGY?HOT.guest.at:P(XL+0.2,3.4,2.05));
     // 대문 명패는 없다 — 화면 아래 큰 「출전」 버튼(#sortieBtn)이 그 자리다. 대문 칸은 눌러도 같은 길로 간다.
     if(HOT.gate)HOT.gate.tag=null;
     {const lab=`${{spring:'봄',summer:'여름',autumn:'가을',winter:'겨울'}[season]} · ${weather==='rain'?'비':SNOW?'눈':night?'밤':dusk?'노을':'맑음'}`;ctx.font="700 11px 'Noto Sans KR'";ctx.textAlign='left';ctx.textBaseline='middle';const lw=ctx.measureText(lab).width+16;ctx.fillStyle='rgba(255,255,255,.85)';rr(8,8,lw,20,10);ctx.fill();ctx.fillStyle='#5B6B85';ctx.fillText(lab,16,18);}
@@ -7526,12 +7526,18 @@ function roomTitle(W,t1,t2,el){ctx.font="400 18px 'Jua','Noto Sans KR',sans-seri
   ctx.fillStyle='#3A2A14';ctx.fillText(t1,dot?35:19,25);ctx.font="700 10.5px 'Noto Sans KR'";const w2=ctx.measureText(t2).width+14;ctx.fillStyle='rgba(255,255,255,.75)';rr(10,44,w2,18,9);ctx.fill();ctx.fillStyle='#6E5A3A';ctx.fillText(t2,17,53);
   ctx.font="700 11.5px 'Noto Sans KR'";const t3='마당으로 ›';const w3=ctx.measureText(t3).width+20;ctx.fillStyle='rgba(255,255,255,.9)';rr(W-10-w3,10,w3,26,13);ctx.fill();ctx.strokeStyle='#D9CFBC';ctx.lineWidth=1.2;rr(W-10-w3,10,w3,26,13);ctx.stroke();ctx.fillStyle='#22303F';ctx.textAlign='center';ctx.fillText(t3,W-10-w3/2,23);return [W-10-w3,8,w3,30];}
 function roomSay(x,y,txt){ctx.font="700 11.5px 'Noto Sans KR'";const bw=Math.min(351-24,ctx.measureText(txt).width+22);const bx=Math.max(12,Math.min(351-12-bw,x-bw/2));const by=y-44;ctx.fillStyle='#EAF3FF';ctx.beginPath();ctx.moveTo(x-6,by+28);ctx.lineTo(x+6,by+28);ctx.lineTo(x,by+38);ctx.closePath();ctx.fill();ctx.strokeStyle='#2A6BD6';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#EAF3FF';rr(bx,by,bw,30,12);ctx.fill();ctx.stroke();ctx.fillStyle='#1E3F73';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,bx+bw/2,by+15,bw-12);}
+// **v20.8 — 걸어 나가는 연출은 「문」의 것이다.** 탭바를 누르면 안채·사당에서 나갈 때마다
+// 걸어 나가기(720ms) + 문 여닫이(300ms)가 앞에 붙어 **화면이 1초 뒤에야** 바뀌었다(실측 1.04초).
+// 탭바는 메뉴지 문이 아니다 — 눌렀으면 바로 바뀌어야 한다. 방 안의 「마당으로」 문(door 핫스팟·rh-back)으로
+// 나갈 때만 걸어 나간다. 그 길이 탭 단추를 대신 누르므로, 누르기 직전에 이 표를 세워 알린다.
+let ROOM_EXIT_WALK=false;
+const roomExitByDoor=()=>{ROOM_EXIT_WALK=true;document.querySelector('.tabbar button[data-s="home"]').click();};
 function roomWalkOut(kind,cb){if(ROOM_WALK){return;}if(!(kind==='hero'||kind==='shrine')||!SAJU){cb();return;}ROOM_WALK={kind,t0:performance.now(),dur:720};ROOM_SAY=null;let n=0;const iv=setInterval(()=>{try{AU.tone(150+(n%2)*30,0.04,'triangle',0.025);}catch(_){}n++;},150);const draw=kind==='hero'?drawRoomHero:drawRoomShrine;let done=false;const fin=()=>{if(done)return;done=true;clearInterval(iv);ROOM_WALK=null;try{cb();}catch(e){console.error(e);}};const loop=()=>{if(done)return;if(performance.now()-ROOM_WALK.t0>=ROOM_WALK.dur){fin();return;}try{draw();}catch(e){console.error(e);}requestAnimationFrame(loop);};requestAnimationFrame(loop);setTimeout(fin,ROOM_WALK.dur+80);}
 function walkPose(kind,x0,y0,x1,y1){if(!ROOM_WALK||ROOM_WALK.kind!==kind)return null;const u=Math.min(1,(performance.now()-ROOM_WALK.t0)/ROOM_WALK.dur);const e=u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;return {x:x0+(x1-x0)*e,y:y0+(y1-y0)*e,sc:1-0.22*e,a:u<0.7?1:Math.max(0,1-(u-0.7)/0.3),u};}
 function curRoom(){const sh=$('scr-shrine');if(sh&&sh.classList.contains('on'))return 'shrine';const on=document.querySelector('.tabbar button.on');return on?on.dataset.s:'';}
 // opt.blink — 마당 「오늘 운세」로 들어왔을 때 위패(또는 이미 뽑았으면 산통) 명패를 한 번 반짝인다.
 function showShrine(opt){if(!SAJU){openSaju();return;}const sec=$('scr-shrine');if(!sec)return;const go=()=>{try{closeRoomSheet(true);closeRoomPop(true);}catch(_){}document.querySelectorAll('.scr').forEach(p=>p.classList.toggle('on',p.id==='scr-shrine'));document.querySelectorAll('.tabbar button').forEach(x=>x.classList.toggle('on',x.dataset.s==='shrine'));ROOM_SAY=null;try{roomEnter('shrine');}catch(_){}if(opt&&opt.blink)setTimeout(()=>{try{shrineHint(DAILY.level?'santong':'tablet');}catch(_){}},460);};if(sec.classList.contains('on')){go();return;}doorWipe(go);}
-function shrineExit(){document.querySelector('.tabbar button[data-s="home"]').click();}
+function shrineExit(){roomExitByDoor();}
 function shrineLoop(alive,fin,ms){let done=false;const end=()=>{if(done)return;done=true;try{fin();}catch(e){console.error(e);}};const loop=()=>{if(done)return;if(!alive()){end();return;}try{drawRoomShrine();}catch(e){console.error(e);}requestAnimationFrame(loop);};requestAnimationFrame(loop);setTimeout(end,ms);}
 // 절 연출이 촛불·향을 데리고 온다 — 옛 「촛불」·「향」 핫스팟 둘이 여기로 들어왔다.
 // 촛불은 곳간 설정에서 끈 사람의 뜻을 거스르지 않는다(켜져 있을 때만 한 번 부푼다 — drawRoomShrine 의 flare).
@@ -8022,7 +8028,7 @@ function closeInnerSheet(silent){const sh=$('innerSheet');if(!sh)return;innerSta
   if(!sh.hidden){sh.hidden=true;if(!silent){try{roomEnter(curRoom());}catch(_){}}}}
 const RS={grow:()=>document.querySelector('.hp[data-p="grow"]'),gear:()=>document.querySelector('.hp[data-p="gear"]'),quest:()=>document.querySelector('.hp[data-p="quest"]'),dex:()=>document.querySelector('.hp[data-p="dex"]'),self:()=>document.querySelector('.id-row'),army:()=>$('armyPane'),friends:()=>$('friendBox'),code:()=>document.querySelector('.code-card'),rec:()=>$('pane-rec'),ach:()=>$('pane-ach'),board:()=>$('pane-board'),settings:()=>$('pane-settings'),store:()=>$('pane-store'),data:()=>$('pane-data'),help:()=>$('pane-help'),quick:()=>$('pane-quick'),rules:()=>$('pane-rules'),rice:()=>$('pane-rice')};
 function roomTap(kind,ev){const cv=ev.currentTarget;const r=cv.getBoundingClientRect();const x=(ev.clientX-r.left)*351/r.width,y=(ev.clientY-r.top)*351/r.width;const inB=(h)=>x>=h[0]&&x<=h[0]+h[2]&&y>=h[1]&&y<=h[1]+h[3];const hot=(ROOM_HOT[kind]||[]).find(h=>inB([h.x,h.y,h.w,h.h])||(h.tag&&inB(h.tag)));if(!hot)return;const id=hot.id;const onTag=!!(hot.tag&&inB(hot.tag));AU.init();buzz(10);if(id!=='door'){propFx(kind,hot);try{AU.tone(660,0.05,'triangle',0.04);}catch(_){}}closeRoomPop();
-  if(id==='door'){document.querySelector('.tabbar button[data-s="home"]').click();return;}
+  if(id==='door'){roomExitByDoor();return;}
   if(kind==='shrine'){shrineTap(id,hot);return;}
   // 안채 — 핫스팟 넷. 셋은 같은 시트(#innerSheet)를 제 탭으로 열고, 등불은 켜짐/꺼짐만 바꾼다.
   if(kind==='hero'){
@@ -10353,9 +10359,10 @@ assaultBind();
 function doorWipe(cb){let d=$('doorWipe');if(!d){d=document.createElement('div');d.id='doorWipe';d.className='dw';d.innerHTML='<i class="l"></i><i class="r"></i>';document.body.appendChild(d);}if(d.classList.contains('on')){cb();return;}d.classList.remove('on');void d.offsetWidth;d.classList.add('on');try{AU.tone(140,0.12,'triangle',0.05);AU.tone(90,0.2,'sine',0.05,0,0.28);}catch(_){}setTimeout(cb,300);setTimeout(()=>d.classList.remove('on'),760);}
 // 사당 탭(v14)은 화면만 바꾸는 게 아니라 제 문을 지난다 — 사주 확인 · 문 여닫이 · 「위패에 절하라」 안내가
 // showShrine 안에 들어 있고, 탭 표시(.on)도 거기서 켠다. 나머지 넷은 지금까지 그대로다.
-document.querySelectorAll('.tabbar button').forEach(t=>t.onclick=()=>{if(t.dataset.s==='shrine'){if(curRoom()!=='shrine')showShrine();return;}const from=document.querySelector('.tabbar button.on');const ov=$('startOverlay')&&!$('startOverlay').hidden;const fromK=curRoom();const wipe=from&&from!==t&&(from.dataset.s==='home'||t.dataset.s==='home')&&ov;const apply=()=>{try{closeRoomSheet(true);closeRoomPop(true);}catch(_){}document.querySelectorAll('.tabbar button').forEach(x=>x.classList.toggle('on',x===t));document.querySelectorAll('.scr').forEach(p=>p.classList.toggle('on',p.id==='scr-'+t.dataset.s));try{roomEnter(t.dataset.s);}catch(_){}const sc=$('scr-'+t.dataset.s);if(sc)sc.scrollTop=0;};if(ov&&(fromK==='hero'||fromK==='shrine')&&t.dataset.s!==fromK&&!ROOM_WALK&&$('roomSheet').hidden&&$('innerSheet').hidden&&!document.querySelector('.rpop')){roomWalkOut(fromK,()=>{if(fromK==='shrine'||wipe)doorWipe(apply);else apply();});return;}if(wipe)doorWipe(apply);else apply();});
+document.querySelectorAll('.tabbar button').forEach(t=>t.onclick=()=>{if(t.dataset.s==='shrine'){if(curRoom()!=='shrine')showShrine();return;}const from=document.querySelector('.tabbar button.on');const ov=$('startOverlay')&&!$('startOverlay').hidden;const fromK=curRoom();const wipe=from&&from!==t&&(from.dataset.s==='home'||t.dataset.s==='home')&&ov;const apply=()=>{try{closeRoomSheet(true);closeRoomPop(true);}catch(_){}document.querySelectorAll('.tabbar button').forEach(x=>x.classList.toggle('on',x===t));document.querySelectorAll('.scr').forEach(p=>p.classList.toggle('on',p.id==='scr-'+t.dataset.s));try{roomEnter(t.dataset.s);}catch(_){}const sc=$('scr-'+t.dataset.s);if(sc)sc.scrollTop=0;};const byDoor=ROOM_EXIT_WALK;ROOM_EXIT_WALK=false;   // 문으로 나선 것만 걸어 나간다(탭바는 곧장)
+  if(byDoor&&ov&&(fromK==='hero'||fromK==='shrine')&&t.dataset.s!==fromK&&!ROOM_WALK&&$('roomSheet').hidden&&$('innerSheet').hidden&&!document.querySelector('.rpop')){roomWalkOut(fromK,()=>{if(fromK==='shrine'||wipe)doorWipe(apply);else apply();});return;}if(wipe)doorWipe(apply);else apply();});
 {roomSetup();
- document.querySelectorAll('.rh-back').forEach(b=>b.onclick=()=>document.querySelector('.tabbar button[data-s="home"]').click());const fb=$('friendBox'),cc=document.querySelector('#scr-social .code-card');if(fb&&cc)fb.parentNode.insertBefore(cc,fb.nextSibling);const fl=$('hFortLink');if(fl)fl.onclick=()=>$('hFortuneBtn').click();
+ document.querySelectorAll('.rh-back').forEach(b=>b.onclick=()=>roomExitByDoor());const fb=$('friendBox'),cc=document.querySelector('#scr-social .code-card');if(fb&&cc)fb.parentNode.insertBefore(cc,fb.nextSibling);const fl=$('hFortLink');if(fl)fl.onclick=()=>$('hFortuneBtn').click();
  // v14 U4 · 사랑방 시트 — 탭 셋 · 닫기 · 바깥 누르면 닫기
  {const gs=$('guestSheet');if(gs){const cl=$('gsClose');if(cl)cl.onclick=()=>closeGuestSheet();
    gs.addEventListener('click',ev=>{if(ev.target===gs)closeGuestSheet();});
@@ -10396,7 +10403,7 @@ setTimeout(fortunePrompt,400);
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
 window.__ubz={goGate,todoItems,startGoldToday,get art(){return {spirits:window.ART_SPIRITS,heroes:window.ART_HEROES,scene:window.BATTLE_SCENE};},startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,wavePeek,wavePreview:(w)=>S?ASSAULT.wavePreview(w==null?S.wave:w,S):null,get SQUAD(){return SQUAD;},get ESEL(){return ESEL;},weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,doSpin,spinUI,spinFlush,spinReels,spinResultCard,spinCardUI,get SPIN(){return SPIN;},SFX,sfxScan,hudHp,onMerged,unitLv,unitCapH,bossTop,get FX(){return FXP;},get AANIM(){return AANIM;},get WIN(){return AWIN;},get ADIE(){return ADIE;},winResolve,get CHSEEN(){return CHSEEN;},
 // v20.1 — 웨이브 전환 연출(대오 복귀 · 다음 부대 등장). 검사망이 「진짜로 움직이는지」를 본다.
-retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},get LEAKF(){return LEAKF;},get FINF(){return FINF;},leakFlash,spriteSil,SIL_CUT,chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
+retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},get LEAKF(){return LEAKF;},get FINF(){return FINF;},leakFlash,spriteSil,SIL_CUT,roomExitByDoor,chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
 // v18 — 검사망(smoke·viewport·arttest)이 보는 자[尺]: 유닛 키 천장·배율·몸 폭
 mercScale,mercTop,mercBodyW,foeScale,unitHDef,unitWDef,
 // v18 R3 ruling 1 — 표식은 둘뿐: 몸 위 HP 바 · 발밑 등급 점(고리·배지·별 없음)
