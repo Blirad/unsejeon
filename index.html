@@ -1578,7 +1578,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.8</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.9</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -1627,7 +1627,9 @@ window.SPRIMG=SPRIMG;
     </div>
     <div class="overlay" id="endOverlay" hidden>
       <div class="box">
-        <h2>돌격이 <em>멈췄다</em></h2>
+        <!-- v20.9 — 이긴 화면과 같은 꼴(알약 하나). 옛 「돌격이 멈췄다」는 알약의 「췄」이 20px Jua 에서
+             획이 뭉쳐 못 읽었다(5배 확대로 확인). 획이 성긴 글자로 바꾼다. -->
+        <h2><em>물러났다</em></h2>
         <canvas id="endCv" width="702" height="170" aria-label="귀환"></canvas>
         <div class="hsay"><canvas id="endFace" width="120" height="120"></canvas><p id="endSay"></p></div>
         <p id="endMsg"></p>
@@ -10296,6 +10298,7 @@ function finishRun(won){const A=ASSAULT;S.phase='result';S.over=true;
   // 체험(tutorial)은 다른 보상과 같이 지갑도 없다 — 이기든 지든 0.
   if(S.walletPaid==null){S.walletPaid=S.mode==='tutorial'?0:Math.floor(S.coins/2)+st*5;META.wallet+=S.walletPaid;if(S.walletPaid)saveMeta();}
   const walletLine=S.mode==='tutorial'?'체험 판은 지갑에 들어오지 않는다':`지갑 +${S.walletPaid}냥 (남은 엽전 ${S.coins}의 절반 + ${st}웨이브 ×5) · 모은 돈 ${META.wallet}냥`;
+  const prevBest=REC.bestWave||0;   // 갱신하기 **전** 값 — 결과 화면이 「새 기록」을 말하려면 이게 있어야 한다
   if(S.mode!=='tutorial'){
     updateQuests();
     REC.games=(REC.games||0)+1;REC.lastPlay=todayStr();
@@ -10320,7 +10323,13 @@ function finishRun(won){const A=ASSAULT;S.phase='result';S.over=true;
     const winBtns=$('winOverlay').querySelector('.btns');winBtns.parentNode.insertBefore(submitBox,winBtns);winBtns.parentNode.insertBefore(submitMsgEl,winBtns);
     $('winOverlay').hidden=false;AU.fanfare&&AU.fanfare();}
   else{
-    $('endMsg').textContent=S.mode==='tutorial'?'안내 판이 끝났다. 자유 모드에서 다시 도전하라.':`${st}웨이브에서 멈췄다.`;
+    // 옛 글은 「${st}웨이브에서 멈췄다.」였는데, 바로 위 현판(「N웨이브에서 물러났다」)과 아래 통계(「돌파 웨이브 N」)가
+    // 같은 말을 이미 두 번 한다. 이 자리에는 **아직 아무도 안 한 말**(최고 기록과의 견줌)을 적는다.
+    $('endMsg').textContent=S.mode==='tutorial'?'안내 판이 끝났다. 자유 모드에서 다시 도전하라.'
+      :!st?(prevBest?`최고 기록 ${prevBest}웨이브`:'한 웨이브도 못 넘겼다')   // 0웨이브에 「나란하다」는 말이 안 된다
+      :st>prevBest?(prevBest?`새 기록이다 · 이전 최고 ${prevBest}웨이브`:'첫 기록이다')
+      :st===prevBest?`최고 기록과 나란하다 · ${prevBest}웨이브`
+      :`최고 기록 ${prevBest}웨이브`;
     $('endResult').innerHTML=`<div class="cell"><b>${st}</b><span>돌파 웨이브</span></div><div class="cell"><b>${S.kills}</b><span>처치</span></div><div class="cell"><b>${S.fusions}</b><span>합성</span></div><div class="cell"><b>${sc.toLocaleString()}</b><span>점수</span></div>`;
     $('endMore').innerHTML=`<div class="cell"><b>${S.coins}</b><span>남은 엽전</span></div><div class="cell"><b>${S.clashes}</b><span>상극 처치</span></div><div class="cell"><b>${S.flipTotal||0}</b><span>스핀</span></div><div class="cell"><b>${S.ults||0}</b><span>신살</span></div>`;
     $('endNext').innerHTML=`<div id="endWallet">${walletLine}</div>`+(st>=A.WAVES?'천하통일까지 왔다. 다음은 점수 경신이다.':`다음 목표 · ${Math.min(A.WAVES,(REC.bestWave||0)+1)}웨이브 돌파`);
