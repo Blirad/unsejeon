@@ -1582,7 +1582,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.12</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.13</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -9192,11 +9192,11 @@ function goSocial(){assaultPause();const t=document.querySelector('.tabbar butto
 // ── 안내 판(튜토리얼) ──
 const TUT2=[
  {id:'spin',when:S=>S.phase==='prep'&&S.wave===1&&!S.lastSpin,text:'뽑기를 돌려 용병을 모아라. 웨이브마다 첫 뽑기는 무료다.'},
- {id:'place',when:S=>S.phase==='prep'&&S.flipTotal>0&&S.units.filter(Boolean).length>=6,text:'용병을 끌어 자리를 바꿔라. 전위는 맨 앞줄, 사수·술사는 뒷줄.'},
- {id:'chain',when:S=>S.phase==='prep'&&S.flipTotal>0&&ASSAULT.computeChains(S.units).chains.length>0,text:'선이 이어졌다. 상생 순서(수→목→화→토→금)로 붙이면 연환이 된다.'},
+ {id:'place',when:S=>S.phase==='prep'&&S.flipTotal>0&&S.units.filter(Boolean).length>=6,text:'용병을 끌어 자리를 바꿔라. 전위는 앞열(오른쪽), 사수·술사는 뒷열(왼쪽).'},
+ {id:'chain',when:S=>S.phase==='prep'&&S.flipTotal>0&&ASSAULT.computeChains(S.units).chains.length>0,text:'연환은 모두 직선이다. 한 줄에 상생 순서(목→화→토→금→수)로 잇달아 놓아라 — 다섯 칸을 오행 다섯으로 채우면 오행연환이다.'},
  {id:'ten',when:S=>S.phase==='prep'&&S.wave===2&&!S.tenCards.length,text:'십성패를 하나 끼워라. 타고난 십성이 공격·방어를 돕는다.'},
  {id:'merge',when:S=>S.phase==='prep'&&S.units.some((u,i)=>stackable(u)&&S.units.some((v,j)=>j!==i&&stackable(v)&&v.el===u.el&&v.role===u.role&&v.grade===u.grade)),text:'같은 오행·역할·등급이 둘 있다. 하나를 끌어 다른 하나에 포개면 레벨이 오르고, Lv4 가 되면 승급한다.'},
- {id:'charge',when:S=>S.phase==='prep'&&S.wave===3,text:'마지막 웨이브다. 돌격을 누르고 신살 스킬을 써 보라.'},
+ {id:'charge',when:S=>S.phase==='prep'&&S.wave===3,text:'마지막 웨이브다. 「전투 시작!」을 누르고 신살 스킬을 써 보라.'},
 ];
 // ── HUD·준비 패널 ──
 // 스킬 버튼 초상 — 영웅 머리만 둥근 창에 크게. assaultUI 는 프레임마다 도니 천간·성별·등급이
@@ -10429,7 +10429,7 @@ setTimeout(fortunePrompt,400);
 (()=>{try{const c=document.createElement('canvas');c.width=c.height=180;const g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,180);gr.addColorStop(0,'#2F7BE8');gr.addColorStop(1,'#1F4FA8');g.fillStyle=gr;g.fillRect(0,0,180,180);g.fillStyle='#FFB020';g.beginPath();g.arc(90,78,50,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font="700 64px 'Jua','Noto Sans KR',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('운',90,80);g.font="700 26px 'Noto Sans KR',sans-serif";g.fillText('운세전',90,152);$('appIcon').href=c.toDataURL('image/png');}catch(_){}})();
 window.__ubz={goGate,todoItems,startGoldToday,get art(){return {spirits:window.ART_SPIRITS,heroes:window.ART_HEROES,scene:window.BATTLE_SCENE};},startAssault,migrateAch,loadAch,fortuneEffects,drawStagePreview,wavePeek,wavePreview:(w)=>S?ASSAULT.wavePreview(w==null?S.wave:w,S):null,get SQUAD(){return SQUAD;},get ESEL(){return ESEL;},weeklyMod,get META(){return META;},get PREVIEW(){return PREVIEW;},get BUB(){return BUB;},assaultUI,drawAssault,doSpin,spinUI,spinFlush,spinReels,spinResultCard,spinCardUI,get SPIN(){return SPIN;},SFX,sfxScan,hudHp,onMerged,unitLv,unitCapH,bossTop,get FX(){return FXP;},get AANIM(){return AANIM;},get WIN(){return AWIN;},get ADIE(){return ADIE;},winResolve,get CHSEEN(){return CHSEEN;},
 // v20.1 — 웨이브 전환 연출(대오 복귀 · 다음 부대 등장). 검사망이 「진짜로 움직이는지」를 본다.
-boardOffline,retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},get LEAKF(){return LEAKF;},get FINF(){return FINF;},leakFlash,spriteSil,SIL_CUT,roomExitByDoor,chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
+boardOffline,get TUT2(){return TUT2;},retreatQ,waveInQ,retreatDx,get RETREAT(){return RETREAT;},get WAVEIN(){return WAVEIN;},get LEAKF(){return LEAKF;},get FINF(){return FINF;},leakFlash,spriteSil,SIL_CUT,roomExitByDoor,chainSeed,fxShake,hudBattle,fxAnim,fxDieSeen,hitInfoOf,get camPush(){return ACAM;},get FXQ(){return S?(S.fxq||[]):[];},pushFx,
 // v18 — 검사망(smoke·viewport·arttest)이 보는 자[尺]: 유닛 키 천장·배율·몸 폭
 mercScale,mercTop,mercBodyW,foeScale,unitHDef,unitWDef,
 // v18 R3 ruling 1 — 표식은 둘뿐: 몸 위 HP 바 · 발밑 등급 점(고리·배지·별 없음)
