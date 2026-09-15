@@ -1584,7 +1584,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.16</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.17</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -2234,9 +2234,15 @@ function wallElOf(run,w){   // run 이 없으면 wallElement 가 던진다 — �
   if(w===run.wave&&run.wallEl!=null)return run.wallEl;
   if(w===run.wave+1&&run.nextWallEl!=null)return run.nextWallEl;
   return wallElement(run,w);}
-// waveRng(run): 웨이브 적 부대 전용 rng. seed 와 웨이브 번호만으로 정해지므로 준비 단계에서 골패를
-// 뒤집든 카드를 고르든(run.rng 가 아무리 돌아도) 같은 웨이브에는 늘 같은 부대가 온다(F1).
-function waveRng(run,w){const wv=(w==null?run.wave:w)|0;return seededRng(((run.seed>>>0)^Math.imul(wv,0x9E3779B9))>>>0);}   // w 를 주면 그 웨이브의 rng(기본 run.wave)
+// waveRng(run): 웨이브 적 부대 전용 rng. run.rng 를 안 타므로 준비 단계에서 골패를 뒤집든 카드를
+// 고르든(run.rng 가 아무리 돌아도) **한 번의 시도 안에서는** 늘 같은 부대가 온다(F1).
+// **v20.17 — 다시 할 때는 적 부대를 새로 뽑는다.** 옛 식은 씨앗과 웨이브 번호만 썼다: 지고 다시 하면
+// **똑같은 적이 똑같은 자리에** 선다. 판을 안 고치면 똑같이 지고 고치면 무조건 이기니, 재도전이 아니라
+// 「아까 그 문제 다시 풀기」였다(목숨 다섯을 같은 웨이브에 그대로 쏟는 죽음의 나선도 여기서 났다).
+// `run.retry` 를 섞어 **시도마다 다른 부대**가 오게 한다 — 여전히 결정적이다(씨앗·웨이브·시도 수로 정해진다).
+// 기수·역할·벽 오행·순도는 rng 를 안 타므로 **미리보기는 그대로 맞는다**(바뀌는 것은 낱낱의 오행·등급이다).
+function waveRng(run,w){const wv=(w==null?run.wave:w)|0, rt=(run.retry|0);
+  return seededRng(((run.seed>>>0)^Math.imul(wv,0x9E3779B9)^Math.imul(rt,0x85EBCA6B))>>>0);}   // w 를 주면 그 웨이브의 rng(기본 run.wave)
 // v17: 스택이 없으므로 적은 칸당 1기, 상한 25기(ENEMY_MAX). 두께는 **레벨**로 — waveLv(w)=1+floor(w/5) 를 적 lv 로 넣어
 // §2 공식(lvMul)으로 스탯을 키운다. 손잡이(N_SLOPE·GRADE_DEN·E_SLOPE·보스 배율)는 C2 가 봇으로 다시 잡는다.
 const ENEMY_MAX=CELLS;   // 16(v18 · 판과 같은 칸 수)
@@ -2707,7 +2713,7 @@ function newRun(o){const seed=o.seed==null?Math.floor(Math.random()*1e9):o.seed;
   const heroPos=(o.meta&&o.meta.heroPos!=null&&o.meta.heroPos>=0&&o.meta.heroPos<CELLS)?o.meta.heroPos:HERO_HOME;
   units[heroPos]=heroUnit(o.saju,o.meta,cap);
   const run={mode:o.mode||'free',seed,rng,wave:1,phase:'prep',coins:Math.round((60+(d.startGold||0)+(g.gold||0))),lives:5+(g.lives||0)+(pk.lives||0),luck:(d.luckStart||0)+(g.luck||0),luckStep:3+(d.luckExtra||0)+((o.friends&&o.friends.luck)||0),
-    spinN:0,lastSpin:null,cardOffer:null,units,bench:[],armyIn:0,cards:[],freeSpins:freeSpinsOf(o),freeBase:freeSpinsOf(o),freeUsed:0,guar:!!d.guar,wallEl:0,purity:0.6,nextWallEl:0,nextPurity:0.6,tenCards:[],tenSlots:1,ally:null,allyCode:null,
+    retry:0,spinN:0,lastSpin:null,cardOffer:null,units,bench:[],armyIn:0,cards:[],freeSpins:freeSpinsOf(o),freeBase:freeSpinsOf(o),freeUsed:0,guar:!!d.guar,wallEl:0,purity:0.6,nextWallEl:0,nextPurity:0.6,tenCards:[],tenSlots:1,ally:null,allyCode:null,
     kills:0,fusions:0,bossKills:0,clashes:0,mythic:0,ults:0,luckyPct:0.15+(d.fuseExtra||0),pairPct:0,costStep:SPIN_STEP,costMult:d.costMult||1,clearMult:(d.goldMult||1)*(d.waveMult||1)+((o.friends&&o.friends.gold)||0),sellMult:1,skillCd:pk.skillCd||1,revive:0,mirror:0,twin:0,echo:0,rootHeal:0,almanac:false,
     flipTotal:0,heroFlip:false,cardsTaken:0,maxGrade:0,cycleSeen:false,allyWin:false,won:false,
     opts:o,cnt,history:[],items:[]};
@@ -2815,11 +2821,13 @@ function finishWave(run,B){if(run.phase==='result')return null;run.phase='result
   return {won:true,coins,cards,done,lost:0,tenBonus};}
 // 패배 뒤 done 이 아니면(목숨이 남아 있으면) 같은 웨이브를 다시 준비한다 — 골패·용병은 그대로 두고
 // 체력만 최대로 되돌린다(nextWave 는 부르지 않는다: 웨이브·벽·골패는 그대로).
-function retryWave(run){run.phase='prep';for(const u of run.units)if(u)u.hp=u.max;for(const u of benchOf(run))if(u)u.hp=u.max;}
+function retryWave(run){run.phase='prep';run.retry=(run.retry|0)+1;   // 다시 할 때마다 적 부대를 새로 뽑는다
+  for(const u of run.units)if(u)u.hp=u.max;for(const u of benchOf(run))if(u)u.hp=u.max;}
 // nextWave: 무료 스핀은 웨이브마다 1+freeSummon 으로 **돌아온다**(안 쓴 무료가 쌓이지 않는다). 카드(공짜 스핀)·문창이 얹어 둔
 // 몫이 그보다 크면 그대로 둔다(max) — 결산 카드로 받은 +2 가 다음 웨이브로 넘어가기 전에 지워지지 않게.
 // spinN 은 SPIN_DECAY 비율로 줄인다(비용 계단의 웨이브 리셋 · C2) — retryWave(같은 웨이브 재도전)는 안 줄인다.
-function nextWave(run){run.wave++;run.phase='prep';run.wallEl=run.nextWallEl;run.purity=run.nextPurity;
+function nextWave(run){run.wave++;run.phase='prep';run.retry=0;   // 새 웨이브 — 시도 수를 되돌린다
+  run.wallEl=run.nextWallEl;run.purity=run.nextPurity;
   run.nextWallEl=wallElement(run,run.wave+1);run.nextPurity=wavePurity(run.wave+1);
   // v17 리뷰 1: 웨이브 기본 무료(freeBase)의 안 쓴 몫은 버리고, 그 위에 얹힌 보너스(문창·「공짜 스핀」 카드·옻칠 릴)의 안 쓴 몫만 이월한다.
   {const unusedBase=Math.max(0,(run.freeBase||0)-(run.freeUsed||0));const carry=Math.max(0,(run.freeSpins||0)-unusedBase);
@@ -2831,7 +2839,7 @@ function nextWave(run){run.wave++;run.phase='prep';run.wallEl=run.nextWallEl;run
   for(const u of run.units)if(u){u.hp=u.max;}for(const u of benchOf(run))if(u){u.hp=u.max;}runMods(run);}
 function wavesCleared(run){return run.won?WAVES:run.wave-1;}
 function scoreOf(run){return wavesCleared(run)*1000+run.lives*10+run.kills;}
-const RUN_KEYS=['mode','seed','wave','phase','coins','lives','tenLivesPaid','luck','luckStep','spinN','lastSpin','cardOffer','units','bench','armyIn','cards','freeSpins','freeBase','freeUsed','guar','wallEl','purity','nextWallEl','nextPurity','tenCards','tenSlots','allyCode','kills','fusions','bossKills','clashes','mythic','ults','luckyPct','pairPct','costStep','costMult','clearMult','sellMult','skillCd','revive','mirror','twin','echo','rootHeal','almanac','cnt','history','items','flipTotal','heroFlip','cardsTaken','maxGrade','cycleSeen','allyWin','won'];
+const RUN_KEYS=['mode','seed','wave','retry','phase','coins','lives','tenLivesPaid','luck','luckStep','spinN','lastSpin','cardOffer','units','bench','armyIn','cards','freeSpins','freeBase','freeUsed','guar','wallEl','purity','nextWallEl','nextPurity','tenCards','tenSlots','allyCode','kills','fusions','bossKills','clashes','mythic','ults','luckyPct','pairPct','costStep','costMult','clearMult','sellMult','skillCd','revive','mirror','twin','echo','rootHeal','almanac','cnt','history','items','flipTotal','heroFlip','cardsTaken','maxGrade','cycleSeen','allyWin','won'];
 function serializeRun(run){const o={};for(const k of RUN_KEYS)o[k]=run[k];o.rngN=run.rng.n;return o;}
 // restoreRun: v17 이전 저장(spinN 없음 · tiles/freeFlips/flipN · 유닛 n · perm.lv=META 레벨)은 스핀 필드를 newRun 기본값으로 두고
 // 모든 유닛을 lv 1 로 복원한다(n 삭제 · perm 의 옛 lv 는 mlv 로). 옛 유닛의 hp/atk 는 이미 lv 1 값이라 다시 계산하지 않는다.
@@ -9842,14 +9850,15 @@ function battleSceneSt(){const hr=window.__hr!=null?window.__hr:new Date().getHo
 // 준비 단계에는 성문 앞 돌길에 **이번 웨이브 적 부대가 통째로 서 있다** — 오행·역할·등급이 보이고,
 // 탭하면 그 적을 말해 준다(ESEL). 칸 자리는 아트 모듈의 cellRectEnemy(j) 가 낸다(우리 판과 같은 원근).
 //
-// 부대는 코어 waveSquad 가 **웨이브 전용 rng**(ASSAULT.waveRng: 씨앗과 웨이브 번호만으로 정해진다)로
-// 뽑는다 — 스핀을 돌려도 run.rng 만 앞으로 갈 뿐 부대는 그대로다. 그래서 여기서 그냥 같은 rng 로
+// 부대는 코어 waveSquad 가 **웨이브 전용 rng**(ASSAULT.waveRng: 씨앗·웨이브 번호·시도 수로 정해진다)로
+// 뽑는다 — 뽑기를 돌려도 run.rng 만 앞으로 갈 뿐 부대는 그대로다. 그래서 여기서 그냥 같은 rng 로
 // 한 번 더 뽑으면 "지금 돌격하면 나올 그 부대"가 정확히 나온다(clashInit 과 같은 식·같은 씨앗).
-// 캐시 열쇠는 부대를 실제로 바꾸는 것만 담는다: 씨앗·웨이브·벽 오행·참전 벗(벗이 벽 오행을 바꾼다).
+// 캐시 열쇠는 부대를 실제로 바꾸는 것만 담는다: 씨앗·웨이브·시도 수(v20.17 — 다시 하면 적이 새로
+// 온다)·벽 오행·참전 벗(벗이 벽 오행을 바꾼다).
 let SQUAD=null;
 function wavePeek(){
   if(!S)return null;
-  const key=`${S.seed}|${S.wave}|${S.wallEl}|${S.allyCode||''}`;
+  const key=`${S.seed}|${S.wave}|${S.retry|0}|${S.wallEl}|${S.allyCode||''}`;
   if(SQUAD&&SQUAD.key===key)return SQUAD;
   let cells=[];
   try{
@@ -10350,12 +10359,14 @@ function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;cons
 function endStage(res){if(!res)return; // finishWave 가 이미 소진했다
   ASEL=-1;ESEL=-1;ADRAG=null;SQUAD=null;PREVIEW_CACHE=null;fxReset();BENCH_SIG='';MYTH_SIG='';BUFF_SIG='';benchUI(true);assaultUI();   // 지난 웨이브의 입자·흔들림이 다음 준비 화면으로 안 넘어온다
   if(!res.won){
-    if(res.revived){toast('부활 부적이 발동했다. 목숨 5로 다시 준비한다.');waveInMark();chainSeed();assaultUI();drawAssault();assaultSave();return;}
+    if(res.revived){toast('부활 부적이 발동했다. 목숨 5로 다시 준비한다 · 적 부대가 새로 온다.');waveInMark();chainSeed();assaultUI();drawAssault();assaultSave();return;}
     if(res.done){finishRun(false);return;}
-    // 목숨이 남았으면 판은 안 끝난다 — 같은 웨이브를 용병 그대로 다시 준비한다(§2)
+    // 목숨이 남았으면 판은 안 끝난다 — 같은 웨이브를 용병 그대로 다시 준비한다(§2).
+    // v20.17: 적 부대는 새로 뽑힌다(retryWave 가 run.retry 를 올린다) — 같은 판을 다시 푸는 게 아니라
+    // 다시 한 번 겨루는 것이다. 다시 준비할 때 눈에 띄게 알린다.
     ASSAULT.retryWave(S);
-    if(res.lost>0){flashLives();toast(`목숨 −${res.lost} · ${S.wave}웨이브 다시`);buzz([20,40,20]);}
-    else toast(`화개 결계가 목숨을 지켰다 · ${S.wave}웨이브 다시`,1600);   // v15.1: 화개가 손실을 다 막으면 맞은 연출 없이 알린다
+    if(res.lost>0){flashLives();toast(`목숨 −${res.lost} · ${S.wave}웨이브 다시 · 적 부대가 새로 온다`);buzz([20,40,20]);}
+    else toast(`화개 결계가 목숨을 지켰다 · ${S.wave}웨이브 다시 · 적 부대가 새로 온다`,1600);   // v15.1: 화개가 손실을 다 막으면 맞은 연출 없이 알린다
     log(`${S.wave}웨이브 패배 · 목숨 −${res.lost}${res.lost===0?'(화개)':''} (남은 목숨 ${S.lives})`,'hi');
     waveInMark();chainSeed();assaultUI();drawAssault();assaultSave();return;}
   if(S.ally)S.allyWin=true;
