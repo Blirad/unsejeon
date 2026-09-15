@@ -1569,6 +1569,7 @@ window.SPRIMG=SPRIMG;
             <li><b>신화 소환</b>: 정해진 3기(삼합의 국 — 예: 수·목·토 희귀)를 판 위에 갖추면 한가운데에 「소환!」 단추가 뜨고, 누르면 셋이 사라지고 <b>신화</b> 한 기가 난다. 신화는 승급으로는 못 간다. 재료는 뽑아서 기른 용병만이다(영웅·참전 벗·사주 부대는 안 먹힌다).</li>
             <li><b>십성패</b>: 사주 십성 중 하나를 끼워 판마다 효과(공격·체력·엽전 환급 등)를 더한다. 사주에서 찾은 <b>신살</b>은 쿨타임 있는 스킬로, 전투 중 버튼으로 직접 쓴다.</li>
             <li><b>상극</b>: 극하는 오행으로 치면 피해 +40%(기운 카드로 배율 상승). 극하는 오행으로 처치하면 <b>상극 처치</b>로 기록된다. 웨이브가 오를수록 적 부대가 내가 약한 오행으로 몰려오니 극하는 오행을 채워라.</li>
+            <li><b>목숨</b>: 웨이브를 지면 <b>목숨 −1</b>(보스는 −2)이고 판은 안 끝난다 — 같은 웨이브를 다시 준비하는데, 이때 <b>적 부대는 새로 온다</b>. 목숨이 0이 되면 그 자리에서 끝이다. 목숨은 <b>9까지만</b> 쌓이고, 카드·십성·장비로 넘친 몫은 버리지 않고 <b>한 점에 25냥</b>으로 바뀐다.</li>
             <li><b>친구·기운 카드</b>: 사주 코드를 나누면 친구가 신화 등급 용병으로 판에 참전해 함께 싸우고, 친구의 오행이 뽑기에 더 잘 뜬다(하루 3명, 참전은 판마다 한 명). 보스(10·20·30웨이브)를 잡으면 <b>기운 카드</b>, 5·15·25웨이브를 넘기면 소소 카드를 고른다.</li>
             <li><b>사주 부대</b>: 사주 여덟 글자 중 일간(태어난 날의 천간)은 나의 <b>영웅</b>이 되어 맨 앞줄 가운데에서 직접 싸우고, 나머지 일곱 글자는 영구 부대로 <b>두 웨이브에 한 기씩</b> 합류한다(2·4·6…웨이브 · 14웨이브에 여덟 글자가 다 선다) — 천간은 양간(갑·병·무·경·임)이 <b>전위</b>, 음간(을·정·기·신·계)이 <b>사수</b>; 지지는 생지(인·신·사·해)가 <b>전위</b>, 왕지(자·오·묘·유)가 <b>사수</b>, 고지(진·술·축·미)가 <b>술사</b>. 안채 「사주 부대」에서 판이 끝날 때 들어오는 지갑 냥으로 레벨을 올리면 등급이 오른다(영웅 등급이 상한). <b>십성 2개</b>가 성향, 신살이 스킬이고 영웅이 쓰러진 웨이브에는 스킬을 못 쓴다. 영웅 등급은 레벨로 오르고(Lv.10 전설, Lv.30 신화) 높을수록 신살 스킬이 세진다. 30웨이브 보스를 잡으면 <b>천하통일</b>.</li>
           </ul>
@@ -1584,7 +1585,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.17</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.18</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -2795,6 +2796,15 @@ function startClash(run){if(run.phase!=='prep')return null;const units=run.units
   const ci=run.items.indexOf('crit');if(ci>=0){mods.crit+=0.2;run.items.splice(ci,1);}
   if(mods.lives&&!run.tenLivesPaid){run.lives+=mods.lives;run.tenLivesPaid=true;}   // 십성패 목숨 보정은 판에 한 번 영구히 더한다
   return clashInit(Object.assign({},run,{units,mods,lives:run.lives}));}
+// **v20.18 — 목숨 상한.** 목숨이 16웨에 평균 13까지 쌓여, 한 웨이브 지는 일이 아무 값도 안 치렀다
+// (「생명의 뿌리」가 웨이브마다 +1 을 얹고 「약초 다발」·십성·장비가 바닥을 올린다). 상한을 두어 **한 번
+// 지는 것이 늘 아프게** 한다. 넘치는 몫은 버리지 않고 엽전으로 바꾼다 — 목숨 카드가 죽은 패가 되면 안 된다.
+// 한 군데(웨이브 결산)에서만 재면 카드·도구·십성·장비·부활을 따로 손대지 않아도 전부 이 상한 아래로 든다.
+const LIVES_MAX=9;
+const LIVES_OVER_COIN=25;   // 넘친 목숨 한 점 = 엽전 25냥(스핀 한 번이 100냥)
+function capLives(run){const over=run.lives-LIVES_MAX;
+  if(over>0){run.lives=LIVES_MAX;run.coins+=over*LIVES_OVER_COIN;return over;}
+  return 0;}
 // finishWave: B.lives 는 startClash 가 run.lives 로 심었고(십성 목숨 보정은 startClash 가 run.lives 에 한 번 영구히 더한다),
 // 전투 중 화개가 더 얹었을 수 있다(B.hwagaeLives). v15.1: 화개 몫은 이 웨이브 한정이라 base 에서 반납하고, 패배면 그 몫이
 // 손실을 먼저 막는다(HWAGAE_CARRY 면 v15.0 처럼 base 에 남긴다). base 는 이 웨이브가 끝난 뒤의 목숨이다.
@@ -2804,8 +2814,10 @@ function finishWave(run,B){if(run.phase==='result')return null;run.phase='result
   const base=(B.lives!=null?B.lives:run.lives)-pool;
   if(!won){const lost=Math.max(0,(boss?2:1)-pool);run.lives=Math.max(0,base-lost);
     if(run.lives<=0&&run.revive>0){run.revive--;run.lives=5;retryWave(run);return {won:false,revived:true,coins:0,cards:null,done:false,lost};}
-    const done=run.lives<=0;let coins=done?0:Math.round((5+w/2)*run.clearMult);run.coins+=coins;run.history.push({wave:w,lives:run.lives,kills:B.kills||0,won:false,t:+(B.t||0).toFixed(2)});
-    return {won:false,coins,cards:null,done,lost};}
+    const done=run.lives<=0;let coins=done?0:Math.round((5+w/2)*run.clearMult);run.coins+=coins;
+    const over=capLives(run);coins+=over*LIVES_OVER_COIN;
+    run.history.push({wave:w,lives:run.lives,kills:B.kills||0,won:false,t:+(B.t||0).toFixed(2)});
+    return {won:false,coins,cards:null,done,lost,livesOver:over};}
   if(boss){run.bossKills++;run.luckStep=(run.luckStep||7)+3;}
   run.lives=Math.max(0,base);
   // 십성패 5(웨이브 클리어 엽전 +)가 실제로 얹은 몫을 따로 돌려준다(tenBonus) — 결산 줄이 그 줄만 십성 색으로 쓴다(§3).
@@ -2817,8 +2829,9 @@ function finishWave(run,B){if(run.phase==='result')return null;run.phase='result
   let coins=Math.round(raw*(1+(run.mods.clearCoin||0)));const tenBonus=coins-Math.round(raw);
   run.coins+=coins;if(run.rootHeal)run.lives+=run.rootHeal;
   const done=w>=WAVES;if(done)run.won=true;
+  const over=capLives(run);coins+=over*LIVES_OVER_COIN;
   const cards=boss?'big':(w%10===5)?'small':null;run.history.push({wave:w,lives:run.lives,kills:B.kills||0,won:true,t:+(B.t||0).toFixed(2)});
-  return {won:true,coins,cards,done,lost:0,tenBonus};}
+  return {won:true,coins,cards,done,lost:0,tenBonus,livesOver:over};}
 // 패배 뒤 done 이 아니면(목숨이 남아 있으면) 같은 웨이브를 다시 준비한다 — 골패·용병은 그대로 두고
 // 체력만 최대로 되돌린다(nextWave 는 부르지 않는다: 웨이브·벽·골패는 그대로).
 function retryWave(run){run.phase='prep';run.retry=(run.retry|0)+1;   // 다시 할 때마다 적 부대를 새로 뽑는다
@@ -2871,7 +2884,7 @@ return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,
   armyWeights,EL_POW,EL_FLOOR,N_BASE,strongest,neededElement,combatPower,stageWarning,addUnit,mergeUnit,canJoin,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
   BENCH_MAX,benchPush,benchToCell,cellToBench,MYTH_RECIPES,MYTH_NEED_GRADE,mythReady,summonMyth,
   defaultMods,BOSS_NAMES,damageOf,clashInit,clashTick,hurt,nearestFoe,alliesNear,
-  ENEMY_X0,ENEMY_DX,LEAK_X,RANK_GAP,CHARGE_X,PUSH_BACK,ENGAGE_GAP,WINDUP,HIT_TOL,CLASH_MAX,WAVES,BOSS_WAVES,E_SLOPE,N_SLOPE,GRADE_DEN,GRADE_MUL,MYTH_MUL,BOSS_HP_MUL,BOSS_ATK_MUL,BOSS_DMG_RED,ENEMY_MAX,waveCount,waveLv,enemyCells,ourCellXY,enemyCellXY,waveSquad,wavePreview,waveMobHp,waveGradeMul,wallElement,wallElOf,waveRng,wavePurity,
+  LIVES_MAX,LIVES_OVER_COIN,ENEMY_X0,ENEMY_DX,LEAK_X,RANK_GAP,CHARGE_X,PUSH_BACK,ENGAGE_GAP,WINDUP,HIT_TOL,CLASH_MAX,WAVES,BOSS_WAVES,E_SLOPE,N_SLOPE,GRADE_DEN,GRADE_MUL,MYTH_MUL,BOSS_HP_MUL,BOSS_ATK_MUL,BOSS_DMG_RED,ENEMY_MAX,waveCount,waveLv,enemyCells,ourCellXY,enemyCellXY,waveSquad,wavePreview,waveMobHp,waveGradeMul,wallElement,wallElOf,waveRng,wavePurity,
   CARDS,offerCards,applyCards,applyRunCard,takeCard,
   q,SKV,SKILL_KEYS,SKILL_CD,YANG_K,YEOKMA_CAP,GOE_VULN,GOE_STK,DOHWA_STK,HWAGAE_LIVES,HWAGAE_CARRY,HWAGAE_CAP,RAIN_N,castSkill,
   seededRng,armyRoster,armyGrade,armyUnitOf,armyJoin,armySize,ARMY_EVERY,heroUnit,ARMY_ROLE_STEM,ARMY_ROLE_BRANCH,ARMY_HOME,HERO_HOME,newRun,runMods,emptyCell,useItem,placeUnit,sellUnit,equipTen,pickAlly,startClash,finishWave,retryWave,nextWave,scoreOf,wavesCleared,RUN_KEYS,serializeRun,restoreRun};
@@ -10368,10 +10381,13 @@ function endStage(res){if(!res)return; // finishWave 가 이미 소진했다
     if(res.lost>0){flashLives();toast(`목숨 −${res.lost} · ${S.wave}웨이브 다시 · 적 부대가 새로 온다`);buzz([20,40,20]);}
     else toast(`화개 결계가 목숨을 지켰다 · ${S.wave}웨이브 다시 · 적 부대가 새로 온다`,1600);   // v15.1: 화개가 손실을 다 막으면 맞은 연출 없이 알린다
     log(`${S.wave}웨이브 패배 · 목숨 −${res.lost}${res.lost===0?'(화개)':''} (남은 목숨 ${S.lives})`,'hi');
+    if(res.livesOver>0)log(`넘친 목숨 ${res.livesOver} → 엽전 +${res.livesOver*ASSAULT.LIVES_OVER_COIN}냥 (목숨 상한 ${ASSAULT.LIVES_MAX})`,'hi');
     waveInMark();chainSeed();assaultUI();drawAssault();assaultSave();return;}
   if(S.ally)S.allyWin=true;
   log(`${S.wave}웨이브 클리어 · 엽전 +${res.coins}냥${res.tenBonus>0?` · 십성 +${res.tenBonus}냥`:''}`,'hi');
   if(res.tenBonus>0)toast(`십성 +${res.tenBonus}냥`,1200);
+  // v20.18: 목숨 상한을 넘긴 몫은 버리지 않고 엽전으로 돌려준다 — 상한이 있다는 것을 이 자리에서 배운다
+  if(res.livesOver>0)toast(`목숨은 ${ASSAULT.LIVES_MAX}까지 · 넘친 ${res.livesOver} → 엽전 +${res.livesOver*ASSAULT.LIVES_OVER_COIN}냥`,1800);
   if(S.mode==='tutorial'&&S.wave>=3&&res.won){clearSave();$('assault').hidden=true;showHome();toastLower();toast('안내 끝. 자유 모드로 출전하라.');return;}
   if(res.done){finishRun(true);return;}
   const go=()=>{ASSAULT.nextWave(S);armyJoinFx();waveInMark();chainSeed();SQUAD=null;PREVIEW_CACHE=null;ASEL=-1;ESEL=-1;assaultUI();drawAssault();assaultSave();};   // nextWave 가 보정(mods)을 바꿀 수 있어 다시 채운다
