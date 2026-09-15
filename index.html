@@ -1570,7 +1570,7 @@ window.SPRIMG=SPRIMG;
             <li><b>십성패</b>: 사주 십성 중 하나를 끼워 판마다 효과(공격·체력·엽전 환급 등)를 더한다. 사주에서 찾은 <b>신살</b>은 쿨타임 있는 스킬로, 전투 중 버튼으로 직접 쓴다.</li>
             <li><b>상극</b>: 극하는 오행으로 치면 피해 +40%(기운 카드로 배율 상승). 극하는 오행으로 처치하면 <b>상극 처치</b>로 기록된다. 웨이브가 오를수록 적 부대가 내가 약한 오행으로 몰려오니 극하는 오행을 채워라.</li>
             <li><b>목숨</b>: 웨이브를 지면 <b>목숨 −1</b>(보스는 −2)이고 판은 안 끝난다 — 같은 웨이브를 다시 준비하는데, 이때 <b>적 부대는 새로 온다</b>. 목숨이 0이 되면 그 자리에서 끝이다. 목숨은 <b>9까지만</b> 쌓이고, 카드·십성·장비로 넘친 몫은 버리지 않고 <b>한 점에 25냥</b>으로 바뀐다.</li>
-            <li><b>친구·기운 카드</b>: 사주 코드를 나누면 친구가 신화 등급 용병으로 판에 참전해 함께 싸우고, 친구의 오행이 뽑기에 더 잘 뜬다(하루 3명, 참전은 판마다 한 명). 보스(10·20·30웨이브)를 잡으면 <b>기운 카드</b>, 5·15·25웨이브를 넘기면 소소 카드를 고른다.</li>
+            <li><b>친구·기운 카드</b>: 사주 코드를 나누면 친구가 신화 등급 용병으로 판에 참전해 함께 싸우고, 친구의 오행이 뽑기에 더 잘 뜬다(하루 3명, 참전은 판마다 한 명). <b>참전한 벗은 웨이브 사이에 안 낫는다</b> — 우리 용병과 달리 상처를 안고 다음 웨이브에 서고, <b>쓰러지면 그 판에서는 다시 오지 않는다</b>. 보스(10·20·30웨이브)를 잡으면 <b>기운 카드</b>, 5·15·25웨이브를 넘기면 소소 카드를 고른다.</li>
             <li><b>사주 부대</b>: 사주 여덟 글자 중 일간(태어난 날의 천간)은 나의 <b>영웅</b>이 되어 맨 앞줄 가운데에서 직접 싸우고, 나머지 일곱 글자는 영구 부대로 <b>두 웨이브에 한 기씩</b> 합류한다(2·4·6…웨이브 · 14웨이브에 여덟 글자가 다 선다) — 천간은 양간(갑·병·무·경·임)이 <b>전위</b>, 음간(을·정·기·신·계)이 <b>사수</b>; 지지는 생지(인·신·사·해)가 <b>전위</b>, 왕지(자·오·묘·유)가 <b>사수</b>, 고지(진·술·축·미)가 <b>술사</b>. 안채 「사주 부대」에서 판이 끝날 때 들어오는 지갑 냥으로 레벨을 올리면 등급이 오른다(영웅 등급이 상한). <b>십성 2개</b>가 성향, 신살이 스킬이고 영웅이 쓰러진 웨이브에는 스킬을 못 쓴다. 영웅 등급은 레벨로 오르고(Lv.10 전설, Lv.30 신화) 높을수록 신살 스킬이 세진다. 30웨이브 보스를 잡으면 <b>천하통일</b>.</li>
           </ul>
             </details>
@@ -1585,7 +1585,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.18</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.19</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -2082,8 +2082,14 @@ function summonMyth(run,id){if(run.phase!=='prep')return null;
   return {id,cell,unit:u,used:R.cells.slice()};}
 // 판매값 = 등급값 × lv(설계서 §2). 등급당 ×3 은 v15 그대로.
 const SELL=[0,10,30,90,270,810];const sellPrice=u=>(SELL[u.grade]||0)*(u.lv||1);
-// 참전 친구는 벽을 넘으라고 부르는 영웅이다 — 신화 등급 몸집에 공격 4배·공속 2배·사거리 3칸.
-function allyUnit(f){const a=unitBase(f.el,0,5),b=unitBase(f.el,2,5);const hp=Math.round((a.hp+b.hp)/2);return {id:UID++,el:f.el,role:3,grade:5,star:false,lv:1,hp,max:hp,atk:Math.round(a.atk*4),rate:2,range:3,friend:true,ilju:f.ilju,code:f.code||''};}
+// 참전 친구는 벽을 넘으라고 부르는 영웅이다 — 신화 등급 몸집에 공속 2배·사거리 3칸.
+// **v20.19 — 공격 4배를 1배로 내렸다.** 4배는 초당 5184(공격 2592 × 2연타)로, 30웨 잡몹(체력 1807)을
+// **초당 셋**씩 지웠다: 벗 하나가 우리 판 여덟 기 몫이라 부르는 순간 판이 끝났다(세 사주 20/20 이
+// 30웨 돌파 · 보스 30웨 100%). 재 보니 기운도 벽 오행도 아니고 이 몸 하나였다 — 허수아비로 바꾸면
+// 벗 효과가 +7~12웨에서 +1~2웨로 내려앉는다. 이제 벗은 **신화 한 기의 두 배**(공속 2배)에 사거리 3,
+// 게다가 내 25칸을 안 먹는 공짜 자리다 — 여전히 벌판에서 제일 센 몸 하나지만 부대는 아니다.
+// 이 값이 4 인 동안에는 아래 「쓰러지면 그 판에서 끝」이 **죽은 규칙**이었다(1800 웨이브 동안 0번 쓰러짐).
+function allyUnit(f){const a=unitBase(f.el,0,5),b=unitBase(f.el,2,5);const hp=Math.round((a.hp+b.hp)/2);return {id:UID++,el:f.el,role:3,grade:5,star:false,lv:1,hp,max:hp,atk:Math.round(a.atk*1),rate:2,range:3,friend:true,ilju:f.ilju,code:f.code||''};}
 // 친구 기운: 친구 오행이 내 일간(me)과 맺는 십성 관계로 정해진다. 사주가 없으면(me<0) 응원 +3%.
 function friendBuff(fel,me){const b={k:'응원',t:'공격력 +3%',power:0,luck:0,clash:0,gold:0,boss:0};
   if(!(me>=0)){b.power=0.03;return b;}
@@ -2343,7 +2349,12 @@ function clashInit(run){
   // 대기열(run.bench)은 싣지 않는다 — 대기열 유닛은 싸우지 않는다(설계서 §2.4).
   for(let i=0;i<CELLS;i++){const u=run.units[i];if(!u)continue;const c=colOf(i);const [x,y]=ourCellXY(i);
     let hpm=1+mods.hpAll+(u.role===0?mods.vanguardHp:0)+(bonus[i].hp?bonus[i].hp+mods.wallHp:0);
-    const o=Object.assign({},u,{side:0,cell:i,x,y,homeX:x,homeY:y,id:UID++,cd:0,alive:true,deadAt:null,max:Math.round(u.max*hpm),hp:Math.round(u.max*hpm),bonus:bonus[i],
+    // **v20.19 — 참전 벗만 웨이브를 넘어 상처를 안고 간다.** 우리 용병은 웨이브마다 성해서 선다(nextWave 가
+    // 낫게 한다). 벗은 안 낫는다: 한 판 동안 6480 체력을 나눠 쓰는 손님이라, 뒤로 갈수록 닳다가 쓰러지면
+    // 그 판에서 끝이다(run.allyDown). 이것이 없으면 「쓰러지면 끝」은 죽은 규칙이다 — 재 보니 벗은
+    // 1800 웨이브 동안 **한 번도** 안 쓰러졌다(30웨 잡몹 1807 체력에 벗은 6480/2592×2연타).
+    const start=u.friend?Math.max(1,Math.min(u.hp||u.max,u.max)):u.max;
+    const o=Object.assign({},u,{side:0,cell:i,x,y,homeX:x,homeY:y,id:UID++,cd:0,alive:true,deadAt:null,max:Math.round(u.max*hpm),hp:Math.round(start*hpm),bonus:bonus[i],
       atk:u.merged?Math.round(u.atk*(1+(mods.mergedAtk||0))):u.atk,shield:Math.round(u.max*mods.shieldStart),critBonus:(u.role===1&&c===0)?0.15:0,
       // 참전 벗(role 3)은 ROLE_BASE 에 없는 전용 역할이다 — 옛 battleTick 이 전위(role 0)와 한 갈래로
       // 묶어 다뤘던 대로 이동 속도는 전위 기준으로 대신한다.
@@ -2714,7 +2725,7 @@ function newRun(o){const seed=o.seed==null?Math.floor(Math.random()*1e9):o.seed;
   const heroPos=(o.meta&&o.meta.heroPos!=null&&o.meta.heroPos>=0&&o.meta.heroPos<CELLS)?o.meta.heroPos:HERO_HOME;
   units[heroPos]=heroUnit(o.saju,o.meta,cap);
   const run={mode:o.mode||'free',seed,rng,wave:1,phase:'prep',coins:Math.round((60+(d.startGold||0)+(g.gold||0))),lives:5+(g.lives||0)+(pk.lives||0),luck:(d.luckStart||0)+(g.luck||0),luckStep:3+(d.luckExtra||0)+((o.friends&&o.friends.luck)||0),
-    retry:0,spinN:0,lastSpin:null,cardOffer:null,units,bench:[],armyIn:0,cards:[],freeSpins:freeSpinsOf(o),freeBase:freeSpinsOf(o),freeUsed:0,guar:!!d.guar,wallEl:0,purity:0.6,nextWallEl:0,nextPurity:0.6,tenCards:[],tenSlots:1,ally:null,allyCode:null,
+    retry:0,allyDown:false,spinN:0,lastSpin:null,cardOffer:null,units,bench:[],armyIn:0,cards:[],freeSpins:freeSpinsOf(o),freeBase:freeSpinsOf(o),freeUsed:0,guar:!!d.guar,wallEl:0,purity:0.6,nextWallEl:0,nextPurity:0.6,tenCards:[],tenSlots:1,ally:null,allyCode:null,
     kills:0,fusions:0,bossKills:0,clashes:0,mythic:0,ults:0,luckyPct:0.15+(d.fuseExtra||0),pairPct:0,costStep:SPIN_STEP,costMult:d.costMult||1,clearMult:(d.goldMult||1)*(d.waveMult||1)+((o.friends&&o.friends.gold)||0),sellMult:1,skillCd:pk.skillCd||1,revive:0,mirror:0,twin:0,echo:0,rootHeal:0,almanac:false,
     flipTotal:0,heroFlip:false,cardsTaken:0,maxGrade:0,cycleSeen:false,allyWin:false,won:false,
     opts:o,cnt,history:[],items:[]};
@@ -2787,10 +2798,16 @@ function equipTen(run,idx){if(run.phase!=='prep')return false;const g=run.opts.t
 // 벗이 바뀌면 벽 오행이 바뀐다(wallElement 가 run.ally 를 본다) — 준비 단계에서만 가능하니 여기서
 // run.wallEl/nextWallEl 을 다시 굳혀 미리보기·HUD·실제 부대를 한 값으로 묶는다(C1).
 function freezeWall(run){run.wallEl=wallElement(run,run.wave);run.nextWallEl=wallElement(run,run.wave+1);return run;}
-function pickAlly(run,code){if(run.phase!=='prep')return false;if(!code){run.ally=null;run.allyCode=null;runMods(run);freezeWall(run);return true;}const f=(run.opts.friendList||[]).find(x=>x.code===code);if(!f)return false;run.ally=allyUnit(f);run.allyCode=code;runMods(run);freezeWall(run);return true;}
+function pickAlly(run,code){if(run.phase!=='prep')return false;if(code&&run.allyDown)return false;   // 쓰러진 벗은 이 판에 다시 안 온다
+  if(!code){run.ally=null;run.allyCode=null;runMods(run);freezeWall(run);return true;}const f=(run.opts.friendList||[]).find(x=>x.code===code);if(!f)return false;run.ally=allyUnit(f);run.allyCode=code;runMods(run);freezeWall(run);return true;}
 // 벗을 부른 채로 마당이 꽉 차 있으면 벗이 조용히 사라지는 대신 돌격을 막는다 — 자리를 비우라고 알려 줘야 한다.
+// **v20.19 — 쓰러진 벗은 그 판에서 다시 안 온다(run.allyDown).** 그 전에는 참전한 벗이 **공짜 26번째
+// 자리**로 1웨부터 30웨까지 서고 웨이브마다 되살아났다: 벗을 한 명이라도 부르면 세 사주 20/20 이
+// 30웨를 전부 돌파하고 보스 30웨 승률이 100% 였다(벗 없이는 21~25웨). 재 보니 기운(버프)도 벽 오행도
+// 아니고 **벗의 몸 자체**가 다 했다 — 허수아비로 바꿔 재니 벗 효과가 +7~12웨에서 +1~2웨로 내려앉았다.
+// 이제 벗은 여전히 세지만 **지켜야 할 손님**이다. 쓰러지면 그 판 동안 다시 못 부른다.
 function startClash(run){if(run.phase!=='prep')return null;const units=run.units.slice();
-  if(run.ally){const c=emptyCell({units},run.ally.role);if(c==null){run.lastError='allyFull';return null;}units[c]=run.ally;}
+  if(run.ally&&!run.allyDown){const c=emptyCell({units},run.ally.role);if(c==null){run.lastError='allyFull';return null;}units[c]=run.ally;}
   run.lastError=null;run.phase='battle';const mods=Object.assign({},runMods(run),{elBonus:run.mods.elBonus.slice()});
   const si=run.items.indexOf('shield');if(si>=0){mods.shieldStart+=0.5;run.items.splice(si,1);}
   const ci=run.items.indexOf('crit');if(ci>=0){mods.crit+=0.2;run.items.splice(ci,1);}
@@ -2809,6 +2826,11 @@ function capLives(run){const over=run.lives-LIVES_MAX;
 // 전투 중 화개가 더 얹었을 수 있다(B.hwagaeLives). v15.1: 화개 몫은 이 웨이브 한정이라 base 에서 반납하고, 패배면 그 몫이
 // 손실을 먼저 막는다(HWAGAE_CARRY 면 v15.0 처럼 base 에 남긴다). base 는 이 웨이브가 끝난 뒤의 목숨이다.
 function finishWave(run,B){if(run.phase==='result')return null;run.phase='result';run.kills+=B.kills||0;run.clashes+=B.clashes||0;
+  // 벗이 벌판에서 쓰러졌으면 그 판 동안 다시 안 온다. 살아남았으면 **다친 채로** 다음 웨이브에 선다 —
+  // 벗은 우리 용병과 달리 웨이브 사이에 안 낫는다(clashInit 의 start · nextWave 는 run.units 만 낫게 한다).
+  if(run.ally&&!run.allyDown){const fu=(B.units||[]).find(u=>u&&u.friend);
+    if(fu&&!fu.alive)run.allyDown=true;
+    else if(fu)run.ally.hp=Math.max(1,Math.round(run.ally.max*Math.min(1,fu.hp/(fu.max||1))));}
   const w=run.wave,boss=BOSS_WAVES.includes(w),won=B.result==='win';
   const pool=HWAGAE_CARRY?0:(B.hwagaeLives||0);
   const base=(B.lives!=null?B.lives:run.lives)-pool;
@@ -2852,7 +2874,7 @@ function nextWave(run){run.wave++;run.phase='prep';run.retry=0;   // 새 웨이�
   for(const u of run.units)if(u){u.hp=u.max;}for(const u of benchOf(run))if(u){u.hp=u.max;}runMods(run);}
 function wavesCleared(run){return run.won?WAVES:run.wave-1;}
 function scoreOf(run){return wavesCleared(run)*1000+run.lives*10+run.kills;}
-const RUN_KEYS=['mode','seed','wave','retry','phase','coins','lives','tenLivesPaid','luck','luckStep','spinN','lastSpin','cardOffer','units','bench','armyIn','cards','freeSpins','freeBase','freeUsed','guar','wallEl','purity','nextWallEl','nextPurity','tenCards','tenSlots','allyCode','kills','fusions','bossKills','clashes','mythic','ults','luckyPct','pairPct','costStep','costMult','clearMult','sellMult','skillCd','revive','mirror','twin','echo','rootHeal','almanac','cnt','history','items','flipTotal','heroFlip','cardsTaken','maxGrade','cycleSeen','allyWin','won'];
+const RUN_KEYS=['mode','seed','wave','retry','allyDown','phase','coins','lives','tenLivesPaid','luck','luckStep','spinN','lastSpin','cardOffer','units','bench','armyIn','cards','freeSpins','freeBase','freeUsed','guar','wallEl','purity','nextWallEl','nextPurity','tenCards','tenSlots','allyCode','kills','fusions','bossKills','clashes','mythic','ults','luckyPct','pairPct','costStep','costMult','clearMult','sellMult','skillCd','revive','mirror','twin','echo','rootHeal','almanac','cnt','history','items','flipTotal','heroFlip','cardsTaken','maxGrade','cycleSeen','allyWin','won'];
 function serializeRun(run){const o={};for(const k of RUN_KEYS)o[k]=run[k];o.rngN=run.rng.n;return o;}
 // restoreRun: v17 이전 저장(spinN 없음 · tiles/freeFlips/flipN · 유닛 n · perm.lv=META 레벨)은 스핀 필드를 newRun 기본값으로 두고
 // 모든 유닛을 lv 1 로 복원한다(n 삭제 · perm 의 옛 lv 는 mlv 로). 옛 유닛의 hp/atk 는 이미 lv 1 값이라 다시 계산하지 않는다.
@@ -9513,12 +9535,19 @@ function assaultUI(){if(!S)return;const A=ASSAULT;
     const ten=S.opts.ten;$('tenRow').innerHTML=A.TEN10.map((n,i)=>{const g=ten.grade[i];return `<button class="${S.tenCards.includes(i)?'on':''} ${g?'':'none'}" data-i="${i}" title="${A.TEN_DESC[i]}">${n}<small> ${['','하','중','상'][g]}</small></button>`;}).join('');
     $('tenRow').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(A.equipTen(S,+b.dataset.i)){AU.buy&&AU.buy();assaultUI();drawAssault();assaultSave();}});
     tenSkin();
-    const fl=S.opts.friendList;$('allyRow').innerHTML=(fl.length?fl.map(f=>`<button class="${S.allyCode===f.code?'on':''}" data-c="${f.code}">${f.ilju} ${A.EL_K[f.el]}</button>`).join(''):'<button class="ghost sm" id="allyNone">사랑방에서 친구 들이기</button>');
+    // v20.19: 벗은 웨이브 사이에 안 낫는다 — 남은 체력을 단추에 적고, 쓰러졌으면 이 판에서는 못 부른다.
+    const fl=S.opts.friendList, aHp=S.ally?Math.max(1,Math.round(100*Math.min(1,(S.ally.hp||S.ally.max)/(S.ally.max||1)))):100;
+    $('allyRow').innerHTML=(fl.length?fl.map(f=>{
+      const on=S.allyCode===f.code, down=!!S.allyDown&&on;
+      const tail=down?' <small>쓰러짐</small>':(on&&aHp<100?` <small>${aHp}%</small>`:'');
+      return `<button class="${on?'on':''} ${down?'none':''}" data-c="${f.code}"${down?' disabled':''}>${f.ilju} ${A.EL_K[f.el]}${tail}</button>`;
+    }).join(''):'<button class="ghost sm" id="allyNone">사랑방에서 친구 들이기</button>')
+      +(S.allyDown?'<small class="note" style="display:block;width:100%;margin-top:2px">벗이 쓰러졌다 — 이 판에서는 다시 오지 않는다.</small>':'');
     $('allyRow').querySelectorAll('button[data-c]').forEach(b=>b.onclick=()=>{A.pickAlly(S,S.allyCode===b.dataset.c?null:b.dataset.c);AU.buy&&AU.buy();assaultUI();drawAssault();assaultSave();});
     const an=$('allyNone');if(an)an.onclick=goSocial;
     const {bonus,chains}=A.computeChains(S.units,S.mods);if(chains.some(c=>c.type==='cycle'))S.cycleSeen=true;
     // 벗을 불러 놓고 마당이 꽉 차 있으면 벗이 설 자리가 없다 — 돌격 단추가 먼저 알려 준다.
-    $('hudPower').textContent=(S.ally&&A.emptyCell(S)==null)?'참전 자리 없음':`상성 전투력 ${A.combatPower(S.units,bonus,S.wallEl)}`;
+    $('hudPower').textContent=(S.ally&&!S.allyDown&&A.emptyCell(S)==null)?'참전 자리 없음':`상성 전투력 ${A.combatPower(S.units,bonus,S.wallEl)}`;
     const ec=ESEL>=0?(wavePeek()||{cells:[]}).cells.find(c=>c.j===ESEL):null;
     if(ec){$('unitInfo').hidden=false;
       $('unitInfo').innerHTML=`<span>적 ${A.EL_K[ec.el]} ${ec.boss?'보스 '+ec.name:A.ROLE_K[ec.role]} · ${A.GRADE_K[ec.grade]} · 체력 ${ec.hp} 공격 ${ec.atk}</span>`;}
@@ -10243,7 +10272,12 @@ assaultCv.addEventListener('pointerup',ev=>{if(!S||!ADRAG)return;const p=cellAt(
 // 코어가 B.result 로 거절한다(castSkill 도 가드). assaultSave 는 phase==='prep' 에서만 쓰므로 잔상 중 저장은 안 찍힌다 —
 // 탭을 숨기거나 닫을 때(visibilitychange/pagehide)는 winResolve 로 잔상을 즉시 마무리해 결산·다음 판 준비까지 간 뒤 저장한다.
 const WIN_HOLD_MOB=0.45;
-function winResolve(){if(!AWIN||!B)return;AWIN=null;retreatMark(B);const res=ASSAULT.finishWave(S,B);B=null;AACC=0;endStage(res);}
+// v20.19: 벗이 쓰러졌는지는 finishWave 가 정한다 — 부르기 전후를 견줘 그 자리에서 알린다.
+function finishAndEnd(){const was=!!(S&&S.allyDown);retreatMark(B);const res=ASSAULT.finishWave(S,B);
+  const fell=!was&&!!(S&&S.allyDown);B=null;AACC=0;
+  if(fell){const nm=(S.ally&&S.ally.ilju)||'벗';toast(`${nm}이 쓰러졌다 · 이 판에서는 다시 오지 않는다`,2200);log(`참전 ${nm} 전사 — 이 판에서는 다시 부를 수 없다`,'hi');buzz([24,50,24]);}
+  endStage(res);}
+function winResolve(){if(!AWIN||!B)return;AWIN=null;finishAndEnd();}
 // ── 히트스톱(v19.6) ────────────────────────────────────────────────────────
 // 센 한 방·처치에 **아주 짧게** 시간이 멎는다. 격투 게임이 쓰는 손인데, 여기서는 「무겁다」를 만드는 거의
 // 유일한 공짜 수단이다 — 코어 규칙이 아니라 **틱을 먹이는 박자**만 늦춘다(시뮬 시간 기준 밸런스 불변:
@@ -10358,7 +10392,7 @@ function assaultLoop(ts){const prev=ALAST;const dt=(ts-ALAST)/1000;ALAST=ts;cons
         // 셋을 한꺼번에 건다: ① 더 긴 히트스톱(보스면 더) ② 화면 섬광 한 번 ③ 잔진동.
         // 전부 연출이라 규칙·밸런스와 무관하다(코어는 이미 result 를 찍었다).
         finishFlash(boss);hitStop(boss?0.16:0.11);fxShake(boss?9:6,boss?0.42:0.26);}
-      else{retreatMark(B);const res=ASSAULT.finishWave(S,B);B=null;AACC=0;endStage(res);}}}
+      else{finishAndEnd();}}}
   else {AACC=0;if(on&&(!B||!S||S.phase!=='battle'))hudBattle();}
   // 입자는 자세·반동 창과 같은 시계(시뮬 시간)로 산다 — 2배속에서 전투만 빨라지고 연출이 뒤처지면
   // 피해 숫자가 다음 타격 뒤에 뜬다. ASPD 를 곱해 둘을 같은 속도로 맞춘다.
