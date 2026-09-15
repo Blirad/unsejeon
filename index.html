@@ -1584,7 +1584,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.15</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.16</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -2179,7 +2179,19 @@ const enemyCellXY=j=>[ENEMY_X0+(j%N)*ENEMY_DX, Math.floor(j/N)+0.5];
 // 등급(GRADE_DEN 20)이나 E_SLOPE 로 더하면 smart 가 먼저 내려앉아 이득이 사라진다 — 두께가 아니라 **수**가 문제다.
 const E_SLOPE=0.0;          // E(w)=1+E_SLOPE·w — 잡몹·보스 체력/공격의 웨이브 배율(등급 배율 위에 곱해진다 · 지금은 0 · C3 도 0.01 만 얹어도 smart −4)
 // v18 룰링 7: 적 수 = min(16, 3 + floor(0.45·w)) — 1웨이브 3기 → 30웨이브 16기(판과 같은 칸 수). 두께는 등급·레벨로.
-const N_SLOPE=0.36;         // n=min(ENEMY_MAX=25, 3+floor(N_SLOPE·w)) — 웨이브 적 기수
+// **v20.16 — 판의 앞쪽에 처음으로 긴장을 넣는다.** 승률을 웨이브별로 재 보니 **1~16웨가 전부 100%** 였다
+// (17웨 48% · 20웨 15% 로 절벽). 열여섯 웨이브 동안 질 수가 없으니 배치·합성·연환 **결정에 대가가 없고**,
+// 판은 17웨부터 시작해 20웨 보스에서 끝났다.
+// 까닭은 두께가 아니라 **수**였다 — 옛 식(3+0.36w)은 1웨 3기 · 10웨 6기인데 우리 판은 10웨에 11칸이라
+// 두세 배로 밀어붙였다. 두께를 올리는 손잡이(등급 배율)는 지수라 전반은 그대로 두고 후반만 더 세진다(실측했다).
+// 그래서 **바닥을 올리고 기울기를 낮춘다**: 1웨 3→6기 · 5웨 4→7 · 10웨 6→8 · 20웨 10(그대로) · 30웨 13(그대로).
+// 앞쪽만 조이고 뒤쪽 기수는 안 건드리는 모양이다.
+// 실측(씨앗 40×3사주 · smart): 3웨 100→98% · 5웨 100→97% · 10웨 95→90% · 13웨 97→82% · 16웨 98→91%.
+// 밴드 smart 21.4→20.7 · naive 18.8→17.8 · no-merge 18.8→18.3, **smart−naive 격차는 2.59→2.89 로 벌어졌다**
+// (수가 많아질수록 배치·합성이 더 값어치를 한다 — 조이는 것이 실력의 폭을 넓힌다).
+// 1·2웨는 그대로 100% 다 — 첫 판에서 지는 것은 배움이 아니라 사고다.
+const N_BASE=6;             // 1웨이브 적 기수(옛 3)
+const N_SLOPE=0.24;         // 웨이브마다 더해지는 기수(옛 0.36)         // n=min(ENEMY_MAX=25, 3+floor(N_SLOPE·w)) — 웨이브 적 기수
 // **v19: 0.45 → 0.60**(판이 25칸으로 커져 우리 화력이 늘었다) **→ v19.1: 0.40**.
 // v19.1 에서 적이 빈 행을 그냥 안 지나가게 되자(전부 남아서 싸운다) 난도가 통째로 올랐다 —
 // 그전에는 빈 행의 적이 목숨 하나만 깎고 **싸우지 않고 사라졌다**. naive 18.7 → 15.6 이라 0.40 으로 내렸다:
@@ -2228,7 +2240,11 @@ function waveRng(run,w){const wv=(w==null?run.wave:w)|0;return seededRng(((run.s
 // v17: 스택이 없으므로 적은 칸당 1기, 상한 25기(ENEMY_MAX). 두께는 **레벨**로 — waveLv(w)=1+floor(w/5) 를 적 lv 로 넣어
 // §2 공식(lvMul)으로 스탯을 키운다. 손잡이(N_SLOPE·GRADE_DEN·E_SLOPE·보스 배율)는 C2 가 봇으로 다시 잡는다.
 const ENEMY_MAX=CELLS;   // 16(v18 · 판과 같은 칸 수)
-function waveCount(w){return Math.min(ENEMY_MAX,3+Math.floor(N_SLOPE*w));}
+// 1·2웨이브만 바닥보다 얕게 준다(4·5기) — 손에 익히는 자리다. 바닥(6)을 그대로 주면 naive 120판 가운데
+// 두 판이 **3웨 안에 쓸려 나갔다**(목숨 다섯을 첫 두 웨이브에 다 쓴다). 「목숨만 깎이고 판은 안 끝난다」가
+// 이 게임의 약속이라, 그 약속이 깨지는 자리만 막는다. 3웨이브부터는 바닥 그대로다.
+function waveCount(w){const n=N_BASE+Math.floor(N_SLOPE*w);
+  return Math.min(ENEMY_MAX,w<=2?Math.min(n,3+w):n);}
 // waveLv(w): 적 레벨 계단(C2 · balance §9). C1 은 w/5(10웨이브 lv3 ×1.6)였고, 8 이면 계단이 드물어 한 칸이 ×1.3 이라도 8웨이브에
 // 죽는 씨앗이 늘었다. C2 는 6(6·12·18·24·30 에 한 칸). C3(§9.7): 한 칸이 ×1.8(hp·atk)·공속 +8%·사거리 +.1 로 커져 계단을 **11** 로 늦췄다 —
 // 11·22 에 한 칸(10웨이브 보스는 lv 1 · 20웨이브 보스는 lv 2 · 30웨이브 lv 3 ×2.6). 6·8 은 10웨이브 보스가 lv 2 라 naive·smart 모두 10 에 죽고(통과 25~65%),
@@ -2844,7 +2860,7 @@ function restoreRun(o,opts){const run=newRun(Object.assign({},opts,{seed:o.seed}
 return {VERSION,EL_K,GEN,OVER,ROLE_K,GRADE_K,STEM_EL,BRANCH_MAIN,TEN10,TEN_DESC,tenStars,tenEffect,ITEMS,pickW,
   SPIN_SYM,SPIN_BASE,SPIN_STEP,SPIN_DECAY,KIND_W,ROLE_W,GRADE_W,SPIN_TIER,COIN_AMT,spin,spinCost,elWeights,gradeWeights,fillReels,chooseCard,joinTargets,
   N,COLS,ROWS,CELLS,idx,colOf,rowOf,CHAIN_LINES,FRONT_COL,BACK_COL,ROWS_OUT,CYC_STACK,CYC_ATK,CYC_HP,GRAND_ATK,GRAND_SPD,SHENG_CAP,RAIN_N,CELL_PREF,ROLE_BASE,unitBase,makeUnit,LV_MAX,LV_PROMOTE,PROMOTE_MAX,LV_K,LV_RATE,LV_RANGE,lvMul,lvRate,lvRange,restat,elMult,computeChains,
-  armyWeights,EL_POW,EL_FLOOR,strongest,neededElement,combatPower,stageWarning,addUnit,mergeUnit,canJoin,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
+  armyWeights,EL_POW,EL_FLOOR,N_BASE,strongest,neededElement,combatPower,stageWarning,addUnit,mergeUnit,canJoin,sellPrice,allyUnit,friendBuff,allyBuffOf,FRIEND_CAP,
   BENCH_MAX,benchPush,benchToCell,cellToBench,MYTH_RECIPES,MYTH_NEED_GRADE,mythReady,summonMyth,
   defaultMods,BOSS_NAMES,damageOf,clashInit,clashTick,hurt,nearestFoe,alliesNear,
   ENEMY_X0,ENEMY_DX,LEAK_X,RANK_GAP,CHARGE_X,PUSH_BACK,ENGAGE_GAP,WINDUP,HIT_TOL,CLASH_MAX,WAVES,BOSS_WAVES,E_SLOPE,N_SLOPE,GRADE_DEN,GRADE_MUL,MYTH_MUL,BOSS_HP_MUL,BOSS_ATK_MUL,BOSS_DMG_RED,ENEMY_MAX,waveCount,waveLv,enemyCells,ourCellXY,enemyCellXY,waveSquad,wavePreview,waveMobHp,waveGradeMul,wallElement,wallElOf,waveRng,wavePurity,
