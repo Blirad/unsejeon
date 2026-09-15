@@ -1584,7 +1584,7 @@ window.SPRIMG=SPRIMG;
           <div class="r" id="assetList" style="margin-top:6px"></div>
           <div class="note" style="margin-top:6px">영웅 시트: 프레임 8장(대기 4 · 공격 3 · 피격 1), 발이 아래쪽 중앙. 신살 시트: 프레임 6~12장, 백호·역마는 옆모습(왼쪽→오른쪽으로 달림), 귀인은 정면.</div>
             </details>
-            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.14</span> · 사주로 겨루는 오행 돌격전</div>
+            <div class="note" style="text-align:center;padding:10px 0 20px">운세전 <span id="verTag">v20.15</span> · 사주로 겨루는 오행 돌격전</div>
           </section>
         </div>
         <nav class="tabbar">
@@ -8689,6 +8689,21 @@ const CHAIN_C={grand:'#FF9A2E',cycle:'#FFC83D',sheng:'#E8B830',peer:'#3FA66B',wa
 const CHAIN_LABEL=(type,n)=>type==='grand'?'대연환':type==='cycle'?'오행':'×'+n;
 const CHAIN_TINT_A=0.25;
 const CHAIN_PILL_H=12, CHAIN_PILL_F=9, CHAIN_PILL_A=0.5;   // v18 R6 — 알약 높이·글자·받침 알파(옛 14/10/0.78)
+// **v20.15 — 대연환 귀띔.** 오행연환(한 줄에 오행 다섯)이 서면 그 줄은 「순서만 맞추면」 대연환이 된다.
+// 규칙은 v20.6 에 적었지만 **판 위에서는 어느 줄이 한 수 남았는지 알 길이 없었다** — 대연환은 이름·색·외곽선을
+// 다 갖춰 두고도 아무도 노리지 않는 값이었다. 두 칸만 맞바꾸면 상생 순환이 되는 줄을 찾아 그 두 칸에 「↔」를 놓는다.
+// (열 쌍이 열 개뿐이라 값이 싸다. 코어는 안 건드린다 — 보여 주기만 한다.)
+function grandSwap(cells,units){
+  const A=ASSAULT, els=cells.map(c=>units&&units[c]?units[c].el:-1);
+  if(els.length!==A.COLS||els.some(e=>e==null||e<0||e>4))return null;
+  const ok=a=>a.every((e,k)=>k===0||A.GEN(a[k-1])===e)||a.every((e,k)=>k===0||A.GEN(e)===a[k-1]);
+  if(ok(els))return null;                                   // 이미 대연환이다
+  for(let i=0;i<els.length;i++)for(let j=i+1;j<els.length;j++){
+    const a=els.slice(), t=a[i];a[i]=a[j];a[j]=t;
+    if(ok(a))return [cells[i],cells[j]];
+  }
+  return null;                                              // 한 번 바꿔서는 안 된다 — 귀띔 안 한다
+}
 function chainMarks(CH,L,units){const out=[];if(!CH||!Array.isArray(CH.chains))return out;
   ctx.save();ctx.font=`700 ${CHAIN_PILL_F}px 'Noto Sans KR'`;
   const placed=[];
@@ -8700,7 +8715,9 @@ function chainMarks(CH,L,units){const out=[];if(!CH||!Array.isArray(CH.chains))r
     // v16 컨트롤러 룰링: 라벨은 「×N」 알약 하나(이름은 정보 판에서) — 열마다 사슬이 서도 이웃끼리 안 겹치게 칸 왼쪽 위 모서리에 붙인다.
     // v18 R6 — 등급 고리가 사라져 칸 왼쪽 위가 비었다. 자리는 그대로 두되(사슬을 짚는 곳이라 옮길 곳이 없다)
     // 무게만 덜었다: 알약이 CHAIN_PILL_H·CHAIN_PILL_F 로 작아지고 받침이 옅어져(CHAIN_PILL_A) HP 바·등급 점과 안 다툰다.
-    const label=CHAIN_LABEL(c.type,cells.length), tw=ctx.measureText(label).width, w=tw+8, h=CHAIN_PILL_H;
+    // v20.15 — 한 수 남은 줄(cycle)이면 알약에 「↔」가 붙는다. **폭을 먼저 재야** 자리 잡기(가장자리 클램프)가 맞는다.
+    const sw=c.type==='cycle'?grandSwap(cells,units):null;
+    const label=CHAIN_LABEL(c.type,cells.length)+(sw?' ↔':''), tw=ctx.measureText(label).width, w=tw+8, h=CHAIN_PILL_H;
     // v19.3 — 오행연환·대연환(줄 사슬)은 **줄 바깥**에 이름을 붙인다: 세로줄은 줄 위, 가로줄은 줄 왼쪽 끝.
     // 다 왼쪽 위 모서리에 붙이면 다섯 줄이 한자리에 겹쳐 서로를 가린다(칸 사슬 ×N 은 옛 자리 그대로).
     if(c.type==='cycle'||c.type==='grand'){
@@ -8710,7 +8727,7 @@ function chainMarks(CH,L,units){const out=[];if(!CH||!Array.isArray(CH.chains))r
       const ly=vert?y0+h+3:(y0+y1)/2+h/2;
       let yy=ly;while(placed.some(q=>Math.abs(q.x-lx)<(q.w+w)/2&&Math.abs(q.y-yy)<h+1))yy+=h+2;
       placed.push({x:lx,y:yy,w});
-      out.push({type:c.type,cells:cells.slice(),key:c.type+':'+cells.join(','),tint,label,col:CHAIN_C[c.type]||'#FFC83D',x:lx,y:yy,w,h});
+      out.push({type:c.type,cells:cells.slice(),key:c.type+':'+cells.join(','),tint,label,col:CHAIN_C[c.type]||'#FFC83D',x:lx,y:yy,w,h,swap:sw});
       continue;}
     const x=Math.max(w/2+2,Math.min(L.cw-w/2-2,x0+w/2+3)), rows=Math.max(1,Math.round((y1-y0)/Math.max(1,L.rh)));
     let y=y0+h+2, xx=x, ok=false;
@@ -8719,6 +8736,35 @@ function chainMarks(CH,L,units){const out=[];if(!CH||!Array.isArray(CH.chains))r
     const px_=xx;placed.push({x:px_,y,w});
     out.push({type:c.type,cells:cells.slice(),key:c.type+':'+cells.join(','),tint,label,col:CHAIN_C[c.type]||'#FFC83D',x:px_,y,w,h});}
   ctx.restore();return out;}
+// 맞바꿀 두 칸의 자리 — 선은 칸 한가운데를 잇고, 「↔」 알은 칸 **오른쪽 위 모서리**에 앉는다(얼굴을 안 덮는다).
+function swapPts(m){
+  const P=m.swap.map(c=>{const t=m.tint.find(q=>q.cell===c);if(!t)return null;const q=t.pts;
+    return [(q[0][0]+q[1][0])/2,(q[0][1]+q[2][1])/2];}).filter(Boolean);
+  return P.length===2?P:null;}
+function swapBadges(m){
+  return m.swap.map(c=>{const t=m.tint.find(q=>q.cell===c);if(!t)return null;const q=t.pts;
+    return [q[1][0]-11,q[1][1]+11];}).filter(Boolean);}
+// 「↔」 알은 **몸을 다 그린 뒤**에 얹는다 — 칸 그림 밑에 깔면 정령에 가려 안 보인다(처음에 그랬다).
+// **v20.15 — 이름표는 몸 **위**에 그린다.** 가로줄 이름표는 줄 왼쪽 끝(첫 칸 안)에 붙는데,
+// 칸 그림보다 먼저 그리면 그 칸의 정령이 이름표를 덮어 「대연…」처럼 잘려 보였다(v19.3 이 자리를 잡아 준 뜻이 죽는다).
+function drawChainLabels(marks,a){
+  if(!marks||!marks.length)return;a=a==null?1:Math.max(0,Math.min(1,a));if(a<=0)return;
+  ctx.save();
+  ctx.globalAlpha=a;ctx.font=`700 ${CHAIN_PILL_F}px 'Noto Sans KR'`;ctx.textAlign='center';ctx.textBaseline='middle';
+  for(const m of marks){ctx.fillStyle=`rgba(38,22,10,${m.type==='grand'||m.type==='cycle'?0.82:CHAIN_PILL_A})`;
+    rr(m.x-m.w/2,m.y-m.h,m.w,m.h,5);ctx.fill();
+    ctx.fillStyle=mixHex(m.swap?CHAIN_C.grand:m.col,'#FFFFFF',0.35);ctx.fillText(m.label,m.x,m.y-m.h/2+0.5);}
+  ctx.restore();}
+function drawChainSwap(marks,a){
+  if(!marks||!marks.length)return;a=a==null?1:Math.max(0,Math.min(1,a));if(a<=0)return;
+  ctx.save();
+  for(const m of marks){if(!m.swap)continue;
+    for(const [px,py] of swapBadges(m)){
+      ctx.globalAlpha=a;ctx.fillStyle='rgba(38,22,10,.86)';ctx.beginPath();ctx.arc(px,py,9,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle=CHAIN_C.grand;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(px,py,9,0,Math.PI*2);ctx.stroke();
+      ctx.fillStyle=CHAIN_C.grand;ctx.font="700 11px 'Noto Sans KR'";ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('↔',px,py+0.5);}}
+  ctx.restore();}
 // a: 0~1 — 대오 복귀 중에는 함께 떠오른다(안 주면 1). 안에서 알파를 직접 적는 자리마다 곱한다.
 function drawChainMarks(marks,a){if(!marks||!marks.length)return;a=a==null?1:Math.max(0,Math.min(1,a));if(a<=0)return;ctx.save();
   const done=new Set();
@@ -8733,10 +8779,12 @@ function drawChainMarks(marks,a){if(!marks||!marks.length)return;a=a==null?1:Mat
     for(const t of m.tint)for(const q of t.pts){X0=Math.min(X0,q[0]);X1=Math.max(X1,q[0]);Y0=Math.min(Y0,q[1]);Y1=Math.max(Y1,q[1]);}
     rr(X0+1.5,Y0+1.5,X1-X0-3,Y1-Y0-3,8);ctx.stroke();
     ctx.setLineDash([]);}
-  ctx.globalAlpha=a;ctx.font=`700 ${CHAIN_PILL_F}px 'Noto Sans KR'`;ctx.textAlign='center';ctx.textBaseline='middle';
-  for(const m of marks){ctx.fillStyle=`rgba(38,22,10,${m.type==='grand'||m.type==='cycle'?0.82:CHAIN_PILL_A})`;
-    rr(m.x-m.w/2,m.y-m.h,m.w,m.h,5);ctx.fill();
-    ctx.fillStyle=mixHex(m.col,'#FFFFFF',0.35);ctx.fillText(m.label,m.x,m.y-m.h/2+0.5);}
+  // v20.15 — 한 수 남은 줄: 맞바꿀 두 칸을 점선으로 잇는다(선은 판 자국이라 **몸 밑**에 깐다).
+  for(const m of marks){if(!m.swap)continue;
+    const P=swapPts(m);if(!P)continue;
+    ctx.globalAlpha=a*0.85;ctx.strokeStyle=CHAIN_C.grand;ctx.lineWidth=2;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(P[0][0],P[0][1]);ctx.lineTo(P[1][0],P[1][1]);ctx.stroke();ctx.setLineDash([]);
+  }
   ctx.restore();}
 // 끌고 있는 동안 놓일 칸: 같은 오행·역할·등급(코어 canJoin)이면 초록(merge · 포개기), 그 밖의 점유 칸은 호박색 점선(교환), 빈 칸은 표시 없음.
 // canJoin 은 승급이 남았으면(등급 < PROMOTE_MAX) 늘 받아 주고, 승급이 끝난 전설·신화만 레벨 상한(LV_MAX)으로 막는다.
@@ -9993,7 +10041,8 @@ function drawAssault(){const cv=assaultCv;if(!cv||!cv.clientWidth||!S)return;con
         // 들어 올린 정령: 그림자가 1.55배 넓고 옅어지며(높이 있다는 뜻) 몸은 6px 떠 있다(§6.5)
         SCN.groundShadow(ctx,ADRAG.x,ADRAG.y+6,gk,{r:1.55,a:0.62});
         drawUnitAt(u,{cx:ADRAG.x,cy:ADRAG.y-6-MDY,k:gk},L,MDY,{sx:1,sy:1},{alpha:0.85,shadow:false});}}}
-    // 준비 단계 사건(스핀·합성·연환·놓기·돌격) — 판과 정령 위에 얹는다(§6.5)
+    if(units){const cq2=retreatQ();drawChainLabels(CHMARKS,cq2);drawChainSwap(CHMARKS,cq2);}   // v20.15 — 이름표·「한 수 남았다」 알은 몸 위에
+    // 준비 단계 사건(뽑기·합성·연환·놓기·돌격) — 판과 정령 위에 얹는다(§6.5)
     SCN.drawPrepFx(ctx,L,S.fxq||(S.fxq=[]),tt);
     // 전투: 개체 위치로 그림 — 양쪽이 같은 벌판에 선다(§3). v17 상하 대치(P2 ruling 1): **화면 y 오름차순**
     // = 논리 y(깊이) 내림차순으로 그린다 — 화면 위(적 뒷줄)부터 깔아야 아래(카메라에 가까운 쪽 · 우리 뒷줄)가 위에 겹친다.
